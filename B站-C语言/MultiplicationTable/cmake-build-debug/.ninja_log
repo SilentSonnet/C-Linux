@@ -1,0 +1,11 @@
+# ninja log v6
+11	270	7443464826893244	CMakeFiles/MultiplicationTable.dir/main.c.obj	24fb850b3827cb68
+270	501	7443464829486207	MultiplicationTable.exe	f95fec1f7f89e10f
+9	119	7443465147260778	CMakeFiles/MultiplicationTable.dir/main.c.obj	24fb850b3827cb68
+119	249	7443465148374606	MultiplicationTable.exe	f95fec1f7f89e10f
+7	105	7443465250993960	CMakeFiles/MultiplicationTable.dir/main.c.obj	24fb850b3827cb68
+106	232	7443465251980387	MultiplicationTable.exe	f95fec1f7f89e10f
+2	114	7443500583494837	CMakeFiles/MultiplicationTable.dir/main.c.obj	24fb850b3827cb68
+115	242	7443500584624159	MultiplicationTable.exe	f95fec1f7f89e10f
+11	142	7443533685481702	CMakeFiles/MultiplicationTable.dir/main.c.obj	24fb850b3827cb68
+142	302	7443533686800026	MultiplicationTable.exe	f95fec1f7f89e10f

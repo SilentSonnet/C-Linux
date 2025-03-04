@@ -1,0 +1,3 @@
+C:/Users/LyuTroy/Desktop/HelloWorld/cmake-build-debug/CMakeFiles/HelloWorld.dir
+C:/Users/LyuTroy/Desktop/HelloWorld/cmake-build-debug/CMakeFiles/edit_cache.dir
+C:/Users/LyuTroy/Desktop/HelloWorld/cmake-build-debug/CMakeFiles/rebuild_cache.dir

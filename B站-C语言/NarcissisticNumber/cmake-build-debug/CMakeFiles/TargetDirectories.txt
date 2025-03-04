@@ -1,0 +1,3 @@
+D:/Code/Code/BasedOnClion-Cprogarmming/NarcissisticNumber/cmake-build-debug/CMakeFiles/NarcissisticNumber.dir
+D:/Code/Code/BasedOnClion-Cprogarmming/NarcissisticNumber/cmake-build-debug/CMakeFiles/edit_cache.dir
+D:/Code/Code/BasedOnClion-Cprogarmming/NarcissisticNumber/cmake-build-debug/CMakeFiles/rebuild_cache.dir

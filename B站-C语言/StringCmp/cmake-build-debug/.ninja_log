@@ -1,0 +1,5 @@
+# ninja log v6
+12	63	7456773071947448	CMakeFiles/StringCmp.dir/main.c.obj	bd56104fefa81476
+63	132	7456773072457395	StringCmp.exe	85151b6061b816cb
+29	250	7460771630974354	CMakeFiles/StringCmp.dir/main.c.obj	393ff11dead8b4e6
+251	350	7460771633192867	StringCmp.exe	615909ceb9ac82e8

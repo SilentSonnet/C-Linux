@@ -1,0 +1,25 @@
+# ninja log v6
+1	96	7444466588102591	CMakeFiles/BubbleSort.dir/main.c.obj	9470b71bde91afa3
+97	266	7444466589065158	BubbleSort.exe	705f00e2b37ab90d
+9	117	7444466998919485	CMakeFiles/BubbleSort.dir/main.c.obj	9470b71bde91afa3
+118	270	7444467000006544	BubbleSort.exe	705f00e2b37ab90d
+9	103	7444468410788554	CMakeFiles/BubbleSort.dir/main.c.obj	9470b71bde91afa3
+103	243	7444468411728096	BubbleSort.exe	705f00e2b37ab90d
+9	108	7444468871167218	CMakeFiles/BubbleSort.dir/main.c.obj	9470b71bde91afa3
+108	283	7444468872156015	BubbleSort.exe	705f00e2b37ab90d
+17	138	7444472457594124	CMakeFiles/BubbleSort.dir/main.c.obj	9470b71bde91afa3
+139	332	7444472458807203	BubbleSort.exe	705f00e2b37ab90d
+7	109	7444472832752458	CMakeFiles/BubbleSort.dir/main.c.obj	9470b71bde91afa3
+118	325	7444472833866925	BubbleSort.exe	705f00e2b37ab90d
+9	110	7444473043866093	CMakeFiles/BubbleSort.dir/main.c.obj	9470b71bde91afa3
+111	237	7444473044878929	BubbleSort.exe	705f00e2b37ab90d
+11	95	7444473205223591	CMakeFiles/BubbleSort.dir/main.c.obj	9470b71bde91afa3
+95	234	7444473206067999	BubbleSort.exe	705f00e2b37ab90d
+9	121	7444473426083160	CMakeFiles/BubbleSort.dir/main.c.obj	9470b71bde91afa3
+121	287	7444473427203960	BubbleSort.exe	705f00e2b37ab90d
+18	116	7444473545913176	CMakeFiles/BubbleSort.dir/main.c.obj	9470b71bde91afa3
+117	333	7444473546904593	BubbleSort.exe	705f00e2b37ab90d
+25	147	7444475908623496	CMakeFiles/BubbleSort.dir/main.c.obj	9470b71bde91afa3
+148	301	7444475909850796	BubbleSort.exe	705f00e2b37ab90d
+8	93	7444476501655733	CMakeFiles/BubbleSort.dir/main.c.obj	9470b71bde91afa3
+93	244	7444476502501407	BubbleSort.exe	705f00e2b37ab90d

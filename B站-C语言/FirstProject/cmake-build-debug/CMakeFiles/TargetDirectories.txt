@@ -1,0 +1,3 @@
+D:/CodeFile/Code/BasedOnClion-Cprogarmming/FirstProject/cmake-build-debug/CMakeFiles/FirstProject.dir
+D:/CodeFile/Code/BasedOnClion-Cprogarmming/FirstProject/cmake-build-debug/CMakeFiles/edit_cache.dir
+D:/CodeFile/Code/BasedOnClion-Cprogarmming/FirstProject/cmake-build-debug/CMakeFiles/rebuild_cache.dir
