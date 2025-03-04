@@ -1,0 +1,283 @@
+#include <stdio.h>
+#include<stdlib.h>
+
+struct c1{
+    int c;//头节点
+    struct  c1* next;//申请一个结构体指针指向下一个链表
+};
+ //传入链表的首地址，一直打印其内包含的所有c值   直到指向NULL
+ void printfLink(struct c1 *head)//这是一个遍历链表的函数 传入的参数是指针型  或者说传入的参数要取地址
+ {//这是遍历部分
+struct c1 *point;//申请结构体指针
+point =  head; //将传入的值赋给point   这是指针互相赋值
+while(point !=NULL)//判断节点是否为空
+{
+    printf("%d",point->c);
+    point =point->next;//将下一个结构体传过来
+    putchar(' ');
+}
+putchar('\n');
+}
+
+//统计链表节点个数函数
+int GetLinkNodeNUm(struct c1 *head)
+{
+struct c1 *point ;
+int  sum=0;//sum计数  统计链表的节点数  其实计数和遍历差不多 
+point =head;
+while(point !=NULL)
+{
+    sum++;
+    point=point->next;
+}
+return  sum;
+}
+//链表查找函数   传入的参数为需要查找的链表的头   和  查找到数据为  返回值为1 0代表有无这个数据如果有，在第几位
+int searchLink(struct c1 *head,int data)//
+{
+    struct c1 *point;
+    int sum=1,flag=0,weizhi=0;//查找的位置为
+    point =head;
+    
+    while(point!=NULL)
+    {
+        if(point->c==data) {weizhi=sum;break;}
+        else   sum++;
+        
+        point=point->next;
+    }
+    return weizhi;
+}
+//链表从指定节点后方插入数据
+/*
+1 找到要插入数据的节点
+2 将要插入的节点 指向后面的节点
+3 将前节点指向新出现的节点
+
+*///传入的参数为 头节点，指定的节点数据，新的节点  返回值为1表示插入成功  返回值为0表示失败
+int  insertFromBehind(struct c1* head,int data,struct c1* new)
+{
+struct c1* point =head;
+while(point !=NULL)
+{
+if(point->c==data)
+{
+    new->next=point->next;
+    point->next=new;
+    return 1;
+}
+point =point->next;
+}
+return 0;
+}
+//从指定节点前方插入新节点
+/*
+分为两种情况，第一 从原来的头节点开始插入，头节点被代替
+1.找到头节点
+2.将新节点  指向原来的头节点
+3.将头节点改为新节点
+
+第二种情况  不在头节点之前插入
+1 找到被插入节点
+2 将新节点指向被插入节点
+3 将被插入节点之前指向新节点
+*/  //返回值为一个指针型结构体  传入参数为 链表头  被插入数据  新的节点数据
+struct c1* insertFromForward(struct c1* head,int data,struct c1* new)//  将返回值作为头节点
+{
+    struct c1*point =head;
+    if(point->c==data)//判断是不是节点头
+    {
+        new->next=head;
+       return new;//是就返回新的头
+    }
+    while(point->next!=NULL)
+    {
+        if(point->next->c==data)
+        {
+            new->next=point->next;
+            point->next=new;
+            printf("插入成功");
+            return head;
+        }   
+        point=point->next;
+    }
+printf("没找到%d\n",data);
+return head;//不是就返回原来的头
+}
+//链表删除指定节点
+//同样分为两种情况，改变头节点的和不改变的
+/*
+改变头节点的
+找到头结点  将头结点改为头结点的下一个节点
+不改变头结点的
+删除第一个节点以外的其他节点
+找到要删除的节点二
+将被删除的节点的前一个节点指针指向要删除的头节点的下一个节点
+*/
+struct c1* deleteNode(struct c1* head,int data)//返回的是链表的表头的指针
+{
+struct c1* point =head;
+if(point->c==data)
+{
+    head=head->next;
+    printf("提示 删除的是头结点");
+    return head;
+}
+while(point->next!=NULL)
+{
+    if(point->next->c==data)
+    {
+        point->next=point->next->next;
+        printf("提示  删除的不是头结点");
+        return head;
+    }
+    point=point->next;
+}
+return head;
+}
+//更改 链表指定数据为另一个数据 和查找类似就是多了一个参数  
+int changeLink(struct c1* head,int data,int new)
+{
+struct c1* point=head;
+while(point!=NULL) 
+{
+if(point->c==data)
+{
+    point->c=new;
+    return 1;
+}
+point =point->next;
+}
+return 0;
+}
+//动态创建链表之头插法
+/*
+1.如果头节点为空，则直接把待插入节点作为头节点
+2.将新接待2指向原节点1
+3.将新节点2作为头节点
+4.将新节点3指向头节点2  重复
+*/
+//api 函数 为头插法创建节点函数
+struct c1*insertFromHead(struct c1* head,struct c1* new)
+{
+    if(head==NULL)
+    {
+        head=new;
+    }
+    else 
+    {
+        new->next=head;
+        head=new;
+    }
+    return head;
+}
+//头插法创建链表的函数
+struct c1* creatLink(struct c1*head)
+{
+struct c1* new;
+while(1)
+{
+    new=(struct c1*)malloc(sizeof(struct c1));//申请动态内存来存储新产生的数据
+    printf("输入新节点\n");
+    scanf("%d",&(new->c));
+    if(new->c==0)
+    {
+      printf("0  退出创建");
+      return  head;
+    }
+    head=insertFromHead(head,new);
+}
+}
+//尾插法基本解析
+/*
+1  如果头节点为空，则直接将新节点作为头结点
+2  不断遍历链表，直到找到尾节点1
+3  将尾节点1的指针指向新节点
+*/
+//此函数为 api函数  用于尾插法创建节点
+struct c1* insertBehind(struct c1*head,struct c1*new)
+{
+struct c1*p=head;
+if(p==NULL)
+{
+    head=new;
+    return head;
+}
+else
+{
+    while(p->next !=NULL)
+    {
+        p=p->next;
+    }
+    p->next=new;
+    new->next=NULL;
+}
+return head;
+}
+//尾插法创建链表
+struct c1* creatLink2(struct c1*head)
+{
+    struct c1* new;
+    while(1)
+    {
+        new=(struct c1*)malloc(sizeof(struct c1));
+        printf("请输入节点\n");
+        scanf("%d",&(new->c));
+        if(new->c==0)
+        {
+            printf("0  退出创建\n");
+            free(new);
+            return head;
+        }
+        head=insertBehind(head,new);
+    }
+}
+int main()
+{
+    
+   struct c1 *f;
+   struct c1 q={3,NULL};//对结构体进行初始化，对结构体的下一个指向赋值NULL
+   struct c1 q1={4,NULL};
+   struct c1 q2={5,NULL};
+   struct c1 new={100,NULL};
+   int sum1=0,sum2=0;//节点计数
+   int x;//x是需要查询的节点的值
+   q.next=&q1;//把上一个结构体申请的指针地址  通过赋值传递给前一个地址
+   q1.next=&q2;
+   f=&q;
+printf("第一个链表%d\n第二个链表%d\n",q.c,q.next->c);//q.c  是第一个结构体的值，q.next指向下一个结构体的头地址
+//通过指针引用到第一个结构体申请的指针的地址 即下一个结构体的地址位置，并且引用其下一个结构体的值
+printfLink(&q);
+sum1=GetLinkNodeNUm(&q);
+printf("此链表节点数为%d\n",sum1);
+
+
+printf("请输入需要查询的数值\n");
+scanf("%d",&x);
+sum2=searchLink(&q,x);//此处为查询并找到为位置函数入口  
+
+
+if(sum2>0)//如果返回值大于零  表示此链表中有查询值，并且返回值就代表了其位置， 如果小于零则代表没有
+printf("链表中包含数据%d,%d在第%d位\n",x,x,sum2);
+else 
+printf("链表中不包含数据%d\n",x);
+
+// insertFromBehind(&q, 5, &new);//插入节点值  5为可自由调节值x   根据返回值可以输出插入完成和插入失败
+// //插入之后遍历节点值
+//  printfLink(&q);
+
+// f=insertFromForward(&q,6,&new);//    之后插入
+// printfLink(f);
+
+// f=deleteNode(&q,5);
+// printfLink(f);   删除指定节点
+
+// f=creatLink(f);  在链表的头节点之前插入
+// printfLink(f);
+
+
+// f=creatLink2(f);  //在链表的尾节点之后插入
+//  printfLink(f);
+
+return 0;
+}
