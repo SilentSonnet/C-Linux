@@ -10,7 +10,7 @@
 •STM32常应用在嵌入式领域，如智能车、无人机、机器人、无线通信、物联网、工业控制、娱乐电子产品等
 •STM32功能强大、性能优异、片上资源丰富、功耗低，是一款经典的嵌入式微控制器
 
-![image-20250320082822991](C:\Users\57117\AppData\Roaming\Typora\typora-user-images\image-20250320082822991.png)
+<img src="images\image-20250320082822991.png" alt="image-20250320082822991" style="zoom:50%;" />
 
 其中的CoreMark是内核跑分的意思
 
@@ -22,11 +22,11 @@
 
 
 
-![image-20250320083117286](C:\Users\57117\AppData\Roaming\Typora\typora-user-images\image-20250320083117286.png)
+![image-20250320083117286](images\image-20250320083117286.png)
 
 ST公司设计的就是内核之外的存储器和外设
 
-![image-20250320083122223](C:\Users\57117\AppData\Roaming\Typora\typora-user-images\image-20250320083122223.png)
+<img src="images\image-20250320083122223.png" alt="image-20250320083122223" style="zoom:50%;" />
 
 ## STm32F103C8T6
 
@@ -41,13 +41,13 @@ ST公司设计的就是内核之外的存储器和外设
 
 •封装：LQFP48 意思是一共有48个引脚 
 
-![image-20250320083222836](C:\Users\57117\AppData\Roaming\Typora\typora-user-images\image-20250320083222836.png)
+<img src="images\image-20250320083222836.png" alt="image-20250320083222836" style="zoom:50%;" />
 
 ## 片上资源/外设
 
 英文名字为Peripheral 外设，STm32主要学习的就是外设，通过程序配置外设，来完成我们想要的功能。
 
-![image-20250320083240642](C:\Users\57117\AppData\Roaming\Typora\typora-user-images\image-20250320083240642.png)
+![image-20250320083240642](images\image-20250320083240642.png)
 
 加绿色的是位于Cortex-M3内核中的外设
 
@@ -79,11 +79,11 @@ USB OTG：用OTG功能，让USB作为主机去读取其它的USB设备。
 
 ## 命名规则
 
-![image-20250320090017330](C:\Users\57117\AppData\Roaming\Typora\typora-user-images\image-20250320090017330.png)
+![image-20250320090017330](images\image-20250320090017330.png)
 
 ## 系统结构
 
-![image-20250320090032787](C:\Users\57117\AppData\Roaming\Typora\typora-user-images\image-20250320090032787.png)
+![image-20250320090032787](images\image-20250320090032787.png)
 
 ​	从图上可以看出，从内核Cortex-M3引出了三条总线，分别是ICode指令总线、DCode数据总线，System系统总线。ICode和DCode总线主要是用来连接Flash闪存的，Flash就是用来存储程序的，ICode总线就是用来加载程序指令的，DCode总监是用来加载数据的，比如常量和调试数据这些。除了DCode和ICode内核还引出了System总线，用来连接余下的设备。
 ​	内核的下方就是DMA外设，DMA就是内核的小秘书，用来搬运数据减轻数据搬运对CPU资源的占用。比如说模数转换可以设置1ms转换一次，如果不能及时从寄存器中搬运出来的话新的数据就会覆盖。外设通过DMA请求线发送DMA请求，DMA通过DMA总线获得总线控制权，然后访问并转运数据，整个过程不用CPU参与，省下了CPU的时间来做其它事情。图上的DMA总线拥有和CPU一样的总线控制权用于访问外设，也可以说是外设都是小弟。
@@ -94,7 +94,7 @@ USB OTG：用OTG功能，让USB作为主机去读取其它的USB设备。
 
 引脚示意图的小黑点的左边为1号引脚，然后逆时针排列。
 
-![image-20250320094636272](C:\Users\57117\AppData\Roaming\Typora\typora-user-images\image-20250320094636272.png)
+<img src="images\image-20250320094636272.png" alt="image-20250320094636272" style="zoom: 200%;" />
 
 注意：标为红色为电源相关引脚，蓝色为最小系统相关引脚，绿色为IO口、功能口引脚。
 类型：
@@ -123,12 +123,12 @@ STm32内部采用分区供电的方式，供电口会比较多，在使用时，
 
 ## 启动配置
 
-​	启动配置的作用就是指定程序开始运行的位置，一般情况下，程序都是在Flash程序存储器开始执行，但是某些情况下也可以让程序在别的地方开始执行，用来完成特定功能。![image-20250320102507286](C:\Users\57117\AppData\Roaming\Typora\typora-user-images\image-20250320102507286.png)	表格中的X表示无论是高电平还是低电平，1代表的是3.3V高电平。内置SRAM启动模式是调试程序的时候使用的。BOOT引脚的值是在上电一瞬间有效的，后边便无所谓了，例如BOOT1引脚和PB2是同一个引脚，就是在上电一瞬间是BOOT1功能，过后即切换为PB2功能。
+​	启动配置的作用就是指定程序开始运行的位置，一般情况下，程序都是在Flash程序存储器开始执行，但是某些情况下也可以让程序在别的地方开始执行，用来完成特定功能。![image-20250320102507286](images\image-20250320102507286.png)	表格中的X表示无论是高电平还是低电平，1代表的是3.3V高电平。内置SRAM启动模式是调试程序的时候使用的。BOOT引脚的值是在上电一瞬间有效的，后边便无所谓了，例如BOOT1引脚和PB2是同一个引脚，就是在上电一瞬间是BOOT1功能，过后即切换为PB2功能。
 ​	☆作串口下载用，系统存储器存的即为STm32中的一段BootLoader程序，BootLoader的作用就是接受串口的数据然后刷新到主存中，这样就可以使用串口下载程序了。
 
 ## 最小系统电路
 
-![image-20250320113908292](C:\Users\57117\AppData\Roaming\Typora\typora-user-images\image-20250320113908292.png)
+![image-20250320113908292](images\image-20250320113908292.png)
 
 ​	晶振：20pF的是起振电容，如果要使用RTC功能，则还要接一个32.768kHz晶振在3、4号引脚上，OSC32就是32.768kHz的意思，因为32768是2的15次方，内部的RTC电路经过2的15次方分频，就可以生成1s的时间信号了。
 ​	复位：低电平复位，按下K1时，NRST接地产生了低电平信号，7号引脚上电时，C3没有充电相当于短路，此时NRST为低电平，上电后C3充满电相当于短路，NRST被电阻R1拉高。其效果就是上电一瞬间，单片机复位完成，一些小的设备用针戳一下就会复位就是这样的原理。
@@ -136,7 +136,7 @@ STm32内部采用分区供电的方式，供电口会比较多，在使用时，
 
 ## 型号分类及缩写
 
-![image-20250320115029156](C:\Users\57117\AppData\Roaming\Typora\typora-user-images\image-20250320115029156.png)
+![image-20250320115029156](images\image-20250320115029156.png)
 
 ​	这个表主要使用来选择启动文件的，STm32F103C8T6使用的启动文件是.md。
 ​	STm32的开发方式主要有基于寄存器的方式，基于标准库也就是库函数，这个是ST公司封装好的函数，和基于HAL库的方式，基于寄存器的方式和51单片机的开发方式一样，用程序直接配置寄存器，来达到我们想要的功能，这种方式最底层最直接，效率会高一些。
@@ -159,7 +159,7 @@ CL-Connectivity Line(互联型产品)，其中VL后缀代表的是Value Line性�
 
 ## 工程架构
 
-![image-20250320132036589](C:\Users\57117\AppData\Roaming\Typora\typora-user-images\image-20250320132036589.png)
+![image-20250320132036589](images\image-20250320132036589.png)
 STm32的程序就是从启动文件开始执行的
 	固件库文件说明：
 	htmress 两张图片
@@ -170,6 +170,7 @@ STm32的程序就是从启动文件开始执行的
 	Release_Notes.html 发布页面
 	stm32f10x_stdperiph_lib_wm.chm使用手册
 启动文件的位置：
+
 ```C
 STM32F10x_StdPeriph_Lib_V3.5.0\Libraries\CMSIS\CM3\DeviceSupport\ST\STM32F10x\startup\arm
 启动文件和前面型号分类是相对应的，对于STm32F103C8T6要选择的就是md.s文件
@@ -235,7 +236,7 @@ GPIO简介
 
 ## GPIO基本结构
 
-![image-20250320132858948](C:\Users\57117\AppData\Roaming\Typora\typora-user-images\image-20250320132858948.png)
+![image-20250320132858948](images\image-20250320132858948.png)
 在STm32中，所有的外设都是挂载在APB2总线上的
 每个GPIO外设总共有16个引脚，编号是从0到15
 驱动器是用来增加信号的驱动能力的，寄存器只负责存储数据，如果要进行点灯这样的操作的话，就需要驱动器来增加驱动能力。
@@ -244,9 +245,9 @@ GPIO简介
 
 
 ## GPIO位结构和模式
-![image-20250320142632455](C:\Users\57117\AppData\Roaming\Typora\typora-user-images\image-20250320142632455.png)
+![image-20250320142632455](images\image-20250320142632455.png)
 	通过配置GPIO的端口配置寄存器，端口可以被配置为以下八种模式。
-![image-20250320143352629](C:\Users\57117\AppData\Roaming\Typora\typora-user-images\image-20250320143352629.png)
+![image-20250320143352629](images\image-20250320143352629.png)
 	从I/O引脚开始看起，输入时电平信号从I/O引脚流入会先经过两个保护二极管，上方二极管正极接VDD也就是3.3V，下方二极管负极接VSS也就是0V，当电压在0-3.3V时上下两个二极管都不导通，如果IO引脚电压大于VDD，则会使得上方二极管导通，电流从VDD流出。如果IO引脚电压小于VSS，则会使得下方二极管导通，电流从VSS流出，从而保护了内部电路不会烧坏。
 	输入电流经过保护电路后，向上走会将过两个上拉电阻，上方电阻通过开关接到VDD，下方电阻通过开关接到VSS。如果上面开关导通下面断开，就是上拉输入模式，如果下面开关导通上面断开，就是下拉输入模式，如果两个开关都断开，就是浮空输入模式。在使用浮空输入时端口一定要接上一个连续的驱动源，不能出现引脚悬空的状态。
 	这两个电阻的阻值都是比较大的，只是一种弱上拉和弱下拉，目的是尽量不影响正常的输入操作。
@@ -299,51 +300,51 @@ void GPIO_Write(GPIO_TypeDef* GPIOx, uint16_t PortVal);
 1
 ## 浮空/上拉/下拉输入
 
-![image-20250320162834121](C:\Users\57117\AppData\Roaming\Typora\typora-user-images\image-20250320162834121.png)
+![image-20250320162834121](images\image-20250320162834121.png)
 
 ## 模拟输入
 
 除了在模拟输入模式中会关闭数字的输入功能，其它的七种模式都是开启的
 
-![image-20250320163218615](C:\Users\57117\AppData\Roaming\Typora\typora-user-images\image-20250320163218615.png)
+![image-20250320163218615](images\image-20250320163218615.png)
 
 ## 开漏/推挽输出
 
 在输出模式下，输入模式也是有效的，在输入模式下，输出模式是无效的，因为一个端口只能有一个输出，但可以有很多个输入，所以当配置成输出模式时，内部也可以顺便输入一下，这是没有什么影响的。
 
-![image-20250320163224402](C:\Users\57117\AppData\Roaming\Typora\typora-user-images\image-20250320163224402.png)
+![image-20250320163224402](images\image-20250320163224402.png)
 
 ## 复用开漏/推挽输出
 
 用输出数据寄存器可以保证多位数据的同步性，因为是一下子读写整个寄存器
 
-![image-20250320163233873](C:\Users\57117\AppData\Roaming\Typora\typora-user-images\image-20250320163233873.png)
+![image-20250320163233873](images\image-20250320163233873.png)
 
 ## LED和蜂鸣器介绍
 
 •LED：发光二极管，正向通电点亮，反向通电不亮
 
-|                             图1                              |                             图2                              |
-| :----------------------------------------------------------: | :----------------------------------------------------------: |
-| ![图1](C:\Users\57117\AppData\Roaming\Typora\typora-user-images\image-20250320171709580.png) | <img src="C:\Users\57117\AppData\Roaming\Typora\typora-user-images\image-20250320171717780.png" alt="图2" style="zoom: 50%;" /> |
+|                    图1                     |                             图2                              |
+| :----------------------------------------: | :----------------------------------------------------------: |
+| ![图1](images\image-20250320171709580.png) | <img src="images\image-20250320171717780.png" alt="图2" style="zoom: 50%;" /> |
 
 
 
 •有源蜂鸣器：内部自带振荡源，将正负极接上直流电压即可持续发声，频率固定
 
-<img src="C:\Users\57117\AppData\Roaming\Typora\typora-user-images\image-20250320171953829.png" alt="image-20250320171953829" style="zoom: 50%;" />
+<img src="images\image-20250320171953829.png" alt="image-20250320171953829" style="zoom: 50%;" />
 
-![image-20250320171959127](C:\Users\57117\AppData\Roaming\Typora\typora-user-images\image-20250320171959127.png)
+![image-20250320171959127](images\image-20250320171959127.png)
 
 •无源蜂鸣器：内部不带振荡源，需要控制器提供振荡脉冲才可发声，调整提供振荡脉冲的频率，可发出不同频率的声音
 
 ## 硬件电路
 
-![image-20250320172016434](C:\Users\57117\AppData\Roaming\Typora\typora-user-images\image-20250320172016434.png)
+![image-20250320172016434](images\image-20250320172016434.png)
 
 ## 面包板
 
-![image-20250320172033006](C:\Users\57117\AppData\Roaming\Typora\typora-user-images\image-20250320172033006.png)
+![image-20250320172033006](images\image-20250320172033006.png)
 
 ## 按键介绍
 
@@ -351,25 +352,25 @@ void GPIO_Write(GPIO_TypeDef* GPIOx, uint16_t PortVal);
 
 •按键抖动：由于按键内部使用的是机械式弹簧片来进行通断的，所以在按下和松手的瞬间会伴随有一连串的抖动
 
-<img src="C:\Users\57117\AppData\Roaming\Typora\typora-user-images\image-20250320172039484.png" alt="image-20250320172039484" style="zoom:25%;" />
+<img src="images\image-20250320172039484.png" alt="image-20250320172039484" style="zoom:25%;" />
 
-<img src="C:\Users\57117\AppData\Roaming\Typora\typora-user-images\image-20250320172043397.png" alt="image-20250320172043397" style="zoom:50%;" />
+<img src="images\image-20250320172043397.png" alt="image-20250320172043397" style="zoom:50%;" />
 
 ## 传感器模块简介
 
 •传感器模块：传感器元件（光敏电阻/热敏电阻/红外接收管等）的电阻会随外界模拟量的变化而变化，通过与定值电阻分压即可得到模拟电压输出，再通过电压比较器进行二值化即可得到数字电压输出
 
-![image-20250320172158292](C:\Users\57117\AppData\Roaming\Typora\typora-user-images\image-20250320172158292.png)
+![image-20250320172158292](images\image-20250320172158292.png)
 
-![image-20250320172202371](C:\Users\57117\AppData\Roaming\Typora\typora-user-images\image-20250320172202371.png)
+![image-20250320172202371](images\image-20250320172202371.png)
 
 ## 硬件电路
 
-![image-20250320172223362](C:\Users\57117\AppData\Roaming\Typora\typora-user-images\image-20250320172223362.png)
+![image-20250320172223362](images\image-20250320172223362.png)
 
 ## C语言数据类型
 
-![image-20250320172242050](C:\Users\57117\AppData\Roaming\Typora\typora-user-images\image-20250320172242050.png)
+![image-20250320172242050](images\image-20250320172242050.png)
 
 ## C语言宏定义
 
