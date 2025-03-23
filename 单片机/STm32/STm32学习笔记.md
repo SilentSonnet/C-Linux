@@ -763,25 +763,43 @@ void USBWakeUp_IRQHandler(void) {} // USB 唤醒中断
 
 对于STm32来说，想要获取的信号如果是外部驱动的变化很快的突发信号，比如说编码器、遥控器这些可能很久都不会使用，但是使用的时候又需要迅速响应。要处理这样的信号可以有两种实现方式：1.主程序循环读取引脚的高低电平2.定时器中断读取引脚的高低电平。很显然最好是使用中断的方式，但是按键不要用外部中断来实现，因为不好处理按键抖动和松手检测。
 
+方波的个数代表转过的角度，方波的频率代表转速，因为只有一路输出，因此正转和反转没有办法区分。还有的是一个输出方波信号，一个输出高低电平代表方向。
+
+
+机械触点式编码器，因为是机械触电，所以不适用于转速过高的场景。霍尔传感器的非接触形式的编码器可以用来测电机转速。  相位相差九十度的波形就是正交波形，输出正交波形编码器可以测方向。
+
+
+
 
 ### 硬件电路
 
 <img src="images\image-20250321101830150.png" alt="image-20250321101830150" style="zoom:50%;" />
 
 ![image-20250321101834761](images\image-20250321101834761.png)
+当触电断开时，P点上拉为VCC，输出到A为VCC导通时的P点，下拉至GND因此A点输出位GND。
 
 ![image-20250321101859318](images/image-20250321101859318.png)
+
+对于旋转编码器，在中断函数中初始化PB0和PB1，两个GPIO的外部中断，当然只初始化一个外部中断也是可以的，完成功能的，因为对编码器而言，在上升沿和下降沿时刻可以检测随便一个引脚的高低电平。如果A相引脚触发中断，这样存在的小问题是，正转的情况A相刚开始转就会进入中断，反转A相迟滞，那么编码器已经转到位了，A相才进入中断。因此设计为双中断，只有在B相下降沿和A相低电平的的时候才判断为正转，只有在 A相下降沿和B相低电平时才判断为反转，这样就能保证正转和反转都是转到位了才执行计数变量加减的操作。
 
 ## TIM 定时器
 ### TIM定时器简介
 
-•TIM（Timer）定时器
-•定时器可以对输入的时钟进行计数，并在计数值达到设定值时触发中断
-•16位计数器、预分频器、自动重装寄存器的时基单元，在72MHz计数时钟下可以实现最大59.65s的定时
+•TIM（Timer）定时器。这是最基本的功能，定一个时间，然后定时器每隔这个时间产生一个中断，来实现每隔一个固定时间执行一段程序的目的。
+•定时器可以对输入的时钟进行计数，并在计数值达到设定值时触发中断。当这个计数器的输入是一个准确可靠的基准时钟时，那么在对这个基准时钟计数的时候，实际上就是计时的过程。
+•16位计数器、预分频器、自动重装寄存器的时基单元，在72MHz计数时钟下可以实现最大59.65s的定时。STm32的时钟频率是72MHz，如果计72个数，那么时间就是72/72M=1us，如果计72000个数就是72000/72M=1ms，也就是1kHz。
 •不仅具备基本的定时中断功能，而且还包含内外时钟源选择、输入捕获、输出比较、编码器接口、主从触发模式等多种功能
 •根据复杂度和应用场景分为了高级定时器、通用定时器、基本定时器三种类型
 
 
+定时器的本质就是一个计数器。
+定时器输出比较，常用于产生PWM波形，驱动电机等设备。定时器输入捕获功能，实现测量方波频率。定时器编码器接口，能更加方便地读取正交编码器的输出波形。
+
+计数器：用来执行计数定时的一个寄存器，每来一个时钟，计数器加1。
+预分频器：可以对计数器的时钟进行分频，让这个计数更加灵活。
+自动重装寄存器：计数的目标值，就是我想计多少个时钟脉冲申请中断。
+
+这三个构成了定时器最核心的部分，我们把这一块电路成为时基单元，时基单元中的寄存器都是16位的，2的16次方是65536，如果预分频器和自动重装寄存器都设置为最大，那定时器最大定时时间就是59.65s，计算方法是72M/65536/65536=1/59.65，得到定时中断的频率，然后取倒数就是最大的定时时间。如果觉得这个定时时间不够长的话，STm32的定时器还支持级联模式，也就是一个定时器的输出当做另一个定时器的输入，这样对打定时时间是59.65s×65536×65536 大概是八千多年，再级联一个的话，大概是34万亿年。
 ### 定时器类型
 
 
@@ -792,12 +810,126 @@ void USBWakeUp_IRQHandler(void) {} // USB 唤醒中断
 
 ![image-20250321101933445](images/image-20250321101933445.png)
 
-
+主从触发模式，它能让内部的硬件在不受程序的控制下实现自动运行，把这个掌握好就可以在某些情况下极大地减轻CPU负担。
 
 ![image-20250321102009783](images/image-20250321102009783.png)
+没有基本定时器。不同的型号定时器的数量是不同的，在操作这个外设之前，一定要查看一下它是不是有这个外设操作到了不存在的外设，那样是不会运行的。资源一共是1个高级定时器，3个通用定时器。
 
+初始化定时器的步骤
+1.RCC开启时钟
+打开时钟后，定时器的基准时钟和整个外设的工作时钟就都同时打开了。
+2.选择时基单元的时钟源
+对定时中断，我们选择的是内部时钟源。
+3.配置时基单元
+包括预分频器、自动重装器、计数模式等，这些参数用一个结构体就可以配置好。
+4.配置输出中断控制
+允许更新中断输出到NVIC。
+5.配置NVIC
+在NVIC中打开定时器中断的通道并分配一个优先级。
+6.运行控制
+整个模块配置完成后，我们还要使能一下计数器，要不然计数器是不会运行的，当定时器使能后，计数器就会开始计数了，当计数器更新时，触发中断。最后再写一个定时器中断函数，这样这个中断函数每隔一段时间就可以重新执行一次了。
 
+TIM库函数
+```C
+// 恢复缺省配置
+void TIM_DeInit(TIM_TypeDef* TIMx);
+// 配置时基单元，TIMx选择定时器，结构体包含时基单元参数
+void TIM_TimeBaseInit(TIM_TypeDef* TIMx, TIM_TimeBaseInitTypeDef* TIM_TimeBaseInitStruct);
+void TIM_OC1Init(TIM_TypeDef* TIMx, TIM_OCInitTypeDef* TIM_OCInitStruct);
+void TIM_OC2Init(TIM_TypeDef* TIMx, TIM_OCInitTypeDef* TIM_OCInitStruct);
+void TIM_OC3Init(TIM_TypeDef* TIMx, TIM_OCInitTypeDef* TIM_OCInitStruct);
+void TIM_OC4Init(TIM_TypeDef* TIMx, TIM_OCInitTypeDef* TIM_OCInitStruct);
+void TIM_ICInit(TIM_TypeDef* TIMx, TIM_ICInitTypeDef* TIM_ICInitStruct);
+void TIM_PWMIConfig(TIM_TypeDef* TIMx, TIM_ICInitTypeDef* TIM_ICInitStruct);
+void TIM_BDTRConfig(TIM_TypeDef* TIMx, TIM_BDTRInitTypeDef *TIM_BDTRInitStruct);
+// 结构体初始化函数
+void TIM_TimeBaseStructInit(TIM_TimeBaseInitTypeDef* TIM_TimeBaseInitStruct);
+void TIM_OCStructInit(TIM_OCInitTypeDef* TIM_OCInitStruct);
+void TIM_ICStructInit(TIM_ICInitTypeDef* TIM_ICInitStruct);
+void TIM_BDTRStructInit(TIM_BDTRInitTypeDef* TIM_BDTRInitStruct);
+// 对应的是运行控制，TIMx选择定时器，NewState选择使能还是失能
+void TIM_Cmd(TIM_TypeDef* TIMx, FunctionalState NewState);
+void TIM_CtrlPWMOutputs(TIM_TypeDef* TIMx, FunctionalState NewState);
+// 使能中断输出信号，TIMx选择定时器，TIM_IT选择要配置哪个中断输出，NewState选择使能还是失能
+void TIM_ITConfig(TIM_TypeDef* TIMx, uint16_t TIM_IT, FunctionalState NewState);
+void TIM_GenerateEvent(TIM_TypeDef* TIMx, uint16_t TIM_EventSource);
+void TIM_DMAConfig(TIM_TypeDef* TIMx, uint16_t TIM_DMABase, uint16_t TIM_DMABurstLength);
+void TIM_DMACmd(TIM_TypeDef* TIMx, uint16_t TIM_DMASource, FunctionalState NewState);
+// 选择内部时钟
+void TIM_InternalClockConfig(TIM_TypeDef* TIMx);
+// 选择ITRx其它定时器的时钟，TIMx选择定时器，TIM_InputTriggerSource选择要接入哪个其它的定时器
+void TIM_ITRxExternalClockConfig(TIM_TypeDef* TIMx, uint16_t TIM_InputTriggerSource);
+// 选择TIx捕获通道的时钟
+void TIM_TIxExternalClockConfig(TIM_TypeDef* TIMx, uint16_t TIM_TIxExternalCLKSource,uint16_t TIM_ICPolarity, uint16_t ICFilter);
+void TIM_ETRClockMode1Config(TIM_TypeDef* TIMx, uint16_t TIM_ExtTRGPrescaler, uint16_t TIM_ExtTRGPolarity,uint16_t ExtTRGFilter);
+void TIM_ETRClockMode2Config(TIM_TypeDef* TIMx, uint16_t TIM_ExtTRGPrescaler, uint16_t TIM_ExtTRGPolarity, uint16_t ExtTRGFilter);
+void TIM_ETRConfig(TIM_TypeDef* TIMx, uint16_t TIM_ExtTRGPrescaler, uint16_t TIM_ExtTRGPolarity,
+                   uint16_t ExtTRGFilter);
+void TIM_PrescalerConfig(TIM_TypeDef* TIMx, uint16_t Prescaler, uint16_t TIM_PSCReloadMode);
+void TIM_CounterModeConfig(TIM_TypeDef* TIMx, uint16_t TIM_CounterMode);
+void TIM_SelectInputTrigger(TIM_TypeDef* TIMx, uint16_t TIM_InputTriggerSource);
+void TIM_EncoderInterfaceConfig(TIM_TypeDef* TIMx, uint16_t TIM_EncoderMode,
+                                uint16_t TIM_IC1Polarity, uint16_t TIM_IC2Polarity);
+void TIM_ForcedOC1Config(TIM_TypeDef* TIMx, uint16_t TIM_ForcedAction);
+void TIM_ForcedOC2Config(TIM_TypeDef* TIMx, uint16_t TIM_ForcedAction);
+void TIM_ForcedOC3Config(TIM_TypeDef* TIMx, uint16_t TIM_ForcedAction);
+void TIM_ForcedOC4Config(TIM_TypeDef* TIMx, uint16_t TIM_ForcedAction);
+void TIM_ARRPreloadConfig(TIM_TypeDef* TIMx, FunctionalState NewState);
+void TIM_SelectCOM(TIM_TypeDef* TIMx, FunctionalState NewState);
+void TIM_SelectCCDMA(TIM_TypeDef* TIMx, FunctionalState NewState);
+void TIM_CCPreloadControl(TIM_TypeDef* TIMx, FunctionalState NewState);
+void TIM_OC1PreloadConfig(TIM_TypeDef* TIMx, uint16_t TIM_OCPreload);
+void TIM_OC2PreloadConfig(TIM_TypeDef* TIMx, uint16_t TIM_OCPreload);
+void TIM_OC3PreloadConfig(TIM_TypeDef* TIMx, uint16_t TIM_OCPreload);
+void TIM_OC4PreloadConfig(TIM_TypeDef* TIMx, uint16_t TIM_OCPreload);
+void TIM_OC1FastConfig(TIM_TypeDef* TIMx, uint16_t TIM_OCFast);
+void TIM_OC2FastConfig(TIM_TypeDef* TIMx, uint16_t TIM_OCFast);
+void TIM_OC3FastConfig(TIM_TypeDef* TIMx, uint16_t TIM_OCFast);
+void TIM_OC4FastConfig(TIM_TypeDef* TIMx, uint16_t TIM_OCFast);
+void TIM_ClearOC1Ref(TIM_TypeDef* TIMx, uint16_t TIM_OCClear);
+void TIM_ClearOC2Ref(TIM_TypeDef* TIMx, uint16_t TIM_OCClear);
+void TIM_ClearOC3Ref(TIM_TypeDef* TIMx, uint16_t TIM_OCClear);
+void TIM_ClearOC4Ref(TIM_TypeDef* TIMx, uint16_t TIM_OCClear);
+void TIM_OC1PolarityConfig(TIM_TypeDef* TIMx, uint16_t TIM_OCPolarity);
+void TIM_OC1NPolarityConfig(TIM_TypeDef* TIMx, uint16_t TIM_OCNPolarity);
+void TIM_OC2PolarityConfig(TIM_TypeDef* TIMx, uint16_t TIM_OCPolarity);
+void TIM_OC2NPolarityConfig(TIM_TypeDef* TIMx, uint16_t TIM_OCNPolarity);
+void TIM_OC3PolarityConfig(TIM_TypeDef* TIMx, uint16_t TIM_OCPolarity);
+void TIM_OC3NPolarityConfig(TIM_TypeDef* TIMx, uint16_t TIM_OCNPolarity);
+void TIM_OC4PolarityConfig(TIM_TypeDef* TIMx, uint16_t TIM_OCPolarity);
+void TIM_CCxCmd(TIM_TypeDef* TIMx, uint16_t TIM_Channel, uint16_t TIM_CCx);
+void TIM_CCxNCmd(TIM_TypeDef* TIMx, uint16_t TIM_Channel, uint16_t TIM_CCxN);
+void TIM_SelectOCxM(TIM_TypeDef* TIMx, uint16_t TIM_Channel, uint16_t TIM_OCMode);
+void TIM_UpdateDisableConfig(TIM_TypeDef* TIMx, FunctionalState NewState);
+void TIM_UpdateRequestConfig(TIM_TypeDef* TIMx, uint16_t TIM_UpdateSource);
+void TIM_SelectHallSensor(TIM_TypeDef* TIMx, FunctionalState NewState);
+void TIM_SelectOnePulseMode(TIM_TypeDef* TIMx, uint16_t TIM_OPMode);
+void TIM_SelectOutputTrigger(TIM_TypeDef* TIMx, uint16_t TIM_TRGOSource);
+void TIM_SelectSlaveMode(TIM_TypeDef* TIMx, uint16_t TIM_SlaveMode);
+void TIM_SelectMasterSlaveMode(TIM_TypeDef* TIMx, uint16_t TIM_MasterSlaveMode);
+void TIM_SetCounter(TIM_TypeDef* TIMx, uint16_t Counter);
+void TIM_SetAutoreload(TIM_TypeDef* TIMx, uint16_t Autoreload);
+void TIM_SetCompare1(TIM_TypeDef* TIMx, uint16_t Compare1);
+void TIM_SetCompare2(TIM_TypeDef* TIMx, uint16_t Compare2);
+void TIM_SetCompare3(TIM_TypeDef* TIMx, uint16_t Compare3);
+void TIM_SetCompare4(TIM_TypeDef* TIMx, uint16_t Compare4);
+void TIM_SetIC1Prescaler(TIM_TypeDef* TIMx, uint16_t TIM_ICPSC);
+void TIM_SetIC2Prescaler(TIM_TypeDef* TIMx, uint16_t TIM_ICPSC);
+void TIM_SetIC3Prescaler(TIM_TypeDef* TIMx, uint16_t TIM_ICPSC);
+void TIM_SetIC4Prescaler(TIM_TypeDef* TIMx, uint16_t TIM_ICPSC);
+void TIM_SetClockDivision(TIM_TypeDef* TIMx, uint16_t TIM_CKD);
+uint16_t TIM_GetCapture1(TIM_TypeDef* TIMx);
+uint16_t TIM_GetCapture2(TIM_TypeDef* TIMx);
+uint16_t TIM_GetCapture3(TIM_TypeDef* TIMx);
+uint16_t TIM_GetCapture4(TIM_TypeDef* TIMx);
+uint16_t TIM_GetCounter(TIM_TypeDef* TIMx);
+uint16_t TIM_GetPrescaler(TIM_TypeDef* TIMx);
+FlagStatus TIM_GetFlagStatus(TIM_TypeDef* TIMx, uint16_t TIM_FLAG);
+void TIM_ClearFlag(TIM_TypeDef* TIMx, uint16_t TIM_FLAG);
+ITStatus TIM_GetITStatus(TIM_TypeDef* TIMx, uint16_t TIM_IT);
+void TIM_ClearITPendingBit(TIM_TypeDef* TIMx, uint16_t TIM_IT);
 
+```
 ### 高级定时器
 
 ![image-20250321102018983](images/image-20250321102018983.png)
