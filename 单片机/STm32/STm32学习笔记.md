@@ -836,6 +836,8 @@ void TIM_DeInit(TIM_TypeDef* TIMx);
 // 配置时基单元，TIMx选择定时器，结构体包含时基单元参数
 void TIM_TimeBaseInit(TIM_TypeDef* TIMx, 
                       TIM_TimeBaseInitTypeDef* TIM_TimeBaseInitStruct);
+// 这四个函数就是用来配置输出比较模块的，OC就是OutputCompare输出比较，因为输出比较有4路，所以刚好对应四个配置函数。TIMx选择定时器，TIM_TimeBaseInitStruct输出比较的参数，这个结构体的成员很多，有些是高级定时器才用到的。
+// 这里有一个需要注意的问题就是，因为次使用到的是通用定时器而不是高级定时器，因此有一些变量是不用赋值的，因为此时的结构体是局部变量，没有赋初始值时，其值是不确定的，可能会导致问题。比如当想把高级定时器当做通用定时器用时，把TIM2改成TIM1，这样之前的结构体用不到的成员现在要用了，然而这些没有赋值，那就会导致高级定时器输出PWM有奇怪的问题，比如江科协本人遇到的就是将初始化函数在第一行正常，前面有其它的代码就会导致PWM无法正常输出，有3路无法正常输出。原因在于前面有代码的话，栈被用过有参留值使得TIM1配置错误，因此最好的方法就是先调用结构体初始化函数，给结构体一个初始值然后再局部修改值。
 void TIM_OC1Init(TIM_TypeDef* TIMx, TIM_OCInitTypeDef* TIM_OCInitStruct);
 void TIM_OC2Init(TIM_TypeDef* TIMx, TIM_OCInitTypeDef* TIM_OCInitStruct);
 void TIM_OC3Init(TIM_TypeDef* TIMx, TIM_OCInitTypeDef* TIM_OCInitStruct);
@@ -845,11 +847,13 @@ void TIM_PWMIConfig(TIM_TypeDef* TIMx, TIM_ICInitTypeDef* TIM_ICInitStruct);
 void TIM_BDTRConfig(TIM_TypeDef* TIMx, TIM_BDTRInitTypeDef *TIM_BDTRInitStruct);
 // 结构体初始化函数
 void TIM_TimeBaseStructInit(TIM_TimeBaseInitTypeDef* TIM_TimeBaseInitStruct);
+// 给输出结构体一个默认值
 void TIM_OCStructInit(TIM_OCInitTypeDef* TIM_OCInitStruct);
 void TIM_ICStructInit(TIM_ICInitTypeDef* TIM_ICInitStruct);
 void TIM_BDTRStructInit(TIM_BDTRInitTypeDef* TIM_BDTRInitStruct);
 // 对应的是运行控制，TIMx选择定时器，NewState选择使能还是失能
 void TIM_Cmd(TIM_TypeDef* TIMx, FunctionalState NewState);
+// 仅高级定时器使用，在使用高级定时器，输出PWM时需要调用这个函数使能主输出，否则PWM将不能正常输出
 void TIM_CtrlPWMOutputs(TIM_TypeDef* TIMx, FunctionalState NewState);
 // 使能中断输出信号，TIMx选择定时器，TIM_IT选择要配置哪个中断输出，NewState选择使能还是失能
 void TIM_ITConfig(TIM_TypeDef* TIMx, uint16_t TIM_IT, FunctionalState NewState);
@@ -880,6 +884,7 @@ void TIM_CounterModeConfig(TIM_TypeDef* TIMx, uint16_t TIM_CounterMode);
 void TIM_SelectInputTrigger(TIM_TypeDef* TIMx, uint16_t TIM_InputTriggerSource);
 void TIM_EncoderInterfaceConfig(TIM_TypeDef* TIMx, uint16_t TIM_EncoderMode,
                                 uint16_t TIM_IC1Polarity, uint16_t TIM_IC2Polarity);
+// 这4个函数是用来配置强输出模式的，如果在运行中想要暂停输出波形，并且强制输出高电平或低电平，可以用这个函数但用的不多，因为强制输出高电平和设置100%占空比一样，强制输出低电平和设置0%占空比也是一样的。
 void TIM_ForcedOC1Config(TIM_TypeDef* TIMx, uint16_t TIM_ForcedAction);
 void TIM_ForcedOC2Config(TIM_TypeDef* TIMx, uint16_t TIM_ForcedAction);
 void TIM_ForcedOC3Config(TIM_TypeDef* TIMx, uint16_t TIM_ForcedAction);
@@ -888,28 +893,36 @@ void TIM_ForcedOC4Config(TIM_TypeDef* TIMx, uint16_t TIM_ForcedAction);
 void TIM_ARRPreloadConfig(TIM_TypeDef* TIMx, FunctionalState NewState);
 void TIM_SelectCOM(TIM_TypeDef* TIMx, FunctionalState NewState);
 void TIM_SelectCCDMA(TIM_TypeDef* TIMx, FunctionalState NewState);
+// 这4个函数是用来配置CCR寄存器的预装功能的，这个预装功能就是影子寄存器，就是写入的值不会立即生效，而是在更新事件后才会生效。
 void TIM_CCPreloadControl(TIM_TypeDef* TIMx, FunctionalState NewState);
 void TIM_OC1PreloadConfig(TIM_TypeDef* TIMx, uint16_t TIM_OCPreload);
 void TIM_OC2PreloadConfig(TIM_TypeDef* TIMx, uint16_t TIM_OCPreload);
 void TIM_OC3PreloadConfig(TIM_TypeDef* TIMx, uint16_t TIM_OCPreload);
 void TIM_OC4PreloadConfig(TIM_TypeDef* TIMx, uint16_t TIM_OCPreload);
+// 这4个函数是用来配置快速使能的，这个功能在手册中，单脉冲模式有介绍。
 void TIM_OC1FastConfig(TIM_TypeDef* TIMx, uint16_t TIM_OCFast);
 void TIM_OC2FastConfig(TIM_TypeDef* TIMx, uint16_t TIM_OCFast);
 void TIM_OC3FastConfig(TIM_TypeDef* TIMx, uint16_t TIM_OCFast);
 void TIM_OC4FastConfig(TIM_TypeDef* TIMx, uint16_t TIM_OCFast);
+// 这个功能在手册里，外部事件时清除REF信号
 void TIM_ClearOC1Ref(TIM_TypeDef* TIMx, uint16_t TIM_OCClear);
 void TIM_ClearOC2Ref(TIM_TypeDef* TIMx, uint16_t TIM_OCClear);
 void TIM_ClearOC3Ref(TIM_TypeDef* TIMx, uint16_t TIM_OCClear);
 void TIM_ClearOC4Ref(TIM_TypeDef* TIMx, uint16_t TIM_OCClear);
+// 这些用来单独设置输出比较的极性，带N的就是高级定时器里的互补通道的配置
 void TIM_OC1PolarityConfig(TIM_TypeDef* TIMx, uint16_t TIM_OCPolarity);
 void TIM_OC1NPolarityConfig(TIM_TypeDef* TIMx, uint16_t TIM_OCNPolarity);
 void TIM_OC2PolarityConfig(TIM_TypeDef* TIMx, uint16_t TIM_OCPolarity);
 void TIM_OC2NPolarityConfig(TIM_TypeDef* TIMx, uint16_t TIM_OCNPolarity);
 void TIM_OC3PolarityConfig(TIM_TypeDef* TIMx, uint16_t TIM_OCPolarity);
 void TIM_OC3NPolarityConfig(TIM_TypeDef* TIMx, uint16_t TIM_OCNPolarity);
+// OC4没有互补通道，所以就没有OC4N的函数
+// 在函数这里可以设置极性，在结构体函数初始化的地方也可以设置极性，这两个地方设置极性的作用是一样的，只不过用结构体是一体初始化的，在这里是一个单独的函数进行修改的，一般来说，结构体里的参数都会有一个单独的函数进行修改。
 void TIM_OC4PolarityConfig(TIM_TypeDef* TIMx, uint16_t TIM_OCPolarity);
+// 用来单独修改输出使能参数的
 void TIM_CCxCmd(TIM_TypeDef* TIMx, uint16_t TIM_Channel, uint16_t TIM_CCx);
 void TIM_CCxNCmd(TIM_TypeDef* TIMx, uint16_t TIM_Channel, uint16_t TIM_CCxN);
+// 选择输出比较模式，用来单独更改输出比较模式的函数
 void TIM_SelectOCxM(TIM_TypeDef* TIMx, uint16_t TIM_Channel, uint16_t TIM_OCMode);
 void TIM_UpdateDisableConfig(TIM_TypeDef* TIMx, FunctionalState NewState);
 void TIM_UpdateRequestConfig(TIM_TypeDef* TIMx, uint16_t TIM_UpdateSource);
@@ -922,6 +935,7 @@ void TIM_SelectMasterSlaveMode(TIM_TypeDef* TIMx, uint16_t TIM_MasterSlaveMode);
 void TIM_SetCounter(TIM_TypeDef* TIMx, uint16_t Counter);
 // 给自动重装器写入一个值，如果想手动给自动重装值就用这个。
 void TIM_SetAutoreload(TIM_TypeDef* TIMx, uint16_t Autoreload);
+// 这4个函数是用来单独设置CCR寄存器值的函数，在运行的时候更改占空比，就用到这四个函数
 void TIM_SetCompare1(TIM_TypeDef* TIMx, uint16_t Compare1);
 void TIM_SetCompare2(TIM_TypeDef* TIMx, uint16_t Compare2);
 void TIM_SetCompare3(TIM_TypeDef* TIMx, uint16_t Compare3);
@@ -945,6 +959,27 @@ ITStatus TIM_GetITStatus(TIM_TypeDef* TIMx, uint16_t TIM_IT);
 void TIM_ClearITPendingBit(TIM_TypeDef* TIMx, uint16_t TIM_IT);
 
 ```
+```C
+// 结构体成员
+TIM_OCMode
+	TIM_OCMode_Timing         // 冻结模式      
+    TIM_OCMode_Active         // 相等时置有效电平        
+    TIM_OCMode_Inactive       // 相等时置无效电平       
+    TIM_OCMode_Toggle         // 相等时电平翻转        
+    TIM_OCMode_PWM1           // PWM模式1        
+    TIM_OCMode_PWM2           // PWM模式2     
+// 下面还有
+    TIM_ForcedAction_Active  // 强制输出的两种，这两个参数无法在初始化的时候使用
+    TIM_ForcedAction_InActive
+TIM_OCPolarity
+	High高极性，就是极性不翻转，REF波形直接输出，或者说是有效电平是高电平，REF有效时输出高电平，这两个都是一个意思。
+	Low低极性，就是REF电平取反，或者说有效电平为低电平
+TIM_OutputState
+	Disable 失能
+	Enable 使能
+TIM_Pulse
+	在0x0000和0xFFFF之间就是CCR的值
+```
 
 程序设计的具体步骤
 1.启动时钟
@@ -963,6 +998,36 @@ extern就是告诉编译器，我现在由Num这个变量，但是它在别的�
 对于定时中断而言，中断函数就可以放在使用它的地方。
 代码在一开始时复位直接从1开始，意味着代码在一开始时就进入了一次中断，具体原因是因为TimeBaseInit函数中手动产生了一个更新事件用来重新装载值，这样预分频器的值就有效了，但副作用是更新事件和更新中断是同时发生的，更新中断会置更新中断标志位，之后一旦初始化完了，更新中断就会立刻进入，这就是刚一上电就立刻进入中断的原因。解决方法就是在TimeBaseInit后开启中断前手动调用TIM_ClearFlag。
 浮空输入一旦悬空，电平就会跳个没完，上拉输入即可，如果外部输入信号功率很小，内部上拉电阻可能会影响到这个输入信号，这时可用浮空输入方式影响外部输入电平信号。
+
+TIM2和GPIO的对应关系
+引脚定义表的默认复用功能就是片上外设的端口和GPIO的连接关系
+PA0有TIM2_CH1_ETR
+也就是说TIM2的CH1和ETR都是共用了GPIOA的Pin0引脚，也就是TIM2的引脚复用在了PA0引脚上，如果使用TIM2的OC1也就是CH1通道输出PWM波，那它就只能在PA0输出。引脚的对应关系是定死的，不能随意更改，不过虽然是定死的，STm32还是给了一次更改的机会，这就是重定义或重映射。比如既要用USART2的Tx引脚，又要用TIM2的CH3通道，那就可以在重映射引脚中找TIM2，CH3的重映射引脚来避免引脚冲突，如果重映射列表找不到，那外设复用的GPIO就不能挪位置，这就是重映射的功能，配置重映射是用AFIO来完成的。
+此时的GPIO模式选择的是复用推挽输出，GPIO_Mode_AF_PP，对于普通的开漏/推挽输出，引脚的控制权来自于输出数据寄存器的，那如果想让定时器来控制引脚，那就需要使用复用开漏/推挽输出模式在这里输出数据寄存器将被断开，输出控制权将转移给片上外设，此处的片上外设连接的即是TIM2的CH1通道。所以只有把引脚设置为复用推挽输出，引脚的控制权才能交给片上外设，PWM波形才能通过引脚输出。
+
+复用引脚的步骤
+1.开启AFIO时钟，AFIO是APB2的设备
+2.GPIO_PinRemapConfig，引脚重映射配置，GPIO PA15 上电后默认是调试端口，要想重映射还需要关闭调试的功能，解除的具体方法也是使用GPIO_PinRemapConfig函数，但需要注意的是其余的端口还是调试端口
+函数的参数是：
+```C
+// SWJ就是SWD-JTAG两种调试方式
+// 解除JTRS引脚复用，也就是PB4变为正常GPIO
+GPIO_Remap_SWJ_NoJTRST
+// 解除JTAG调试端口的复用，也就是PA15，PB3，PB4这三个端口变成普通的GPIO，上面的PA13和PA14仍为SWD端口。
+GPIO_Remap_SWJ_JTAGDisable
+// 解除JTAG-SWD调试端口的所有引脚，也就是PA13，PA14，PA15，PB3，PB4全部都变成了普通端口，但是需要特别注意的是，一旦调用参数下载程序后调试端口就没有了，ST-Link就下载不进去程序了，这时候就只能用串口下载一个新的没有解除调试端口的程序，这样才能把调试端口弄回来
+GPIO_Remap_SWJ_Disable 
+```
+如果想重映射定时器或者其他外设的引脚，就开启AFIO的时钟，并用AFIO重映射外设复用的引脚，如果重映射的引脚正好是调试端口，就还需要加上GPIO解除调试端口
+1.打开AFIO时钟
+2.重映射GPIO端口
+3.解除调试端口
+```C
+void GPIO_PinRemapConfig(uint32_t GPIO_Remap, FunctionalState NewState);
+void GPIO_EXTILineConfig(uint8_t GPIO_PortSource, 
+uint8_t GPIO_PinSource);
+void GPIO_ETH_MediaInterfaceConfig(uint32_t GPIO_ETH_MediaInterface);
+```
 ### 高级定时器
 
 ![image-20250321102018983](images/image-20250321102018983.png)
@@ -1086,31 +1151,51 @@ PWM频率越快，等效模拟的信号就越平稳，不过同时性能开销�
 可以认为这个表格就是在描述输出模式控制器。
 ![image-20250321102221654](images/image-20250321102221654.png)
 用处在于正在输出PWM波的时候想暂停一会儿，就可以设置成这个模式，一旦切换为冻结模式输出就暂停了，并且高低电平也为维持暂停时刻状态，保持不变。
-有效电平和无效电平一般是高级定时器里面的说法，是和关断刹车这些功能配合表述的，它说的比较严谨，可以直接理解为置有效电平就是置高电平，置无效电平就是置低电平。
+匹配时电平翻转模式：可以方便输出一个频率可用，占空比始终为50%的PWM波形，比如设置CCR为0时，那CNT每次更新清0时，就会产生一次CNT=CCR事件，这就会导致输出电平翻转一次，每更新两次，输出为一个周期，并且高电平和低电平时间始终相等，也就是占空比始终为50%，当改变定时器更新频率时，输出波形的频率也会随之改变，输出波形的频率=更新频率/2。
+有效电平和无效电平一般是高级定时器里面的说法，是和关断刹车这些功能配合表述的，它说的比较严谨，可以直接理解为置有效电平就是置高电平，置无效电平就是置低电平。这两个模式都是一次性的，如果想输出一次性的信号，可以参考这两个模式。
+
+强制为无效电平和强制为有效电平，这两个模式和冻结模式也差不多，如果想暂停输出，并且在暂停期间保持低电平或者高电平时可以用这两个模式。
+PWM模式1和PWM模式2：可以用于输出频率和占空比都可调的PWM波形，PWM模式2实际上就是PWM模式1的取反，输出模式控制器和极性控制器都可以控制PWM输出的极性，所以使用PWM模式1的正极性和PWM模式2的反极性最终的输出结果都是一样的，因此在实际使用过程中，仅使用PWM模式1即可。
 ### PWM基本结构
-
+输出PWM的基本结构，蓝色线是CNT的值，黄色线是ARR的值，红色线是CCR的值。CNT<CCR置高电平，CNT≥CCR置低电平，CNT溢出清零后CNT<CCR。
 <img src="images/image-20250321102328129.png" alt="image-20250321102328129" style="zoom:200%;" />
+输出PWM不需要使用中断，配置好时基单元后，CNT就可以开始不断地自增运行了。  文字被擦除了，显示不全。
 
+输出PWM的步骤
+1.RCC开启时钟，把我们要用的TIM外设和GPIO外设的时钟打开。
+2.配置时基单元，包括这前面的时钟源选择。
+3.配置输出比较单元，包括CCR的值，输出比较模块，极性选择，输出使能这些参数，在库函数里也是用结构体统一来配置的。
+4.配置GPIO，把PWM对应的GPIO口，初始化为复用推挽输出，GPIO和PWM的对应关系看引脚对应表。
+5.运行控制，启动定时器。
 ### 参数计算
-
+在实际使用中，可以先根据分辨率的要求，先确定ARR，比如分辨率1%，则ARR给100-1这样PSC决定频率，CCR决定占空比，如果要更高的分辨率，0.1%那ARR先固定1000-1这样频率就是72M/预分频器数值/1000占空比就是CCR/1000
+当ARR=100-1时，CCR的值本身就是占空比，用起来很直观。PSC和ARR都可以调节频率，但是占空比=CCR/(ARR+1)所以通过调节ARR还会同事影响到占空比，而通过PSC调节频率，不会影响占空比，显然比较方便。
 ![image-20250321102408745](images/image-20250321102408745.png)
+在等于30的瞬间，就已经跳变为低电平了，所以CNT从0到29是高电平，总共是30个数的时间，因为占空比就是30/100=30%。PWM周期，对应的是计数器的一个溢出更新周期，所以PWM的频率等于计数器的更新频率。
 PWM频率：	Freq = CK_PSC / (PSC + 1) / (ARR + 1)
-PWM占空比：	Duty = CCR / (ARR + 1)
-PWM分辨率：	Reso = 1 / (ARR + 1)
+PWM占空比：	Duty = CCR / (ARR + 1)由上图可以看书CCR的值应该设置在0到ARR+1这个范围内，CCR=ARR+1时，占空比就正好是100%，如果CCR再大一些，那占空比就始终是100%，没有意义，所以CCR的变化范围取决于ARR的值，ARR越大，CCR的范围就越大，对应的分辨率就越大。
+PWM分辨率：	Reso = 1 / (ARR + 1)此时分辨率的定义是占空比最小的变化步距，因此这个值是越小越好，也可以把CCR的范围定义成分辨率，那就是值越大越好，总之就是占空比的变化越细腻越好。
 
 ### 舵机介绍
+舵机并不是一种单独的电机，它的内部是由直流电机驱动的，其内部有控制电路板，是一个电机的控制系统，大概的执行逻辑是PWM信号输入到控制板，给控制板一个指定的目标角度，然后电位器检测输出轴当前的角度，如果大于目标角度，电机就会反转，如果小于目标角度，电机就会正转，最终使输出轴固定在制定角度，这就是舵机内部的工作流程。
+
 
 舵机是一种根据输入PWM信号占空比来控制输出角度的装置
 输入PWM信号要求：周期为20ms，高电平宽度为0.5ms~2.5ms
 
 
 ![image-20250324164850161](images/image-20250324164850161.png)
-
+3根输入线，两根式电源线VCC和GND，具体的型号是SG90，PWM的确也可以作为常用的通讯协议，因为他只用一根信号线。中间的角度是线性对应的，这里的PWM波形，其实是当作通讯协议来使用的，和之前所说的用PWM等效模拟输出关系不大。
 ### 硬件电路
-
+舵机使用的是PA1引脚的通道2，一个定时器有4个通道，同一个定时器的不同通道输出PWM它们因为是通道间共用一个计数器的，所以他们的频率是一样的，他们的占空比由各自的CCR决定，所以占空比可以各自设定，还有就是它们的相位，由于计数器更新，所有PWM同时跳变，他们的相位是同步的，这就是同一个定时器不同通道输出PWM的特点。如果驱动多个舵机或直流电机，那使用一个通道的不同PWM即可。
+舵机的对应关系的角度换算
+0°-500ms
+180°-2500ms
+pwm=angle/180×(2500-500)+500
 ![image-20250324164840161](images/image-20250324164840161.png)
-
+这个+5V是要接到ST-Link的5V端口上，因为STm32的输出电压只有3.3V，而且输出功率不大，所以是没有办法带得动电机的。一般点击都是大功率设备，它的驱动电源也必须是一个大功率的输出设备，如果能单独供电最好，如果不能也要看电源的功率能否达标，如果单独供电的话，供电的负极要和STm32共地，然后正极接在5V供电引脚上。因为舵机内部是有驱动电路的，所以单片机的引脚可以直接接到这里来，PWM只是一个通讯线，是不需要特别大功率的。
 ### 直流电机及驱动简介
+因为电机也是磁铁和线圈，所以在PWM的驱动下会发出蜂鸣器的声音，解决的方法是加大PWM频率，人耳听力频率是20Hz-20kHz，因此PWM频率加大到20kHz以上即可。
 
 直流电机是一种将电能转换为机械能的装置，有两个电极，当电极正接时，电机正转，当电极反接时，电机反转
 直流电机属于大功率器件，GPIO口无法直接驱动，需要配合电机驱动电路来操作
@@ -1161,3 +1246,669 @@ IC（Input Capture）输入捕获
 ![image-20250324164529007](images/image-20250324164529007.png)
 
 # ESP32-IDF
+
+## WSL2搭建ESP-IDF开发环境
+
+### WSL环境搭建
+
+#### 1.安装
+
+1. 管理员运行powershell
+
+2. 启用“适用于Linux的Windows子系统”可选功能
+
+   ```powershell
+   dism.exe /online /enable-feature /featurename:Microsoft-Windows-Subsystem-Linux /all
+   ```
+
+3. 启用虚拟机可选组件
+
+   ```
+   dism.exe /online /enable-feature /featurename:VirtualMachinePlatform /all /norestart
+   ```
+
+   
+
+4. 重启电脑重新以管理员运行powershell
+
+   ```
+   wsl --set-default-version 2
+   ```
+
+   
+
+5. 打开Microsoft Store，选择偏好的Linux分发版获取
+
+6. 安装完成电机启动，在powershell里面执行wsl.exe
+
+7. 设置初始用户名和密码
+
+#### 2.更换源
+
+1. 备份文件
+
+   ```bash
+   sudo mv /etc/apt/sources.list /etc/apt/sources.list_bak
+   ```
+
+   
+
+2. 新建文件并选择一家写入文件
+
+   ```bash
+    sudo vim /etc/apt/sources.list
+   ```
+
+   
+
+3. 或选择一键指令配置
+
+   ```bash
+   sudo sed -i -r 's#http://(archive|security).ubuntu.com#https://mirrors.aliyun.com#g' /etc/apt/sources.list
+   ```
+
+   
+
+4. 获取&更新
+
+   ```bash
+   sudo apt-get update
+   sudo apt-get upgrade
+   ```
+
+   
+
+清华源
+
+```powershell
+# 默认注释了源码镜像以提高 apt update 速度，如有需要可自行取消注释
+deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ jammy main restricted universe multiverse
+# deb-src https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ jammy main restricted universe multiverse
+deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ jammy-updates main restricted universe multiverse
+# deb-src https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ jammy-updates main restricted universe multiverse
+deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ jammy-backports main restricted universe multiverse
+# deb-src https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ jammy-backports main restricted universe multiverse
+deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ jammy-security main restricted universe multiverse
+# deb-src https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ jammy-security main restricted universe multiverse
+
+# 预发布软件源，不建议启用
+# deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ jammy-proposed main restricted universe multiverse
+# deb-src https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ jammy-proposed main restricted universe multiverse
+
+```
+
+阿里源
+
+```bash
+deb http://mirrors.aliyun.com/ubuntu/ jammy main restricted universe multiverse
+deb-src http://mirrors.aliyun.com/ubuntu/ jammy main restricted universe multiverse
+deb http://mirrors.aliyun.com/ubuntu/ jammy-security main restricted universe multiverse
+deb-src http://mirrors.aliyun.com/ubuntu/ jammy-security main restricted universe multiverse
+deb http://mirrors.aliyun.com/ubuntu/ jammy-updates main restricted universe multiverse
+deb-src http://mirrors.aliyun.com/ubuntu/ jammy-updates main restricted universe multiverse
+deb http://mirrors.aliyun.com/ubuntu/ jammy-proposed main restricted universe multiverse
+deb-src http://mirrors.aliyun.com/ubuntu/ jammy-proposed main restricted universe multiverse
+deb http://mirrors.aliyun.com/ubuntu/ jammy-backports main restricted universe multiverse
+deb-src http://mirrors.aliyun.com/ubuntu/ jammy-backports main restricted universe multiverse
+
+```
+
+中科大源
+
+```bash
+deb https://mirrors.ustc.edu.cn/ubuntu/ jammy main restricted universe multiverse
+deb-src https://mirrors.ustc.edu.cn/ubuntu/ jammy main restricted universe multiverse
+deb https://mirrors.ustc.edu.cn/ubuntu/ jammy-updates main restricted universe multiverse
+deb-src https://mirrors.ustc.edu.cn/ubuntu/ jammy-updates main restricted universe multiverse
+deb https://mirrors.ustc.edu.cn/ubuntu/ jammy-backports main restricted universe multiverse
+deb-src https://mirrors.ustc.edu.cn/ubuntu/ jammy-backports main restricted universe multiverse
+deb https://mirrors.ustc.edu.cn/ubuntu/ jammy-security main restricted universe multiverse
+deb-src https://mirrors.ustc.edu.cn/ubuntu/ jammy-security main restricted universe multiverse
+deb https://mirrors.ustc.edu.cn/ubuntu/ jammy-proposed main restricted universe multiverse
+deb-src https://mirrors.ustc.edu.cn/ubuntu/ jammy-proposed main restricted universe multiverse
+
+```
+
+网易163源
+
+```bash
+deb http://mirrors.163.com/ubuntu/ jammy main restricted universe multiverse
+deb http://mirrors.163.com/ubuntu/ jammy-security main restricted universe multiverse
+deb http://mirrors.163.com/ubuntu/ jammy-updates main restricted universe multiverse
+deb http://mirrors.163.com/ubuntu/ jammy-proposed main restricted universe multiverse
+deb http://mirrors.163.com/ubuntu/ jammy-backports main restricted universe multiverse
+deb-src http://mirrors.163.com/ubuntu/ jammy main restricted universe multiverse
+deb-src http://mirrors.163.com/ubuntu/ jammy-security main restricted universe multiverse
+deb-src http://mirrors.163.com/ubuntu/ jammy-updates main restricted universe multiverse
+deb-src http://mirrors.163.com/ubuntu/ jammy-proposed main restricted universe multiverse
+deb-src http://mirrors.163.com/ubuntu/ jammy-backports main restricted universe multiverse
+
+```
+
+
+
+#### 3.ssh配置
+
+```bash
+sudo apt remove openssh-server
+sudo apt install openssh-server
+sudo vim /etc/ssh/sshd_config 
+
+#找到以下配置并更改
+Port 22222                   # 设置端口为22222
+ListenAddress 0.0.0.0		
+PermitRootLogin yes         # 允许root远程登录
+PasswordAuthentication yes  # 密码验证登录
+
+#windows自启动&服务启动
+#wsl2下
+sudo vim /etc/init.wsl
+    #内容如下
+    #! /bin/sh
+    /etc/init.d/ssh start
+#配置权限
+sudo chmod +x /etc/init.wsl
+
+#windows下创建 wsl-start.vbs文件添加内容如下
+    Set ws = WScript.CreateObject("WScript.Shell")        
+    ws.run "wsl -d ubuntu -u root /etc/init.wsl"
+    
+#Win+R  shell:startup 将上面vbs文件放入打开的文件夹内
+
+```
+
+### ESP-IDF
+
+#### 1.环境安装
+
+```bash
+#编译 ESP-IDF 需要以下软件包
+sudo apt-get install git wget flex bison gperf python3 python3-venv python3-setuptools cmake ninja-build ccache libffi-dev libssl-dev dfu-util libusb-1.0-0
+```
+
+
+
+#### 2.获取ESP-IDF
+
+```bash
+#用户目录下创建esp文件夹，从git仓库拉取V5.0版本至此目录下
+mkdir -p ~/esp
+cd ~/esp
+git clone -b release/v5.0 --recursive https://github.com/espressif/esp-idf.git
+```
+
+
+
+#### 3.设置工具
+
+```bash
+#进入idf文件夹，设置对应工具
+cd ~/esp/esp-idf
+
+#配置esp32项目开发
+./install.sh esp32
+
+#配置esp32&esp32s2项目开发
+./install.sh esp32,esp32s2
+
+#配置所有项目开发
+./install.sh all
+```
+
+
+
+#### 4.设置环境变量
+
+```bash
+# 注意设置环境变量后才可以正常使用idf开发
+. $HOME/esp/esp-idf/export.sh
+```
+
+#### 5.hello world工程示例
+
+工程示例，从/esp-idf中的example目录下将get-started/hello工程复制到本地的~/esp目录下，进入hello_world目录，设置esp32s3为目标芯片，然后运行工程配置工具menuconfig，使用idf.py set-target esp32s3设置目标芯片时，此操作将清除并初始化项目之前的编译和配置(如果有的话)，也可以直接将目标配置为环境变量。
+
+```bash
+cd ~/esp/hello_world
+idf.py set-target esp32S3
+idf.py menuconfig
+
+# 编译
+idf.py build
+
+# 下载运行
+idf.py -p PORT [-b BAUD] flash
+
+# 监视输出
+idf.py -p PORT monitor
+# “Ctrl+]”  退出
+```
+
+
+
+### 常用工具
+
+#### Windows usbipd命令
+
+​	因为wsl2无法直接使用Windows下的串口，借助开源usbipd-win项目来实现串口烧录。
+
+##### usbipd介绍
+
+​	usbipd是一个用于管理USB/IP(USB over IP)服务的命令行工具，可以在Windows下使用。USB/IP是一种协议，允许通过网络共享USB设备。usbipd工具允许用户在Windows上共享USB设备，使其他计算机能够通过网络访问这些设备。
+
+##### Windows下安装
+
+​	仓库下载安装或者通过powershell的Windows程序包管理器程序(winget)来安装
+
+```powershell
+#使用 winget 工具安装和管理应用程序安装  取消--interactive可能导致立即重启
+winget install --interactive --exact dorssel.usbipd-win
+```
+
+##### wsl2下安装
+
+https://github.com/dorssel/usbipd-win/wiki/WSL-support 参考链接
+
+在wsl2下面需要下列命令
+
+```powershell
+sudo apt install linux-tools-virtual hwdata
+sudo update-alternatives --install /usr/local/bin/usbip usbip `ls /usr/lib/linux-tools/*/usbip | tail -n1` 20
+```
+
+##### 具体使用
+
+```powershell
+#管理员打开Powershell，否则会提示没有权限
+wsl -l -v
+	#我的结果如下：
+  	NAME            STATE           VERSION
+	* Ubuntu-22.04    Running         2
+
+#列出所有连接到 Windows 的 USB 设备
+usbipd list
+	#我的结果如下：
+Connected:
+BUSID  VID:PID    DEVICE                                                        STATE
+1-1    1a86:7523  USB-SERIAL CH340 (COM8)                                       Not shared
+1-3    046d:c53f  LIGHTSPEED Receiver, USB 输入设备                             Not shared
+1-6    0408:4035  ACER HD User Facing, APP Mode                                 Not shared
+1-10   8087:0026  英特尔(R) 无线 Bluetooth(R)                                   Not shared
+
+Persisted:
+GUID                                  DEVICE
+#选择WSL的设备总线ID，然后运行此命令。WSL会提示你输入密码以运行sudo命令。要附加的 Linux 发行版必须是默认分发版
+
+#绑定ID
+usbipd bind --busid 4-4
+#创建映射
+usbipd attach -b 4-4 -w
+	# WSL2下使用 sudo /dev/tty* 在绑定前后查询，查看新增设备名
+	# 有些为 /dev/ttyUSB0 我的为 /dev/ttyACM0
+
+#WSL2下设置设备读写权限
+sudo chmod a+rw /dev/ttyACM0
+
+#解绑映射 注意不解绑可能导致windows下无法使用此COM口
+usbipd detach -b 4-4
+
+```
+
+
+
+##### 基本命令参数
+
+```powershell
+usbipd list
+```
+
+**描述**：列出当前系统上所有可用的USB设备
+
+**示例**：
+
+```powershell
+PS C:\Users\57117> usbipd list
+Connected:
+BUSID  VID:PID    DEVICE                                                        STATE
+1-1    1a86:7523  USB-SERIAL CH340 (COM8)                                       Not shared
+1-3    046d:c53f  LIGHTSPEED Receiver, USB 输入设备                             Not shared
+1-6    0408:4035  ACER HD User Facing, APP Mode                                 Not shared
+1-10   8087:0026  英特尔(R) 无线 Bluetooth(R)                                   Not shared
+
+Persisted:
+GUID                                  DEVICE
+```
+
+​	使用usbipd
+
+```powershell
+usbipd unbind --guid [GUID]
+```
+
+# FreeRTOS学习笔记
+
+
+
+
+```c++
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
+#include "freertos/semphr.h"
+#include "freertos/event_groups.h"
+#include "freertos/queue.h"
+#include "esp_log.h"
+
+static const char *TAG = "main";
+
+/** 任务A
+
+ * @param 无
+ * @return 无
+   */
+   void taskA(void *param)
+   {
+    while(1)
+    {
+        //每隔500ms打印
+        ESP_LOGI(TAG,"this is taskA");
+        vTaskDelay(pdMS_TO_TICKS(500));
+    }
+   }
+   /** 任务B
+ * @param 无
+ * @return 无
+   */
+   void taskB(void* param)
+   {
+    while(1)
+    {
+        //每隔700ms打印
+        ESP_LOGI(TAG,"this is taskB");
+        vTaskDelay(pdMS_TO_TICKS(700));
+    }
+   }
+
+/** 任务例程初始化
+
+ * @param 无
+ * @return 无
+   */
+   void rtos_task_sample(void)
+   {
+    //以下创建两个任务，任务栈大小为2048字节，优先级为3，并设定运行在CORE1上
+    xTaskCreatePinnedToCore(taskA,"taskA",2048,NULL,3,NULL,1);
+    xTaskCreatePinnedToCore(taskB,"taskB",2048,NULL,3,NULL,1);
+   }
+
+//队列句柄
+static QueueHandle_t s_testQueue;
+//定义一个队列数据内容结构体
+typedef struct
+{
+    int num;    //里面只有一个num成员，用来记录一下数据
+}queue_packet;
+
+/** 队列任务A，用于定时向队列发送queue_packet数据
+
+ * @param 无
+ * @return 无
+   */
+   void queue_taskA(void *param)
+   {
+    int test_cnt = 0;
+    while(1)
+    {
+        queue_packet packet;
+        packet.num = test_cnt++;
+        //发送queue_packet数据
+        xQueueSend(s_testQueue,&packet,pdMS_TO_TICKS(200));
+        ESP_LOGI(TAG,"taskA send packet,num:%d",packet.num);
+        //延时1000ms
+        vTaskDelay(pdMS_TO_TICKS(1000));
+    }
+   }
+
+/** 队列任务B，用于从队列接收数据
+
+ * @param 无
+ * @return 无
+   */
+   void queue_taskB(void *param)
+   {
+    while(1)
+    {
+        queue_packet packet;
+        BaseType_t ret = xQueueReceive(s_testQueue,&packet,pdMS_TO_TICKS(200));
+        if(ret == pdTRUE)
+        {
+            //如果收到数据就打印出来
+            ESP_LOGI(TAG,"taskB receive packet,num:%d",packet.num);
+        }
+    }
+   }
+
+/** 初始化队列例程
+
+ * @param 无
+ * @return 无
+   */
+   void rtos_queue_sample(void)
+   {
+    //初始化一个队列，队列单元内容是queue_packet结构体，最大长度是5
+    s_testQueue = xQueueCreate(5,sizeof(queue_packet));
+    //队列任务A，定时向队列发送数据
+    xTaskCreatePinnedToCore(queue_taskA,"queue_taskA",2048,NULL,3,NULL,1);
+    //队列任务B，从队列中接收数据
+    xTaskCreatePinnedToCore(queue_taskB,"queue_taskB",2048,NULL,3,NULL,1);
+   }
+
+//二进制信号量
+static SemaphoreHandle_t s_testBinSem;
+//计数信号量
+static SemaphoreHandle_t s_testCountSem;
+//互斥信号量
+static SemaphoreHandle_t s_testMuxSem;
+
+/** 信号量任务A，定时向三种信号量句柄释放信号
+
+ * @param 无
+
+ * @return 无
+   */
+   void sem_taskA(void* param)
+   {
+    const int count_sem_num = 5;
+    while(1)
+    {
+        //向二值信号量释放信号
+        xSemaphoreGive(s_testBinSem);
+
+        //向计数信号量释放5个信号
+        for(int i = 0;i < count_sem_num;i++)
+        {
+            xSemaphoreGive(s_testCountSem);
+        }
+       
+        //向互斥信号量释放信号
+        xSemaphoreGiveRecursive(s_testMuxSem);
+        vTaskDelay(pdMS_TO_TICKS(2000));
+
+    }
+   }
+
+void sem_taskB(void* param)
+{
+    BaseType_t ret = 0;
+    while(1)
+    {
+        //无限等待二进制信号量，直到获取成功才返回
+        ret = xSemaphoreTake(s_testBinSem,portMAX_DELAY);
+        if(ret == pdTRUE)
+            ESP_LOGI(TAG,"take binary semaphore");
+
+
+        //接收计数信号量，每次接收200ms，直到接收失败才结束循环
+        int sem_count = 0;
+        do
+        {
+            ret = xSemaphoreTake(s_testCountSem,pdMS_TO_TICKS(200));
+            if(ret==pdTRUE)
+            {
+                ESP_LOGI(TAG,"take count semaphore,count:%d\r\n",++sem_count);
+            }
+        }while(ret ==pdTRUE);
+        
+        //无限等待互斥信号量，直到获取成功才返回，这里用法和二进制信号量极为类似
+        ret = xSemaphoreTakeRecursive(s_testMuxSem,portMAX_DELAY);
+        if(ret == pdTRUE)
+            ESP_LOGI(TAG,"take Mutex semaphore");
+    
+    }
+
+}
+
+/** 初始化信号量例程
+
+ * @param 无
+ * @return 无
+   */
+   void rtos_sem_sample(void)
+   {
+    s_testBinSem = xSemaphoreCreateBinary();
+    s_testCountSem = xSemaphoreCreateCounting(5,0);
+    s_testMuxSem = xSemaphoreCreateMutex();
+    xTaskCreatePinnedToCore(sem_taskA,"sem_taskA",2048,NULL,3,NULL,1);
+    xTaskCreatePinnedToCore(sem_taskB,"sem_taskB",2048,NULL,3,NULL,1);
+   }
+
+//事件组句柄
+static EventGroupHandle_t s_testEvent;
+
+/** 事件任务A，用于定时标记事件
+
+ * @param 无
+ * @return 无
+   */
+   void event_taskA(void* param)
+   {
+    while(1)
+    {
+        xEventGroupSetBits(s_testEvent,BIT0);
+        vTaskDelay(pdMS_TO_TICKS(1000));
+        xEventGroupSetBits(s_testEvent,BIT1);
+        vTaskDelay(pdMS_TO_TICKS(1500));
+    }
+   }
+
+/** 事件任务B，等待事件组中BIT0和BIT1位
+
+ * @param 无
+ * @return 无
+   */
+   void event_taskB(void* param)
+   {
+    EventBits_t ev;
+    while(1)
+    {
+        ev = xEventGroupWaitBits(s_testEvent,BIT0|BIT1,pdTRUE,pdFALSE,portMAX_DELAY);
+        if(ev & BIT0)
+        {
+            ESP_LOGI(TAG,"Event BIT0 set");
+        }
+        if(ev& BIT1)
+        {
+            ESP_LOGI(TAG,"Event BIT1 set");
+        }
+    }
+   }
+
+/** 事件例程初始化
+
+ * @param 无
+ * @return 无
+   */
+   void rtos_event_sample(void)
+   {
+    s_testEvent = xEventGroupCreate();
+    xTaskCreatePinnedToCore(event_taskA,"event_taskA",2048,NULL,3,NULL,1);
+    xTaskCreatePinnedToCore(event_taskB,"event_taskB",2048,NULL,3,NULL,1);
+   }
+
+//要使用任务通知，需要记录任务句柄
+static TaskHandle_t s_notifyTaskAHandle;
+static TaskHandle_t s_notifyTaskBHandle;
+
+/** 任务通知A，用于定时向任务通知B直接传输数据
+
+ * @param 无
+ * @return 无
+   */
+   void notify_taskA(void* param)
+   {
+    uint32_t rec_val = 0;
+    while(1)
+    {
+        if (xTaskNotifyWait(0x00, ULONG_MAX, &rec_val, pdMS_TO_TICKS(1000)) == pdTRUE)
+        {
+            ESP_LOGI(TAG,"receive notify value:%lu",rec_val);
+        }
+    }
+   }
+
+/** 任务通知B，实时接收任务通知A的数据
+
+ * @param 无
+ * @return 无
+   */
+   void notify_taskB(void* param)
+   {
+    int notify_val = 0;
+    while(1)
+    {
+        xTaskNotify(s_notifyTaskAHandle, notify_val, eSetValueWithOverwrite);
+        notify_val++;
+        vTaskDelay(pdMS_TO_TICKS(1000));
+    }
+   }
+
+/** 任务通知例程初始化
+
+ * @param 无
+ * @return 无
+   */
+   void rtos_notify_sample(void)
+   {
+    xTaskCreatePinnedToCore(notify_taskA,"notify_taskA",2048,NULL,3,&s_notifyTaskAHandle,1);
+    xTaskCreatePinnedToCore(notify_taskB,"notify_taskB",2048,NULL,3,&s_notifyTaskBHandle,1);
+   }
+
+//入口函数
+void app_main(void)
+{
+    /*
+    以下是每种freeRTOS特性的测试例程的初始化函数，建议每次只开一个，否则有太多打印影响体验
+    */
+    //rtos_task_sample();
+    //rtos_queue_sample();
+    rtos_sem_sample();
+    //rtos_event_sample();
+    //rtos_notify_sample();
+}
+
+
+```
+
+## 原生的FreeRTOS和IDF版本的FreeRTOS的区别
+
+1. 优先级问题，多核情况并不使用，因为有多个任务可同时运行
+2. ESP-IDF自动创建空闲、定时器、app_main、IPC、ESP定时器
+3. ESP-IDF不适用原生FreeRTOS的内存堆管理，实现了自己的堆
+4. 创建任务使用xTaskCreatePinnedToCore()
+5. 删除任务避免删除另外一个核的人物
+6. 临界区使用自旋锁确保同步
+7. 如果任务重用到浮点运算，则创建任务的时候必须指定具体运行在哪个核上，不能由系统自动安排
+
+总的来说，建议如下：
+
+1. 程序应用开发创建任务指定内核，建议不要使用tskNO_AFFINITY
+2. 通常，负责处理无线网络的任务(例如WiFi或蓝牙)，将被固定到CPU0(因此名称PRO_CPU)，而处理应用程序其余部分的任务将被固定到CPU1(因此名称为APP_CPU)
