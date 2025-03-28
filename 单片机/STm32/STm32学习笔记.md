@@ -1625,8 +1625,64 @@ usbipd unbind --guid [GUID]
 
 ## FreeRTOS学习笔记
 
-在使用idf.py build编译后，编译器会根据我们的代码区分出指令总线和数据总线，指令总线部分是可以执行的，比如说我们定义的函数，数据总线部分不可执行。
+在使用idf.py build编译后，编译器会根据我们的代码区分出指令总线和数据总线，指令总线部分是可以执行的，比如说我们定义的函数，数据总线部分不可执行，只能通过字节操作访问，比如说全局变量。
+DRAM（数据 RAM）：属于数据总线，非常量静态数据（如 .data 段和 .bss 段，通常是数值为0的全局变量）由链接器放入内部 SRAM 作为数据存储，也可以配置放入外部 RAM。也就是说static变量或者说初始化为0的全局变量就是存放在这里。
+"noinit" DRAM： 属于数据总线，未初始化的全局变量数据，链接器接管放入内部 SRAM 作为数据存储，也可配置放入外部 RAM。在这个部分的值，启动的时候是不会被初始化的。
+IRAM（指令 RAM）： 属于指令总线，ESP-IDF 将内部 SRAM0（包含3个存储块：SRAM0、SRAM1和SRAM2）的一部分区域（SRAM0 和 SRAM1）分配为指令 RAM。一般来说，编写的中断程序就是放在这个IRAM中的，另外在应用程序用可以通过使用 IRAM_ATTR宏在源代码中指定哪些代码需要放入 IRAM 中。
+IROM（代码从 flash 中运行）：指令总线，如果一个函数必须从 flash 中加载，它将被存储在 flash 中，或者存储在 RTC 存储器中。
+DROM（数据存储在 flash 中）： 数据总线，用于存储仅读取的数据，就是程序中的常量用const修饰的变量。
+RTC Slow memory（RTC 慢速存储器）： 数据总线，RTC_NOINIT_ATTR 属性可以将某些数据存入 RTC Slow memory。存储器中的值在深度睡眠模式中保持不变。
+RTC Fast memory（RTC 快速存储器）： 具有双重作用，既可以用作指令存储器，也可以当做数据存储器，RTC Fast memory 也可以在深度睡眠模式下保持数据，并且能够快速存取。从深度睡眠模式唤醒后必须要运行的代码就是要放在RTC存储器中的。
 
+ESP32的启动流程
+刚才介绍的所有区域都可以被称为段，app_main()是ESP32的应用入口，但是在启动和到达应用入口中间还有很多的工作，具体而言如下所示：1.一级引导程序，固化在ROM中，不可修改，它是负责加载二级引导程序至RAM中运行，并检查IO0引脚，选择程序模式，当芯片上电检测到IO0引脚是低电平的话，就会进入下载模式，否则就会继续执行二级引导程序。2.二级引导程序，也就是bootloader程序，从0x8000处读取分区表，处理各种段，比如说会将IRAM内容拷贝到内存SRAM中，最后加载应用程序。3.应用程序，硬件外设和基本C语言运行环境的初始化，最后执行app_main()函数。
+### FreeRTOS
+#### 任务创建
+在RTOS系统中每个模块相当于都是独立的工作的，通过时间片的方式，每个模块都可以得到执行的机会，任务运行的基本单位是Tick，也可以叫做系统时钟节拍，在ESP-IDF中一个系统节拍是1ms。使用FreeRTOS的实时应用程序可以被构建为一组独立的任务。每个任务在自己的上下文中执行，不依赖于其他任务或RTOS调度器本身。任务分为四个状态：运行、准备就绪、阻塞、挂起。
+
+运行：当任务实际执行时，它被称为处于运行状态。 任务当前正在使用处理器。 如果运行
+RTOS 的处理器只有一个内核， 那么在任何给定时间内都只能有一个任务处于运行状态。
+
+准备就绪：准备就绪任务指那些能够执行（它们不处于阻塞或挂起状态），但目前没有执行的任务，因为同等或更高优先级的不同任务已经处于运行状态。
+
+阻塞：如果任务当前正在等待时间或外部事件，则该任务被认为处于阻塞状态。例如，如果一
+个任务调用 vTaskDelay()，它将被阻塞（被置于阻塞状态），直到延迟结束-一个时间事件。任务也可以通过阻塞来等待队列、信号量、事件组、通知或信号量事件。处于阻塞状态的任务通常有一个"超时"期， 超时后任务将被超时，并被解除阻塞，即使该任务所等待的事件没有发生。“阻塞”状态下的任务不使用任何处理时间，不能被选择进入运行状态。
+
+挂起：与“阻塞”状态下的任务一样， “挂起”状态下的任务不能 被选择进入运行状态，但处于挂起状态的任务没有超时。相反，任务只有在分别通过 vTaskSuspend() 和 xTaskResume()API 调用明确命令时 才会进入或退出挂起状态。
+
+优先级：每个任务均被分配了从 0 到 ( configMAX_PRIORITIES - 1 ) 的优先级，其中的configMAX_PRIORITIES 在 FreeRTOSConfig.h 中定义，低优先级数字表示低优先级任务。 空闲任务的优先级为零。
+```C++
+// 这个函数是原生FreeRTOS中没有的函数，是乐鑫公司自己实现的函数，因为原生的FreeRTOS并没有支持多核CPU情况。但是原生的xTaskCreate()也是在IDF中被支持的，但实质上就是将xTaskCreatePinnedToCore()封装成了xTaskCreate()，并且内核指定为了NO_AFFINITY，来保持的函数接口不变。
+BaseType_t xTaskCreatePinnedToCore(
+    TaskFunction_t pvTaskCode,          // 任务函数指针，原型是 void fun(void *param)
+    const char * constpcName,           // 任务名称，打印调试时可能会用到
+    const uint32_t usStackDepth,        // 任务堆栈空间大小（字节），和原生FreeRTOS的单位不同，一般最小就是2048字节
+    void * constpvParameters,          // 任务参数
+    UBaseType_t uxPriority,             // 任务优先级，数值越大，优先级越高，0到(configMAX_PRIORITIES - 1)这个宏定义的默认值就是25，也就是最高优先级就是24
+    TaskHandle_t * constpvCreatedTask, // 返回创建的任务句柄，有了这个句柄就可以对任务进行挂起、恢复、删除操作，如果不需要的话直接置为NULL即可
+    const BaseType_t xCoreID           // 指定任务在哪个核心上运行，可以选择0或者1
+);
+
+// 如果创建成功，则返回 pdPASS，否则返回相关错误码
+
+
+// 自己指定栈内存区的版本
+TaskHandle_t xTaskCreateStaticPinnedToCore(
+    TaskFunction_t pvTaskCode,          // 任务函数指针
+    const char * constpcName,           // 任务名称
+    const uint32_t ulStackDepth,        // 任务堆栈大小
+    void * constpvParameters,           // 任务参数
+    UBaseType_t uxPriority,             // 任务优先级
+    StackType_t * constpxStackBuffer,   // 指向堆栈内存区域的指针
+    StaticTask_t * constpxTaskBuffer,   // 指向任务控制块内存区域的指针
+    const BaseType_t xCoreID            // 指定任务在哪个核心上运行
+);
+// 延时xTickToDelay个周期
+void vTaskDelay(const TickType_t xTickToDelay);
+
+//用于表示精确的接触阻塞时间
+void vTaskGetTickCount(Ticktype_t *pxPreviousWakeTime, const TickType_t xTimeIncrement);
+```
 
 ```c++
 #include "freertos/FreeRTOS.h"
