@@ -1856,7 +1856,8 @@ USART电路输入数据的一些策略，对于串口来说输出TX应该是比�
 CH340芯片的原理图，最左边是USB的端口，USB的标准供电是5V，中间的D+和D-是通信线，走的是USB协议，所以这需要一个CH340芯片转换一下然后输出的就是串口协议TXD和RXD。需要注意的就是这个模块的供电策略，首先所有的电都是从这个VCC+5V来的，然后经过稳压管电路降压之后得到了VCC+3.3V，之后+3.3V和+5V两个VCC都通过排针引出来了，因此第6脚和第4脚是分别有5V和3.3V输出的，对于第五脚板子上标的是VCC，这个引脚其实是CH340的电源输入脚一般来说这个模块都有一个跳线帽，会插在4/5脚或者5/6脚上，因此这个跳线帽是用来选择通信电平和给CH340供电的，把跳线帽插在45引脚上后，剩下的供电就只剩下5V了，如果选择5V电平，那剩下的供电引脚就只有3.3V，要么选择3.3V电平，剩下供电脚就是5V，所以这个供电脚的设计就不是很方便，但是因为电平的5V和3.3V可以互相兼容，因此如果既要通讯又要保证供电的话，就先保证供电正确。
 
 初始化USART的步骤：
-1.开启时钟，把需要用的USART和GPIO的时钟打开，2.GPIO初始化，把TX配置成复用输出，RX配置成输入，3.配置USART，直接使用一个结构体4.只需要发送的功能就可以直接开启USART，如果需要接收的功能，可能还需要配置中断，那就再开启USART之前，再加上ITConfig和NVIC的代码就行了。
+1.开启时钟，把需要用的USART和GPIO的时钟打开，注意USART是APB1的外设，其它的外设都是APB2的外设。2.GPIO初始化，把TX配置成复用输出，RX配置成输入。3.配置USART，直接使用一个结构体。4.只需要发送的功能就可以直接开启USART，如果需要接收的功能，可能还需要配置中断，那就再开启USART之前，再加上ITConfig和NVIC的代码就行了。
+
 ```C++
 // 恢复缺省配置
 void USART_DeInit(USART_TypeDef* USARTx);
@@ -1864,7 +1865,7 @@ void USART_DeInit(USART_TypeDef* USARTx);
 void USART_Init(USART_TypeDef* USARTx, USART_InitTypeDef* USART_InitStruct);
 // 结构体初始化
 void USART_StructInit(USART_InitTypeDef* USART_InitStruct);
-// 时钟初始化
+// 时钟初始化，包括时钟是否要输出、时钟极性、相位等参数
 void USART_ClockInit(USART_TypeDef* USARTx, USART_ClockInitTypeDef* USART_ClockInitStruct);
 // 时钟结构体初始化
 void USART_ClockStructInit(USART_ClockInitTypeDef* USART_ClockInitStruct);
@@ -1872,13 +1873,16 @@ void USART_ClockStructInit(USART_ClockInitTypeDef* USART_ClockInitStruct);
 void USART_Cmd(USART_TypeDef* USARTx, FunctionalState NewState);
 // USART中断
 void USART_ITConfig(USART_TypeDef* USARTx, uint16_t USART_IT, FunctionalState NewState);
+// 开启USART到DMA的触发通道
 void USART_DMACmd(USART_TypeDef* USARTx, uint16_t USART_DMAReq, FunctionalState NewState);
 void USART_SetAddress(USART_TypeDef* USARTx, uint8_t USART_Address);
 void USART_WakeUpConfig(USART_TypeDef* USARTx, uint16_t USART_WakeUp);
 void USART_ReceiverWakeUpCmd(USART_TypeDef* USARTx, FunctionalState NewState);
 void USART_LINBreakDetectLengthConfig(USART_TypeDef* USARTx, uint16_t USART_LINBreakDetectLength);
 void USART_LINCmd(USART_TypeDef* USARTx, FunctionalState NewState);
+// 发送数据，写DR寄存机，DR寄存器内部有4个寄存器，控制发送与接收
 void USART_SendData(USART_TypeDef* USARTx, uint16_t Data);
+// 接收数据。读DR寄存器
 uint16_t USART_ReceiveData(USART_TypeDef* USARTx);
 void USART_SendBreak(USART_TypeDef* USARTx);
 void USART_SetGuardTime(USART_TypeDef* USARTx, uint8_t USART_GuardTime);
@@ -1890,35 +1894,102 @@ void USART_OverSampling8Cmd(USART_TypeDef* USARTx, FunctionalState NewState);
 void USART_OneBitMethodCmd(USART_TypeDef* USARTx, FunctionalState NewState);
 void USART_IrDAConfig(USART_TypeDef* USARTx, uint16_t USART_IrDAMode);
 void USART_IrDACmd(USART_TypeDef* USARTx, FunctionalState NewState);
+// 获取标志位
 FlagStatus USART_GetFlagStatus(USART_TypeDef* USARTx, uint16_t USART_FLAG);
+// 清除标志位
 void USART_ClearFlag(USART_TypeDef* USARTx, uint16_t USART_FLAG);
+// 获取中断标志位
 ITStatus USART_GetITStatus(USART_TypeDef* USARTx, uint16_t USART_IT);
+// 清除中断标志位
 void USART_ClearITPendingBit(USART_TypeDef* USARTx, uint16_t USART_IT);
 
 ```
+```C++
+typedef struct
+{
+	// 可以直接写一个波特率的数值，然后Init函数可以直接算好对应的分频系数，然后写入到BRR寄存器中去。
+    uint32_t USART_BaudRate;
+    // 字长
+    uint16_t USART_WordLength;
+    // 停止位
+    uint16_t USART_StopBits;
+    // 校验位
+    uint16_t USART_Parity;  
+    // 串口模式，可以选择Tx发送模式和Rx接收模式，如果你既需要发送又需要接收，那就用或符号把Tx和Rx或起来。
+    uint16_t USART_Mode;   
+    // 硬件流控制，直接复制名字之后CTRL+ALT+空格就可以看到参数列表
+    uint16_t USART_HardwareFlowControl; 
+} USART_InitTypeDef;
+```
+```C++
+void USART_SendData(USART_TypeDef* USARTx, uint16_t Data)
+{
+  /* Check the parameters */
+  assert_param(IS_USART_ALL_PERIPH(USARTx));
+  assert_param(IS_USART_DATA(Data)); 
+    
+  /* Transmit Data */
+  // 将无关的高位清零之后直接赋值给DR寄存器，因为是写入DR，因此数据最终通向TDR发送数据寄存器，TDR再传递给发送移位寄存器，最后一位一位把数据移除到Tx引脚，完成数据的发送。
+  USARTx->DR = (Data & (uint16_t)0x01FF);
+}
+```
+
+```C++
+uint16_t USART_ReceiveData(USART_TypeDef* USARTx)
+{
+  /* Check the parameters */
+  assert_param(IS_USART_ALL_PERIPH(USARTx));
+  
+  /* Receive Data */
+  return (uint16_t)(USARTx->DR & (uint16_t)0x01FF);
+}
+```
+
 ## 数据模式
-HEX模式/十六进制模式/二进制模式：以原始数据的形式显示
-文本模式/字符模式：以原始数据编码后的形式显示
+
+HEX模式/十六进制模式/二进制模式：以原始数据的形式显示。
+文本模式/字符模式：以原始数据编码后的形式显示。在这种模式下，每一个字节数据，通过查找字符集，编码成一个字符。
 
 ![image-20250402143142971](images/image-20250402143142971.png)
 
 ![image-20250402143207740](images/image-20250402143207740.png)
 
+这个图描述的就是字符和数据，在发送和接收的转换关系，发送0x41数据那么发送到线路传输的就是0x41，接收方如果以原始数据形式显示就是0x41，如果通过字符集译码以字符显示就是大写字母A，这个译码的字符集就是ASCII、GBK，UTF-8等，当然在发送方可以直接发送字符，通过查找字符集找到A的编码为0x41，因此可以看出在实际的传输线路中发送的实际数据就是0x41。
+在写完字符串之后，编译器会自动补上结束标志位，所以字符串的存储空间会被字符的个数大1，如果需要换行的话需要\r\n两个转义字符才能完成换行，这两个字符一个叫回车一个叫做换行，在终端还是打字机的年代，回车是把打印头转移到本行首位置，换行是将打印头下移一行。
+**printf函数的移植方法**使用printf之前，需要打开工程选项，将Use MicroLIB选项勾选上，这个是Keil为嵌入式平台优化的一个精简库，然后还需要对printf进行重定向，将printf函数打印输出的东西输出到串口，因为printf默认是输出到终端但是单片既没有终端屏幕，具体步骤就是先包含标准输入输出库，然后重写fputc函数，这个函数是printf函数的底层，printf函数在打印的时候就是不断调用fputc函数一个一个打印的，把fputc函数重定向到了串口，那么printf自然就输出到串口了。
+这种移植方式printf只能有一个，重定向到串口1了，那串口2再用就没有了，如果多个串口都想用printf的话可以使用sprintf函数，这个函数可以把格式化字符输出到一个字符串中，然后将需要输出的内容直接通过串口发送就可以了。sprintf还可以继续封装，然后就和printf一样使用了。
+汉字编码出现乱码的情况如何解决，因为目前的汉字编码选择的时候UTF-8的形式，所以最终发送到串口，汉字会以UTF-8的方式进行编码，打开工程选项，C/C++杂项控制栏，写上--no-multibyte-chars，要么就是都是用GB开头的中文编码格式，参数不用加。 
+
 ## HEX数据包
 
+数据包数据包的作用是把一个个单独的数据包给打包起来，方便进行多字节的数据通信。比如说有一个陀螺仪传感器，需要用串口发送数据到STm32，陀螺仪的数据比如说X、Y、Z每一个轴一个字节的数据，如果是XYZXYZXYZ这样进行发送的时候，会出现的问题就是接收方可能会在任意的位置进行接收，比如说会出现YXZ这样信息错位的现象，就会导致无法准确对应好哪一个数值是XYZ，因此就需要有一个行之有效的方式来对发送的数据进行分割，将XYZ这样属于同一批的数据进行打包和分割，方便接收方进行识别。
+比如我们可以设计在这个XYZXYZ数据流中，的第一个数据也就是X的数据包，它的最高位置置1，其余的数据包，最高位都置0，当接收到数据之后，如果最高位是1的时候，就是X数据，然后紧跟着的两个数据就是YZ，这种方法就是把每个数据的最高位当做标志位来进行分割的，在实际使用中UTF8的编码方式就是类似的。但一般并不适用这种方式，因为会破坏原有的数据，使用起来较为麻烦，通常使用的方式是 额外添加包头包尾这种方式。
+
 ![image-20250402143231663](images/image-20250402143231663.png)
+
+如果传输1.包头包尾和数据载荷重复的问题，这里定义的是FF为包头，FE为包尾，的数据本身就是FF和FE该怎么办？这样的确会产生误判，解决方式如下：1.限制载荷的范围，在发送的时候对数据进行限幅，比如说陀螺仪数据只发送0~100的载荷然后包头包尾就是这个范围之外的数字。2.如果无法避免包头包尾重复，那就尽量使用固定长度的数据包，这样数据长度就是固定的只要通过包头包尾对齐了数据，我们就可以严格知道，哪个数据应该是包头包尾，哪个数据应该是有效载荷，在接收载荷数据的时候，并不会判断它是不是包头包尾，而在接收包头包尾的时候会判断它是否确实是包头包尾，用于数据对齐。经过几个数据包的对齐之后，剩下的数据包就不会出现问题了。3.增加包头包尾的数量，并且尽量呈现出载荷数据出现不了的状态，比如使用FF、FE作为包头，FD、FC作为包尾。其次来说包头包尾并不是全部都需要的，可以只要一个包头然后不要包尾，这样数据包的格式就是一个包头FF加4个数据。当检测到FF的时候开始接收，接收够4个字节后置标志位，表示一个数据包接收完成，但是这样包头和载荷的问题会更加严重一点，最严重的情况就是包头是FF载荷也全部都是FF。
+其次就是固定包长和可变包长的选择问题，如果载荷会出现包头包尾重复的情况，最好选择固定包长。反之就可以选择可变包长。各种数据转换为数据流的形式，因为发送数据都是一个数据一个数据发送的，如果想要发送16位的整形数据、32位的整形数据的话，只需要用一个指针指向他们然后把它们当做一个字节数组发送就可以了。
 
 ## 文本数据包
 
 ![image-20250402143259366](images/image-20250402143259366.png)
 
+在HEX数据包中，数据都是以原始的字节数据本身呈现的，而在文本数据包里面，每个字节就经过了一层编码和译码，最终变现出来的就是字符形式。因为数据译码成了字符形式，因此就存在大量的字符可以作为包头和包尾，比如这里规定的就是，以@这个字符作为包头，以\r\n这两个字符作为包尾，在载荷数据中间可以出现除了包头包尾的任意字符。
+优点是传输最直接，解析数据非常简单，比较适合一些模块发送一些原始的数据，例如使用串口通信的陀螺仪、温湿度传感器。缺点就是灵活性不足、载荷容易和包头包尾重复。文本数据包优点是，数据直观容易理解，非常灵活，比较适合一些输入指令进行人机交互的场合，比如蓝牙模块常用的AT指令，CNC和3D打印机常用的G代码，都是文本数据包的格式，缺点就是解析效率低。
+
 ## HEX数据包接收
 
 ![image-20250402143323199](images/image-20250402143323199.png)
 
+每收到一个字节，程序就会进入一次中断，在中断函数中我们可以拿到这一个字节，但是拿到之后就需要退出中断函数，因此每个数据都是一个独立的过程，但是对于数据包来说，它具有前后关联性，包头之后是数据，数据之后是包尾，对于包头数据和包尾这三种状态，我们都需要有不同的处理逻辑，因此在程序中我们需要设计一个能记住不同状态的机制，在不同状态执行不同的操作，同时还要进行状态的合理转移，这就是状态机，图上所示的就是状态转移图，这时设计一个好的状态机程序必不可少的步骤。
+对于接收HEX数据包来说，我们可以设计三个状态：等待包头、接收数据、等待包尾，可以设计一个变量来标示这三种状态，依次为S=0、1/2.执行流程是：最开始s=0，收到一个数据进中断，根据s=0进入第一个状态的程序来判断数据是不是包头的数据FF，如果是FF就表示收到了包头，之后置S=1退出中断结束，这样下次再进中断根据S=1就可以进行接收数据的程序了，如果在第一个状态收到的不是FF，就证明数据包没有对齐，应该等待数据包包头的出现，状态为仍然是0，那么下次进入中断的时候就仍然是判断包头的逻辑，直到出现FF才能转到下一个状态，直到收到FF之后再收到数据我们就直接把它存在数组中，另外再用一个变量用来记录记录收了多少个数据，如果没有收够4个数据，就一直是接收状态，如果接收够了就置S=2，下次进入中断时，就可以进入下一个状态了，最后一个状态就是等待包尾了，判断数据是不是FE，这样就可以置S=0，回到最初的状态，开始下一个轮回，当然也有可能就是这个数据不是FE，比如数据和包头重复，导致包头位置判断错了，那这个包尾位置就有可能不是FE，这时就可以进入重复等待包尾的状态，直到接收到真正的包尾。
+这个状态机其实是一种很广泛的编程思路，使用的基本步骤就是，先根据项目要求定义状态，然后考虑好各个状态在什么情况下会进行转移，如何转移。
+
 ## 文本数据包接收
 
 ![image-20250402143734328](images/image-20250402143734328.png)
+
+和HEX相同，比较不一样的就是这个数据包是可变包长的，因此除了要接收数据之外还需要兼职接收包尾的作用，一旦接收到包尾的时候，就结束程序。这个逻辑就应该是判断一个数据是不是\r如果不是就正常接收，如果是就不接收同时跳到下一个状态，等待包尾\n，因为这个包尾有两个，所以需要第三种状态，如果只有一个包尾的话，就可以在出现包尾之后直接回到初始状态了。因为串口的包头包尾不会出现在一个数据中，因此基本不会出现数据错位的现象。
 
 ## IIC通讯
 
