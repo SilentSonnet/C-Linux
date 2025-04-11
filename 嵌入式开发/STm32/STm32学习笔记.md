@@ -2137,46 +2137,136 @@ INT中断状态寄存器，可以控制内部的哪些事件到中断引脚的�
 
 ## I2C外设简介
 
-STM32内部集成了硬件I2C收发电路，可以由硬件自动执行时钟生成、起始终止条件生成、应答位收发、数据收发等功能，减轻CPU的负担
-支持多主机模型
-支持7位/10位地址模式
+STM32内部集成了硬件I2C收发电路，可以由硬件自动执行时钟生成、起始终止条件生成、应答位收发、数据收发等功能，减轻CPU的负担，相比于软件I2C硬件I2C执行效率高节省软件资源，功能强大可以实现完整的多主机通信模型，时序波形规整，通信速率快，在性能方面是要比软件I2C高的。也就是根据硬件电路自动翻转引脚电平，软件只需要写入控制寄存器CR和数据寄存器DR，为了实时监控时序的状态，如软件还需要读取状态寄存器SR。
+支持多主机模型，主机具有主动控制总线的权力，从机只有在主机允许的情况下才能控制总线。多主机模型又分为可变多主机和固定多主机模型，固定多主机 
+支持7位/10位地址模式，7位地址只有128种情况，因此不能支持超过128以上的设备，此外因为I2C设备很多，也会导致设备地址有重复的，这个解决办法在于设备地址的低位一般是可以配置的，并且也可以再加上一根I2C总线。视为地址就是1024个地址了，因为I2C起始之后的第一个字节必须是寻址+读写位，就需要规定起始之后的前两个字节都是寻址位，因为第一个字节有7个空位，第二个字节有8个空位，余下的5位当了标志位，因为需要让别的设备知道发送了这个字节之后还是寻址，就需要在第一个字节开头写特定的标志位，也就是1111 0，这个开头的地址是不会在7位地址的情况下出现的。
 支持不同的通讯速度，标准速度(高达100 kHz)，快速(高达400 kHz)
 支持DMA
-兼容SMBus协议
+兼容SMBus协议(System Management Bus)系统管理总线，是基于I2C总线改进而来的，用于电源管理。
 
 STM32F103C8T6 硬件I2C资源：I2C1、I2C2
 
 ## I2C框图
 
 ![image-20250402144347941](images/image-20250402144347941.png)
+SDA和SCL就是STm32通过GPIO的服用模式与外部世界相连的，SMBALERT就是SMBus用的。和USART类似，需要发送数据的时候，就可以把一个字节的数据写到数据寄存器DR，当移位寄存器没有数据移位时，就可以将数据寄存器的数据放到移位寄存器中，并置状态寄存器的TXE位为1表示发送寄存器为空，在移位时就可以把下一个数据放到数据寄存器中等待发送了。接收数据的时候也是同样，数据接收到数据移位寄存器，当接收一个字节之后，就会将数据整体转移到数据寄存器中，同时置标志位RXNE，表示接收寄存器非空，这时就可以把数据从数据寄存器中读出来了。因为I2C是半双工，所以数据收发是同一组数据寄存器和移位寄存器。
+图上还有的比较器和自身地址寄存器以及双地址寄存器是从机模式使用的，STm32不进行通信的时候就是从机，自身地址寄存器就是指定自身地址的，当STm32作为从机在被寻址时，如果收到的寻址通过比较器判断和自身地址相同，就响应外部通信，并且STm32支持同时响应两个从机地址，因此就有自身地址寄存器和双地址寄存器两个。
+帧错误校验(PEC)计算，这时STm32设计的一个数据校验模块，当我们发送一个多字节的数据帧的时候，硬件可以自动执行CRC校验计算，如果校验错误硬件就会置校验错误标志位。
+在时钟控制寄存器(CCR)写对应的位，电路就会执行对应的功能，写控制寄存器就可以控制电路运行状态，读状态寄存器就可以知道电路的工作状态。也可以申请中断和DMA，当有很多的字节需要收发的时候就可以配合DMA来提高效率。
+
 
 ## IIC基本结构
 
 ![image-20250402144407506](images/image-20250402144407506.png)
 
+因为I2C是高位先行所以这个移位寄存器是向左移位的，发送的时候是最高位先移动出去，接收的时候数据通过GPIO口从右边移动过来。GPIO的配置都需要配置成复用开漏输出的模式，复用就是GPIO的状态交由片上外设来控制的，开漏输出是I2C协议要求的端口配置，开漏输出模式，GPIO端口也是可以输入的。时钟控制器的线路进行了简化，需要注意的是GPIO当前的结构是一主多从的模型，如果是多主机模型的话，时钟信号线还是可以输入的。
+
 ## 主机发送
 
 ![image-20250402144542021](images/image-20250402144542021.png)
+
+当STm32想要执行指定地址写的时候，就按照这个主发送器传送序列图来进行，图上展示的是7位地址的主发送和10位地址的主发送，七位地址，起始条件后的一个字节是寻址，10位地址，起始后的两个字节都是寻址，其中前一个字节，在图上写的是帧头，内容是5位的标志位1110+2位地址+1位读写位，后一个字节就是纯粹的8位地址了，两个字节加在一起就构成了10位寻址。
+首先，初始化之后，总线默认空闲状态，STm32默认是从模式，为了产生一个起始条件，STm32需要写入控制寄存器。起始条件之后会发生EV5事件，可以将其当作标志位，因为一个状态可能会产生多个中断标志位，所以这个事件就是组合了多个标志位的一个大标志位。
+SB（Start Bit）标志位，是状态寄存器的一个位，之后就是发送地址，然后硬件就会自动接收应答位并判断，如果没有应答，硬件就会置应答失败的标志位，然后这个标志位就可以申请中断来提醒。当寻址完成后会产生EV6事件，ADDR=1就代表地址发送结束，EV8_1事件就是可以写入DR数据，EV8就是移位寄存器正在发数据的状态。在数据1的结束时刻，写入了新的DR寄存器数据，当需要发送的数据全部发送完毕的时候此时的事件就是移位寄存器空，数据寄存器也空的状态，这个事件就是EV8_2,BTF（Byte  Transfer Finished），这个是字节发送结束标志位，表示档期你的移位寄存器已经移完了，该找数据寄存器要下一个数据了，但是数据寄存器没有数据就说明主机不想发送数据了，这时就代表字节发送停止。因此当检测到EV8_2的时候就可以产生终止条件了。
 
 ## 主机接收
 
 ![image-20250402144548782](images/image-20250402144548782.png)
 
+七位地址当前地址读，起始位，从机地址+读，接收应答，接收数据发送应答，最后一个数据给非应答，之后终止。十位地址当前地址读，起始，发送帧头，接收应答，然后发送余下的地址，因为这两个字节才是指定了地址 ，要想转入读的地址就必须再发送重复起始条件发送帧头，这次的帧头就是读的了，因为发送读的指令后第二个字节就会转入读的时序中，所以第二个字节的地址就没有了 ，直接转入接收数据的时序。EV6_1就是数据接收到了，正在移位，EV7就是一个字节的数据接收成功，可以读取走到数据寄存器了，读取了之后EV7时间就结束了，不需要接收的时候，就在最后一个时序单元结束的时候，提前把应答位控制寄存器ACK置0 ，并设置终止条件请求。这一部分需要仔细看手册搞明白才行
+
 ## 软件/硬件波形对比
 
 ![image-20250402144557274](images/image-20250402144557274.png)
 
+上面是软件I2C，下面是硬件I2C，硬件I2C的波形会规整一些，软件模拟I2C因为每次电平翻转都会增加一定的延时，电平信号并不规整，电平周期和占空比并不规整。之前说SCL低电平写高电平读，虽然整个电平任意时刻都可以读写，但是一般要求保证尽早的原则，所以可以直接认为就是SCL下降沿写、上升沿读。
+
+将文件移出工程首先就是关闭标签页，然后在group中remove出去，最后在工程树中把文件删除，保持工程树和工程目录里的文件一致。
+初始化I2C流程：、
+
+1. 开启I2C外设和对应GPIO口的时钟2. 把I2C外设对应的GPIO口初始化为复用开漏模式，3.使用结构体对整个I2C进行配置。4.I2C_Cmd使能I2C
+
+```C++
+void I2C_DeInit(I2C_TypeDef* I2Cx);
+void I2C_Init(I2C_TypeDef* I2Cx, I2C_InitTypeDef* I2C_InitStruct);
+void I2C_StructInit(I2C_InitTypeDef* I2C_InitStruct);
+void I2C_Cmd(I2C_TypeDef* I2Cx, FunctionalState NewState);
+void I2C_DMACmd(I2C_TypeDef* I2Cx, FunctionalState NewState);
+void I2C_DMALastTransferCmd(I2C_TypeDef* I2Cx, FunctionalState NewState);
+// 生成起始条件
+void I2C_GenerateSTART(I2C_TypeDef* I2Cx, FunctionalState NewState);
+// 生成终止条件
+void I2C_GenerateSTOP(I2C_TypeDef* I2Cx, FunctionalState NewState);
+// 配置在收到一个字节后是否给从机应答
+void I2C_AcknowledgeConfig(I2C_TypeDef* I2Cx, FunctionalState NewState);
+void I2C_OwnAddress2Config(I2C_TypeDef* I2Cx, uint8_t Address);
+void I2C_DualAddressCmd(I2C_TypeDef* I2Cx, FunctionalState NewState);
+void I2C_GeneralCallCmd(I2C_TypeDef* I2Cx, FunctionalState NewState);
+void I2C_ITConfig(I2C_TypeDef* I2Cx, uint16_t I2C_IT, FunctionalState NewState);
+// 发送数据，写入DR寄存器
+// 库函数发送数据都自带了接收应答的过程，接收数据也自带了发送应答的过程，如果应答错误，硬件会通过标志位和中断来提示我们，因此应答位就不需要处理了。
+void I2C_SendData(I2C_TypeDef* I2Cx, uint8_t Data);
+// 接收数据，读取DR寄存器
+uint8_t I2C_ReceiveData(I2C_TypeDef* I2Cx);
+// 发送七位地址专用的函数，其本质也是写入到DR寄存器，只不过就是帮忙设置了最低位
+void I2C_Send7bitAddress(I2C_TypeDef* I2Cx, uint8_t Address, uint8_t I2C_Direction);
+uint16_t I2C_ReadRegister(I2C_TypeDef* I2Cx, uint8_t I2C_Register);
+void I2C_SoftwareResetCmd(I2C_TypeDef* I2Cx, FunctionalState NewState);
+void I2C_NACKPositionConfig(I2C_TypeDef* I2Cx, uint16_t I2C_NACKPosition);
+void I2C_SMBusAlertConfig(I2C_TypeDef* I2Cx, uint16_t I2C_SMBusAlert);
+void I2C_TransmitPEC(I2C_TypeDef* I2Cx, FunctionalState NewState);
+void I2C_PECPositionConfig(I2C_TypeDef* I2Cx, uint16_t I2C_PECPosition);
+void I2C_CalculatePEC(I2C_TypeDef* I2Cx, FunctionalState NewState);
+uint8_t I2C_GetPEC(I2C_TypeDef* I2Cx);
+void I2C_ARPCmd(I2C_TypeDef* I2Cx, FunctionalState NewState);
+void I2C_StretchClockCmd(I2C_TypeDef* I2Cx, FunctionalState NewState);
+void I2C_FastModeDutyCycleConfig(I2C_TypeDef* I2Cx, uint16_t I2C_DutyCycle);
+
+
+ErrorStatus I2C_CheckEvent(I2C_TypeDef* I2Cx, uint32_t I2C_EVENT);
+uint32_t I2C_GetLastEvent(I2C_TypeDef* I2Cx);
+FlagStatus I2C_GetFlagStatus(I2C_TypeDef* I2Cx, uint32_t I2C_FLAG);
+
+
+void I2C_ClearFlag(I2C_TypeDef* I2Cx, uint32_t I2C_FLAG);
+ITStatus I2C_GetITStatus(I2C_TypeDef* I2Cx, uint32_t I2C_IT);
+void I2C_ClearITPendingBit(I2C_TypeDef* I2Cx, uint32_t I2C_IT);
+
+```
+```C++
+typedef struct
+{
+    // I2C标准模式下最高是100kHz，快速模式最高400kHz。写频率在0~100kHz，I2C就处于一个标准速度状态，写100~400kHz，I2C就处于快速的状态。
+    uint32_t I2C_ClockSpeed;
+    // 选择I2C模式
+    uint16_t I2C_Mode;
+    // 时钟占空比参数只有在快速状态下才有用，标准模式默认是一比一，具体的参数有16:9和2:1两个，这个就是低电平时间和高电平时间的比，多的那个是高电平时间。占空比是为了快速传输设计的，因为下降沿下降非常快但是上升沿是缓慢上升的，这个之所以缓慢的原因是因为是弱上拉，快速地原因在于是直接开漏输出强下拉。调节占空比就是为了增大低电平的时间，为了给SDA数据线的数据跳变留足充足的时间。
+    uint16_t I2C_DutyCycle;
+    uint16_t I2C_OwnAddress1;
+    uint16_t I2C_Ack;                 
+    uint16_t I2C_AcknowledgedAddress;
+}I2C_InitTypeDef;
+```
+对于非阻塞式的函数，需要的是查看标志位，来看函数是否执行到位了。因为STm32默认为从机，发送起始条件后变为主机，所以EV5事件也可以叫做主机模式已选择事件。
 ## SPI通信
 
 ### SPI简介
 
 SPI（Serial Peripheral Interface）是由Motorola公司开发的一种通用数据总线
-四根通信线：SCK（Serial Clock）、MOSI（Master Output Slave Input）、MISO（Master Input Slave Output）、SS（Slave Select）
-同步，全双工
-支持总线挂载多设备（一主多从）
+四根通信线：SCK（Serial Clock）时钟线也可以叫做SCLK，CLK，CK、MOSI（Master Output Slave Input）主机输出、MISO（Master Input Slave Output）主机输入这两个有时候可以直接被叫做DO(Data Output)DI(Data Input)，主机接在叫做MI，从机接上去叫做SO后面的同理、SS（Slave Select）从机选择也可能被叫做NSS(Not Slave Select)、CS(Chip Select)
+同步，全双工，
+同步时序必须要有时钟线，数据位的输出和输入都是在SCK的上升沿或者下降沿进行的，数据位的收发时刻就可以明确地确定。并且同步时序时钟快点慢点中途暂停都是可以的。全双工就是数据发送和数据接收单独各占一条线，两者互不影响。
+支持总线挂载多设备（一主多从），SPI实现一主多从的方式就是直接用SS控制，有几个设备就几个SS线，直接低电平控制，SPI没有应答机制
 
+
+I2C可以在消耗最低硬件资源的情况下，实现最多的功能，在硬件上，无论挂载多少个设备都只需要两根通信线，在软件上数据双向位应答位都可以实现。I2C属于是精打细算思维灵活的人，既要实现硬件上最好的通信线，又要实现软件上最多的功能。由于I2C开漏外加上拉电阻的电路结构，使得通信线高电平的驱动能力比较弱，这个会导致通信线由低电平变到高电平的时候，上升沿的耗时会很长，限制了I2C的最大通信速度，虽然I2C通过改进电路的方式设计出了高速模式可以达到3.4MHz，但是高速模式现在普及程度不是很高，因此一般情况下认为I2C的时钟速度最多就是400kHz。
+
+1.SPI传输速度更快，SPI协议没有严格规定最大传输速度，其取决于芯片厂商的设计需求，比如实验用到的Flash模块的最大SPI时钟频率可达到80MHz，2.结构简单3.硬件开销大通信线的个数很多，通信过程中经常有资源浪费的现象，SPI就属于富家子弟有钱任性这类型的人
 ![image-20250402144611819](images/image-20250402144611819.png)
-
+W25Q64 Flash存储器
+SPI通信的OLED
+2.4G无线通讯模块，芯片型号NRF24L01
+Micro SD 官方的通信协议是SDIO 但是 也支持SPI通信
 ### 硬件电路
 所有SPI设备的SCK、MOSI、MISO分别连在一起
 主机另外引出多条SS控制线，分别接到各从机的SS引脚
@@ -2258,7 +2348,8 @@ W25Qxx系列是一种低成本、小型化、使用简单的非易失性存储�
 	W25Q256：  256Mbit / 32MByte
 
 <img src="images/image-20250402145106289.png" alt="image-20250402145106289" style="zoom: 50%;" />
-
+MID是厂商ID，读出来是0xEF
+DID是设备ID，读出来是0x4017
 
 
 ## 硬件电路
