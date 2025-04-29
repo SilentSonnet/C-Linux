@@ -2435,28 +2435,108 @@ STM32F103C8T6 硬件SPI资源：SPI1、SPI2
 ![image-20250402145144974](images/image-20250402145144974.png)
 左上角就是数据寄存器和移位寄存器打配合的过程，这里和串口I2C的实现思路是一样的，主要是为了实现连续的数据流。LSBFIRST可以控制是低位先行还是高位先行，MOSI和MISO的方框意思就是用来进行主从模式引脚变换的，主机的时候不使用。右下角就是一些控制逻辑，寄存器的哪些位，控制哪些部分会产生哪些效果，具体查看手册。
 上下两个缓冲区就是DR，上面的是接收数据寄存器RDR下面的是发送数据寄存器TDR，TDR和RDR占用同一个地址，统一叫做DR。写入DR时，数据写入到TDR，读取DR时数据从RDR读出，数据寄存器和移位寄存器配合可以实现连续的数据流，当移位寄存器没有数据移位的时候，TDR的数据会立刻转入移位寄存器开始移位，转入时刻会置状态寄存器的TXE为1，表示发送寄存器空，当检查TXE置1后，下一个数据就可以提前写入到TDR里面候着了，一旦上一个数据发送完毕，下一个数据就可以立刻跟进，移位寄存器有数据过来就会自动产生始终，将数据移动出去，在移动出去的过程中MISO的数据也会移入，一旦数据移出完成，数据移入也同时完成，这时数据就会从移位寄存器转入到接收缓冲区RDR，这个时刻会置状态寄存器的RXNE为1，表示接收寄存器非空，当检查RXNE置1后就要尽快把数据从RDR读出来，在下一个数据到来之前读出RDR，就可以实现连续接收，否则RDR的数据就会被覆盖。
+波特率发生器主要就是用来产生时钟的，内部主要就是一个分频器，输入时钟是PCLK，72M或36M，经过分频器之后输出到SCK引脚，这里生成的时钟和移位寄存器是同步的，每产生一个周期的时钟，移入移出一个bit，右边CR1寄存器的三个位，BR0、BR1、BR2用来控制分频系数，写入这三位可以对PCLK时钟执行2~256的分频，分频之后就是SCK时钟。SPE(SPI Enable)，是SPI使能就是SPI_Cmd函数配置的位，BR(Baud Rate)配置波特率，就是SCK时钟频率，MSTR(Master)，配置主从模式，1是主模式0是从模式，一般使用的是主模式，CPOL和CPHA用来选择SPI的四种模式。TXE，发送寄存器空，RXNE，接受寄存器非空。NSS引脚，SS就是从机选择，低电平有效所以这里前面加了个N，这里NSS的实现更偏向于实现多主机模型，SS引脚直接使用GPIO来模拟即可。假设有三个STm32设备，需要把这三个设备的NSS全部连接在一起，NSS可以配置为输出或者输入，当配置为输出时可以告诉别的设备我现在要变为主机，其他设备都变为从机，当配置为输入时，有设备是主机，拉低NSS后，就无论如何也无法变为主机了，这就是他的作用。内部电路而言，当SSOE=1时，NSS作为输出引脚，并在当前设备变为主设备时，给NSS输出低电平，这个输出的低电平就是告诉其他设备我现在是主机了，当主机结束后，SSOE要清零，NSS变为输入，这时输入信号就会通过数据选择器进入通信电路，数据选择器由SSM位选择哪一路。当选择上面一路时，是硬件NSS模式，也就是说这时外部如果输入了低电平，那当前的设备就进入不了主模式了，因为NSS低电平肯定是外部已经有设备进入了主模式，当NSS选择下面的一路时，是软件管理NSS输入，NSS是1还是0由这一位SSI来决定。
 
 ## SPI基本结构
 
 ![image-20250402145406402](images/image-20250402145406402.png)
 
+自己整理笔记的时候再自己写一下过程！
+
 ## 主模式全双工连续输出
 
 ![image-20250402145413197](images/image-20250402145413197.png)
+
+CPOL=1CPHA=1，因此示例使用的是SPI模式3，SCK默认为高电平，在第一个下降沿，MOSI和MISO移出数据，之后上升沿移入数据，依次这样来进行，第一行是MOSI和MISO输出的波形，跟随SCK时钟变换数据位依次出现，从前到后依次出现的是b0、b1一直到b7，所以这里示例演示的是低位先行的模式，实际SPI高位先行用的多一些，下面的发送缓冲器，写入SPI_DR其实就是TDR，BSY，BUSY是由硬件自动设置和清除的，当有数据传输是，BUSY置1，下面就是输入的时序现象。第一行是MISO/MOSI的输入数据，之后是RXNE接收数据寄存器非空标志位，然后就是SPI_DR也就是TDR，在刚开始时，TXE为1，表示TDR空，可以写入数据开始传输，下面指示的第一步就是软件写入0xF1到SPI_DR，0xF1就是要发送的第一个数据，之后可以看到写入之后TDR变为0xF1，同时TXE变为0表示TDR已经有数据了，那么此时TDR是等候区，移位寄存器才是真正的发送区，移位寄存器刚开始肯定没有数据，所以在等候区TDR里的F1就会立刻转入移位寄存器开始发送，转入瞬间置TXE标志为1，表示发送寄存器空，移位寄存器有数据后波形就开始自动生成，在移位产生F1波形的同时等候区TDR是空的，为了移位完成时，下一个数据能不间断地跟随，就要提早把下一个数据写入到TDR里等着了，因此第二步操作在写入0xF1后软件等待TXE=1然后写入0xF2至SPI_DR，写入之后就可以看到TDR的内容就变成F2了。需要注意的是最后一个TXE=1之后还需要继续等待一段时间F3的波形才能完整发送，等波形全部完整发送之后BUSY标志由硬件清除，此时才表示波形发送完成。
+SPI是全双工，发送的同时还可以接收，所以可以看到，在第一个字节发送完成后，第一个字节的接收也完成了，接收的数据是A1，这时移位寄存器的数据整体转入RDR，RDR随后存储的就是A1，转入的同时RXNE标志位也置1，表示收到数据了，此时进行的操作是软件等待RXNE=1，等于1就是表示收到数据了，然后就从SPI_DR也就是RDR读出数据A1，这就是第一个接收到的数据，接收之后软件清除RXNE标志位，然后当下一个数据2收到之后RXNE重新置1，监测到RXNE=1时就继续读出RDR，最后在最后一个字节时序完全产生之后，数据3才能收到，需要注意的是，一个字节波形收到后，移位寄存器的数据自动转入RDR，会覆盖原有的数据，所以读取RDR要及时。连续数据流对软件的配合要求很高，在每个标志位产生后数据都要及时处理，配合得好，时钟可以连续不间断地产生，每个字节之间没有任何空隙，传输效率是最高的。
 
 ## 非连续输出
 
 ![image-20250402145419426](images/image-20250402145419426.png)
 
+这个配置还是SPI模式3，SCK默认高电平，想发送数据时，如果检测到TXE=1，TDR为空，就软件写入0xF1至SPI_DR，这时TDR的值变为0xF1，TXE变为0，目前移位寄存器也是空，所以这个F1会立刻转入移位寄存器开始发送，波形产生并且TXE置回1，表示可以把下一个数据放在TDR里候着了，这里就是和连续模式的区别所在了，在连续模式中，一旦TXE=1了就会把下一个数据写入到TDR里候着，但是在非连续模式中，TXE=1，我们不着急把下一个数据写进去，而是一直等待，等第一个字节时序结束，而是一直等待，等第一个字节时序结束，也就是第一个字节接收也完毕，这时接收的RXNE会置1，先把第一个接收到的数据读出来，之后再写入下一个字节的数据，也就是软件等待TXE=1，但是较晚写入0xF2至SPI_DR。
+也就是四步：1.等待TXE为1 2.写入发送的数据至TDR 3.等待RXNE为1 4. 读取RDR接收的数据。
+
+非连续传输的缺点就是TDR为空之后没有立刻写入，而是等待到数据接收完成之后再进行写入，就会使得在发送的时候字节和字节之间存在间隙，但是这个间隙在SCK频率较低的时候并不明显，但是在SCK频率较高的时候就会很明显。
+
 ## 软件/硬件波形对比
 
 ![image-20250402145426792](images/image-20250402145426792.png)
 
+软硬件最大的区别就是硬件波形的变化，是紧贴着SCK边沿的，而软件波形数据线的变化，在边沿后有一些延迟，实际上还可以发现IIC所描述的，SCL低电平期间数据变化，高电平期间数据采样，和SPI所描述的SCK下降沿数据移出，上升沿数据移入，最终波形的表现形式都是一样的，无论是下降沿变化还是低电平期间变化，这些都是一个意思，下降沿和低电平期间都可以作为数据变化的时刻，只是硬件波形，一般会紧贴边沿，软件波形一般只能在电平期间。
+
+SPI初始化的流程分为：第一步开启时钟，开启SPI和GPIO的时钟。第二步初始化GPIO口，其中SCK和MISO是由硬件外设控制的输出信号，因此配置为复用推挽输出，MISO是硬件外设的输入信号，可以配置为上拉输入，因为输入设备可以有多个，所以不存在复用输入这个东西，直接上拉输入的话，普通GPIO口可以输入，外设也可以输入，最后还有SS引脚，SS是软件控制的输出信号，所以配置为通用推挽输出，这就是GPIO口的初始化配置。第三步，配置SPI外设，这一步使用一个结构体就可以进行配置了。第四步，开关控制。
+
+很多函数后面都带了I2S，因为SPI和I2S共用的是一套电路，所以就当作它不存在就好了
+```C++
+// 恢复缺省配置
+void SPI_I2S_DeInit(SPI_TypeDef* SPIx);
+// 初始化
+void SPI_Init(SPI_TypeDef* SPIx, SPI_InitTypeDef* SPI_InitStruct);
+void I2S_Init(SPI_TypeDef* SPIx, I2S_InitTypeDef* I2S_InitStruct);
+// 结构体变量初始化
+void SPI_StructInit(SPI_InitTypeDef* SPI_InitStruct);
+void I2S_StructInit(I2S_InitTypeDef* I2S_InitStruct);
+// 外设使能
+void SPI_Cmd(SPI_TypeDef* SPIx, FunctionalState NewState);
+void I2S_Cmd(SPI_TypeDef* SPIx, FunctionalState NewState);
+// SPI外设中断使能
+void SPI_I2S_ITConfig(SPI_TypeDef* SPIx, uint8_t SPI_I2S_IT, FunctionalState NewState);
+// DMA使能
+void SPI_I2S_DMACmd(SPI_TypeDef* SPIx, uint16_t SPI_I2S_DMAReq, FunctionalState NewState);
+// 写DR数据寄存器
+void SPI_I2S_SendData(SPI_TypeDef* SPIx, uint16_t Data);
+// 读DR数据寄存器
+uint16_t SPI_I2S_ReceiveData(SPI_TypeDef* SPIx);
+void SPI_NSSInternalSoftwareConfig(SPI_TypeDef* SPIx, uint16_t SPI_NSSInternalSoft);
+void SPI_SSOutputCmd(SPI_TypeDef* SPIx, FunctionalState NewState);
+// 8位或16位数据帧的配置
+void SPI_DataSizeConfig(SPI_TypeDef* SPIx, uint16_t SPI_DataSize);
+void SPI_TransmitCRC(SPI_TypeDef* SPIx);
+void SPI_CalculateCRC(SPI_TypeDef* SPIx, FunctionalState NewState);
+uint16_t SPI_GetCRC(SPI_TypeDef* SPIx, uint8_t SPI_CRC);
+uint16_t SPI_GetCRCPolynomial(SPI_TypeDef* SPIx);
+void SPI_BiDirectionalLineConfig(SPI_TypeDef* SPIx, uint16_t SPI_Direction);
+// 获取标志位，获取TXE和RXNE标志位的状态
+FlagStatus SPI_I2S_GetFlagStatus(SPI_TypeDef* SPIx, uint16_t SPI_I2S_FLAG);
+// 清除标志位
+void SPI_I2S_ClearFlag(SPI_TypeDef* SPIx, uint16_t SPI_I2S_FLAG);
+ITStatus SPI_I2S_GetITStatus(SPI_TypeDef* SPIx, uint8_t SPI_I2S_IT);
+void SPI_I2S_ClearITPendingBit(SPI_TypeDef* SPIx, uint8_t SPI_I2S_IT);
+```
+```C++
+typedef struct
+{
+	// 单线半双工接收模式、单线全双工发送模式、双线全双工、双线只接收模式
+	// 这个参数是用来配置SPI裁剪引脚
+    uint16_t SPI_Direction;       
+    // 决定当前的设备是SPI的主机还是从机
+    uint16_t SPI_Mode;      
+    // 配置8位还是16位数据帧
+    uint16_t SPI_DataSize;   
+    // 时钟极性
+    uint16_t SPI_CPOL;   
+    // 时钟相位
+    uint16_t SPI_CPHA;  
+    // 因为使用的是软件模拟，选择软件模拟即可
+    uint16_t SPI_NSS;      
+    // 波特率预分频器，可以用来配置SCK时钟的频率
+    uint16_t SPI_BaudRatePrescaler;   
+    // 配置高位先行还是低位先行
+    uint16_t SPI_FirstBit;
+    // CRC校验的多项式，填一个默认的数字7即可
+    uint16_t SPI_CRCPolynomial;
+}SPI_InitTypeDef;
+```
+
 ## Unix时间戳
+
 - Unix 时间戳（Unix Timestamp）定义为从UTC/GMT的1970年1月1日0时0分0秒开始所经过的秒数，不考虑闰秒
 - 时间戳存储在一个秒计数器中，秒计数器为32位/64位的整型变量
 - 世界上所有时区的秒计数器相同，不同时区通过添加偏移来得到当地时间
 
+
+实时时钟本质上是一个定时器，但是这个定时器是专门用来产生年月日时分秒这种日期和时间信息的，因此它是可以在STm32内部实现一个独立运行的钟表。
 ![image-20250402145505778](images/image-20250402145505778.png)
 
 ## UTC/GMT
