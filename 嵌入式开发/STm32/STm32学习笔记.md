@@ -2536,13 +2536,13 @@ typedef struct
 - 世界上所有时区的秒计数器相同，不同时区通过添加偏移来得到当地时间
 
 
-实时时钟本质上是一个定时器，但是这个定时器是专门用来产生年月日时分秒这种日期和时间信息的，因此它是可以在STm32内部实现一个独立运行的钟表。
+实时时钟本质上是一个定时器，但是这个定时器是专门用来产生年月日时分秒这种日期和时间信息的，因此它是可以在STm32内部实现一个独立运行的钟表。使用秒来计数能够简化硬件电路设计，直接使用一个容量很大的秒寄存器就可以了。在进行一些时间间隔的计算时非常方便，比如说某年某月某日到某年某月某日中间间隔了多长的时间。缺点就是比较占用软件资源，在每次进行秒计数器和日期时间转换时，软件都会经过比较复杂的计算。
 ![image-20250402145505778](images/image-20250402145505778.png)
 
 ## UTC/GMT
-- GMT（Greenwich Mean Time）格林尼治标准时间是一种以地球自转为基础的时间计量系统。它将地球自转一周的时间间隔等分为24小时，以此确定计时标准
+- GMT（Greenwich Mean Time）格林尼治标准时间是一种以地球自转为基础的时间计量系统。它将地球自转一周的时间间隔等分为24小时，以此确定计时标准。这个是之前的计时标准，这是因为地球自转一周的时间是不固定的，由于潮汐力、地球活动等原因，地球目前是越转越慢的。
 
-- UTC（Universal Time Coordinated）协调世界时是一种以原子钟为基础的时间计量系统。它规定铯133原子基态的两个超精细能级间在零磁场下跃迁辐射9,192,631,770周所持续的时间为1秒。当原子钟计时一天的时间与地球自转一周的时间相差超过0.9秒时，UTC会执行闰秒来保证其计时与地球自转的协调一致
+- UTC（Universal Time Coordinated）协调世界时是一种以原子钟为基础的时间计量系统。它规定铯133原子基态的两个超精细能级间在零磁场下跃迁辐射9,192,631,770周所持续的时间为1秒。当原子钟计时一天的时间与地球自转一周的时间相差超过0.9秒时，UTC会执行闰秒来保证其计时与地球自转的协调一致，也就是UTC多走一秒来同步时间。因此使用UTC的时候需要注意一分钟可能会出现61s的情况。
 
 ## 时间戳转换
 - C语言的time.h模块提供了时间获取和时间戳转换的相关函数，可以方便地进行秒计数器、日期时间和字符串之间的转换
@@ -2557,14 +2557,105 @@ BKP（Backup Registers）备份寄存器
 BKP可用于存储用户应用程序数据。当VDD（2.0~3.6V）电源被切断，他们仍然由VBAT（1.8~3.6V）维持供电。当系统在待机模式下被唤醒，或系统复位或电源复位时，他们也不会被复位
 TAMPER引脚产生的侵入事件将所有备份寄存器内容清除
 RTC引脚输出RTC校准时钟、RTC闹钟脉冲或者秒脉冲
+因为PC13、TAMPER和RTC这三个引脚共用一个端口，所以这三个端口同一时间只能使用一个。
 存储RTC时钟校准寄存器
 用户数据存储容量：
 	20字节（中容量和小容量）/ 84字节（大容量和互联型）
 
+BKP寄存器和Flash类似，但是Flash的数据是真正的掉电不丢失，而BKP的数据是需要VBAT引脚接上备用电池来维持的，这样即使是STm32主电源断电BKP的值也会维持原状。
 ![image-20250402145622133](images/image-20250402145622133.png)
-
+图中橙色部分可以叫做后备区域，BKP处于后备区域，但是后备区域还有RTC的相关电路，STm32后备区域的特性就是当VDD主电源掉电时，后备区域仍然可以由VBAT的备用电池供电，当VDD主电源上电时，后备区域供电会由VBAT切换到VDD，也就是在主电源有点时VBAT不会用到，这样可以节省电池电量。BKP中主要有数据寄存器、控制寄存器、状态寄存器和RTC时钟校准寄存器这些东西，每个数据寄存器是16位的，也就是一个数据寄存器可以存储两个字节，因此C8T6有10个数据寄存器，大容量产品共有42个数据寄存器，容量是84个字节。
+侵入检测TAMPER，当检测到上升沿或者下降沿的时候，就清除掉BKP中的内容。时钟输出可以将时钟从PC13位置的RTC引脚输出出去，供外部使用。输出校准时钟时，配合校准寄存器，可以对RTC的误差进行校准。
 ## BKP基本结构
+```C++
+// 因为有备用电池的话，BKP掉电不清零上电也不清零，如果想要清零的话就可以使用这个函数，这样所有的BKP寄存器就都会重置为了0
+void BKP_DeInit(void);
+// 配置TAMPER引脚的有效电平，就是高电平触发还是低电平触发
+void BKP_TamperPinLevelConfig(uint16_t BKP_TamperPinLevel);
+// 是否开启侵入检测功能
+void BKP_TamperPinCmd(FunctionalState NewState);
+// 中断配置
+void BKP_ITConfig(FunctionalState NewState);
+// 可以选择在RTC引脚上输出时钟信号，输出RTC校准时钟，RTC闹钟脉冲或者秒脉冲
+void BKP_RTCOutputConfig(uint16_t BKP_RTCOutputSource);
+// 写入RTC校准寄存器，设置RTC校准值
+void BKP_SetRTCCalibrationValue(uint8_t CalibrationValue);
+// 写入BKP寄存器，第一个参数是哪个DR，第二个参数是要写入的值
+void BKP_WriteBackupRegister(uint16_t BKP_DR, uint16_t Data);
+// 要读哪个DR，返回值就是DR里面存的值
+uint16_t BKP_ReadBackupRegister(uint16_t BKP_DR);
+// 获取标志位
+FlagStatus BKP_GetFlagStatus(void);
+// 清楚标志位
+void BKP_ClearFlag(void);
+ITStatus BKP_GetITStatus(void);
+void BKP_ClearITPendingBit(void);
+```
+```C++
+void PWR_DeInit(void);
+// 备份寄存器访问使能，就是设置PWR_CR寄存器里的DBP位
+void PWR_BackupAccessCmd(FunctionalState NewState);
+void PWR_PVDCmd(FunctionalState NewState);
+void PWR_PVDLevelConfig(uint32_t PWR_PVDLevel);
+void PWR_WakeUpPinCmd(FunctionalState NewState);
+void PWR_EnterSTOPMode(uint32_t PWR_Regulator, uint8_t PWR_STOPEntry);
+void PWR_EnterSTANDBYMode(void);
+FlagStatus PWR_GetFlagStatus(uint32_t PWR_FLAG);
+void PWR_ClearFlag(uint32_t PWR_FLAG);
+```
+```C++
+// 配置LSE外部低速时钟
+// @arg RCC_LSE_Bypass 表示LSE时钟旁路，时钟旁路的意思是就是不要接晶振，直接从OSE32_IN这个引脚输入一个指定频率的信号。
+void RCC_LSEConfig(uint8_t RCC_LSE);
+// 配置LSI内部低速时钟
+void RCC_LSICmd(FunctionalState NewState);
+// 选择RTCCLK时钟源，实际上就是配置一个数据选择器
+void RCC_RTCCLKConfig(uint32_t RCC_RTCCLKSource);
+// 使能RTCCLK
+void RCC_RTCCLKCmd(FunctionalState NewState);
+void RCC_GetClocksFreq(RCC_ClocksTypeDef* RCC_Clocks);
+void RCC_AHBPeriphClockCmd(uint32_t RCC_AHBPeriph, FunctionalState NewState);
+void RCC_APB2PeriphClockCmd(uint32_t RCC_APB2Periph, FunctionalState NewState);
+void RCC_APB1PeriphClockCmd(uint32_t RCC_APB1Periph, FunctionalState NewState);
 
+void RCC_APB2PeriphResetCmd(uint32_t RCC_APB2Periph, FunctionalState NewState);
+void RCC_APB1PeriphResetCmd(uint32_t RCC_APB1Periph, FunctionalState NewState);
+void RCC_BackupResetCmd(FunctionalState NewState);
+void RCC_ClockSecuritySystemCmd(FunctionalState NewState);
+void RCC_MCOConfig(uint8_t RCC_MCO);
+FlagStatus RCC_GetFlagStatus(uint8_t RCC_FLAG);
+void RCC_ClearFlag(void);
+ITStatus RCC_GetITStatus(uint8_t RCC_IT);
+void RCC_ClearITPendingBit(uint8_t RCC_IT);
+```
+```C++
+// 配置中断输出
+void RTC_ITConfig(uint16_t RTC_IT, FunctionalState NewState);
+// 进入配置模式，置CRL的CNF为1
+void RTC_EnterConfigMode(void);
+// 退出配置模式，就是把CNF位清零
+void RTC_ExitConfigMode(void);
+// 获取CNT计数器的值
+uint32_t  RTC_GetCounter(void);
+// 写入CNT计数器的值
+void RTC_SetCounter(uint32_t CounterValue);
+// 写入预分频器，这个值会写入到预分频器的PRL重装寄存器中
+void RTC_SetPrescaler(uint32_t PrescalerValue);
+// 写入闹钟值
+void RTC_SetAlarm(uint32_t AlarmValue);
+// 读取预分频器中的DIV余数寄存器，一般是为了得到更加细致的时间，因为CNT计数器最小的分辨率就是秒，如果想要分秒（ds），厘秒（cs），毫秒（ms），就可以通过读取这个寄存器实现。
+uint32_t  RTC_GetDivider(void);
+// 等待前一次操作完成
+void RTC_WaitForLastTask(void);
+// 等待同步，函数内容是清除RSF标志位然后循环，知道RSF为1
+void RTC_WaitForSynchro(void);
+// 等待标志位，因为LSE时钟不是说启动就能立刻启动的，因此就需要等待启动标志位
+// 等RCC有个标志位LSERDY置1之后时钟才算启动完成，工作稳定
+FlagStatus RTC_GetFlagStatus(uint16_t RTC_FLAG);
+void RTC_ClearFlag(uint16_t RTC_FLAG);
+ITStatus RTC_GetITStatus(uint16_t RTC_IT);
+void RTC_ClearITPendingBit(uint16_t RTC_IT);
+```
 ## RTC简介
 RTC（Real Time Clock）实时时钟
 RTC是一个独立的定时器，可为系统提供时钟和日历的功能
@@ -2578,22 +2669,34 @@ RTC和时钟配置系统处于后备区域，系统复位时数据不清零，VD
 ## RTC框图
 
 ![image-20250402145633397](images/image-20250402145633397.png)
-
+驱动计数器的时钟，需要是一个1Hz的信号，而RTCCLK的频率一般都比较高，因此就需要在中间加一个RTC预分频器，分频器是20位的，可以选择对输入时钟进行1~2^20
+E(External)结尾是外部，I(Internal)结尾是内部，这两个字母的组合一共有4种。32.768kHz，经过一个15位计数器的自然溢出就可以很方便得到1Hz的频率，自然溢出的好处就是不用设置目标值也不需要进行比较计数器是不是计到目标值了。LSE OSC 的时钟在主电源断电后可以使用后备电源供电，但是上下两路始终在主电源断电后，是停止运行的。因此如果想要实现RTC主电源掉电继续走时的功能，必须要选择中间一路的RTC专用时钟。
 ## RTC基本结构
 
 ![image-20250402145646659](images/image-20250402145646659.png)
-
+右边是中断输出使能和NVIC部分，上面是APB1总线读写部分，下面是和PWR相关联部分，意思是RTC闹钟可以唤醒设备，退出待机模式，有灰色填充的部分都处于后备区域，在主电源掉电后，可以使用后备电池维持工作。
+RTC_PRL 重装载寄存器
+RTC_DIV 余数寄存器，是一个自减计数器，每来一个输入时钟，DIV的值自减一次
+RTC_ALR 也是一个32位的寄存器，就是设置闹钟，如果CNT和ALR相等时。这个功能还可以唤醒STm32，实现定时唤醒，但是如果想要实现周期性的唤醒，需要在唤醒之后重新设置闹钟。
+一共有三个信号可以作为中断，秒中断，就是CNT的输入时钟，也就是1s中断一次，第二个是溢出中断，这个一般是不会触发的，因为要到2106年才会触发，第三个是闹钟中断。F结尾的是中断标志位，IE结尾的是中断使能，Interrupt Enable
+闹钟信号和WKUP引脚都可以唤醒STm32
 ## 硬件电路
 
 ![image-20250402145656716](images/image-20250402145656716.png)
 
+纽扣电池型号是CR2032，有字的一面是正极，没有字的是负极
+
 ## RTC操作注意事项
+
 执行以下操作将使能对BKP和RTC的访问：
 	设置RCC_APB1ENR的PWREN和BKPEN，使能PWR和BKP时钟
 	设置PWR_CR的DBP，使能对BKP和RTC的访问
+	正常的外设开启时钟就可以用了，但是BKP和RTC这两个外设开启稍微复杂一些。
 若在读取RTC寄存器时，RTC的APB1接口曾经处于禁止状态，则软件首先必须等待RTC_CRL寄存器中的RSF位（寄存器同步标志）被硬件置1
-必须设置RTC_CRL寄存器中的CNF位，使RTC进入配置模式后，才能写入RTC_PRL、RTC_CNT、RTC_ALR寄存器
-对RTC任何寄存器的写操作，都必须在前一次写操作结束后进行。可以通过查询RTC_CR寄存器中的RTOFF状态位，判断RTC寄存器是否处于更新中。仅当RTOFF状态位是1时，才可以写入RTC寄存器
+PCLK1在主电源掉电时会停止，为了保证RTC主电源掉电正常工作，RTC里的寄存器都是在RTCCLK的同步下变更的，当使用PCLK1驱动的总线去读取RTCCLK驱动的寄存器时，RTC寄存器只有在RTCCLK的上升沿更新，但是PCLK1的频率是36MHz，远大于RTCCLK的频率36kHz，如果在APB1刚开启的时候就立刻读取RTC寄存器，有可能RTC寄存器还没有更新到APB1总线上，这样我们读取到的值，就是错误的。这就要求在APB1总线刚开始时，要等一下RTCCLK，只要RTCCLK来一个上升沿，RTC把它的寄存器的值同步到APB1总线上，这样之后读取的值就都是没有问题的了。
+必须设置RTC_CRL寄存器中的CNF位，使RTC进入配置模式后，才能写入RTC_PRL、RTC_CNT、RTC_ALR寄存器，库函数会自动调用
+对RTC任何寄存器的写操作，都必须在前一次写操作结束后进行。可以通过查询RTC_CR寄存器中的RTOFF状态位，判断RTC寄存器是否处于更新中。仅当RTOFF状态位是1时，才可以写入RTC寄存器，之所以这样操作的原因还是因为两条总线的时钟并不是相同速率来运行的。
+
 ## PWR简介
 PWR（Power Control）电源控制
 PWR负责管理STM32内部的电源供电部分，可以实现可编程电压监测器和低功耗模式的功能
