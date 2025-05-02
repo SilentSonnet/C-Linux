@@ -2782,16 +2782,59 @@ WKUP引脚的上升沿、RTC闹钟事件的上升沿、NRST引脚上外部复位
 
 ### WDG简介
 
-WDG（Watchdog）看门狗
+WDG（Watchdog）看门狗，本质上就是自动复位电路
 看门狗可以监控程序的运行状态，当程序因为设计漏洞、硬件故障、电磁干扰等原因，出现卡死或跑飞现象时，看门狗能及时复位程序，避免程序陷入长时间的罢工状态，保证系统的可靠性和安全性
 看门狗本质上是一个定时器，当指定时间范围内，程序没有执行喂狗（重置计数器）操作时，看门狗硬件电路就自动产生复位信号
 STM32内置两个看门狗
-	独立看门狗（IWDG）：独立工作，对时间精度要求较低
-	窗口看门狗（WWDG）：要求看门狗在精确计时窗口起作用
+	独立看门狗（IWDG）：独立工作，对时间精度要求较低，就是独立看门狗的时钟是专用的LSI，内部低速时钟，即使主时钟出现问题，看门狗也能正常工作。对时间精度要求低就是独立看门狗只有一个最晚时间界限，喂狗时间只要不超过这个最晚界限就行了。
+	窗口看门狗（WWDG）：要求看门狗在精确计时窗口起作用，窗口看门狗有一个最早界限和一个最晚界限，必须在这两个界限之内喂狗，喂狗晚了或者早了都会导致看门狗复位单片机，他的目的是消除独立看门狗无法监测的状态中，例如程序卡死在喂狗的部分，或者程序跑飞但是喂狗代码也意外执行了，或者程序有时候很快喂狗有时候又比较慢喂狗。窗口看门狗使用的是APB1的时钟，所以不算是独立
 
 ### IWDG框图
 
+可以类比定时器的时基单元
+PR和PSC都是预分频器的意思
+RLR和ARR分别是Reloader 和 Auto Reloader的意思
+
 ![image-20250402145916683](images/image-20250402145916683.png)
+
+预分频器只有八位，所以只能进行256位分频，其次相比于定时器的自动重装，看门狗使用的是手动重装，手动装在重装值的过程就是喂狗操作，计数器看门狗使用的是递减，递减到零时产生IWDG复位。在重装载寄存器写好程序之后，在键寄存器里写一个特定数据，控制电路进行喂狗，这时重装值就会进入到计数其中，这样计数器就会重新回到重装值，重新自减运行了。
+比较重要的是上面的寄存器都是在1.8V工作区，下面的工作电路都是在VDD工作区，因此看门狗在停机和待机模式仍能正常运行。
+
+1.开启LSI的时钟并不需要手动开启
+2.写入0x5555 解除写保护
+3.写入预分频器值
+4.写入0xCCCC启动看门狗
+5.然后不断执行0xAAAA来喂狗
+```C++
+// 写使能控制
+void IWDG_WriteAccessCmd(uint16_t IWDG_WriteAccess);
+// 写预分频器
+void IWDG_SetPrescaler(uint8_t IWDG_Prescaler);
+// 写重装寄存器
+void IWDG_SetReload(uint16_t Reload);
+// 喂狗
+void IWDG_ReloadCounter(void);
+// 使能，启动独立看门狗
+void IWDG_Enable(void);
+FlagStatus IWDG_GetFlagStatus(uint16_t IWDG_FLAG);
+```
+
+```C++
+// 恢复缺省配置
+void WWDG_DeInit(void);
+// 设置预分频器
+void WWDG_SetPrescaler(uint32_t WWDG_Prescaler);
+// 写入窗口值
+void WWDG_SetWindowValue(uint8_t WindowValue);
+// 使能中断
+void WWDG_EnableIT(void);
+// 写入计数器，喂狗
+void WWDG_SetCounter(uint8_t Counter);
+// 启动看门狗，需要在启动的时候同时喂一下狗，防止一启动就复位
+void WWDG_Enable(uint8_t Counter);
+FlagStatus WWDG_GetFlagStatus(void);
+void WWDG_ClearFlag(void);
+```
 
 ### IWDG键寄存器
 
@@ -2799,22 +2842,31 @@ STM32内置两个看门狗
 在可能存在干扰的情况下，一般通过在整个键寄存器写入特定值来代替控制寄存器写入一位的功能，以降低硬件电路受到干扰的概率
 
 ![image-20250402145935288](images/image-20250402145935288.png)
+0xCCCC 是 1100 1100 1100 1100
+0xAAAA 是 1010 1010 1010 1010
+0x5555 是  0101 0101 0101 0101
 
+指令的保护能力是很强的，但是还有PR、SR、RLR三个寄存器，他们也要有防止误操作的功能，SR是只读的，不需要进行保护，剩下对PR和RLR 的操作可以设置一个写保护措施，只有在键寄存器写入5555才能解除写保护，一旦写入其他值，PR和RLR再次被保护，这样PR和RLR就和键寄存器一起被保护了起来，防止误操作。
 ### IWDG超时时间
 
 •超时时间：TIWDG = TLSI × PR预分频系数 × (RL + 1)
 •其中：TLSI = 1 / FLSI
-
+TLSI是固定的0.025ms
 ![image-20250402145942479](images/image-20250402145942479.png)
 
 ### WWDG框图
 
 ![image-20250402145959909](images/image-20250402145959909.png)
 
+计数器是位于控制寄存器CR里的，计数器和控制寄存器合二为一了，窗口看门狗没有重装寄存器，直接在CNT写入数据就可以喂狗了。CFR中是窗口的最早值，左边就是输出信号的操作逻辑了。始终来源是PCLK1，也就是APB1的时钟，36MHz。值得注意的是这个六位递减计数器是有T0~T6七位，原因就在于最高位是当做溢出标志位来使用的。
+
+最早时间界限的实现流程就是在CFR中写入数据，在写入CR的时候就会开启与门，然后将二者进行比较，T6>W6的意思就是假设10-20s喂狗，但是当前计数器喂狗时间是5s就是过早喂狗了，就会触发自动复位。
+
 ### WWDG工作特性
+
 递减计数器T[6:0]的值小于0x40时，WWDG产生复位
 递减计数器T[6:0]在窗口W[6:0]外被重新装载时，WWDG产生复位
-递减计数器T[6:0]等于0x40时可以产生早期唤醒中断（EWI），用于重装载计数器以避免WWDG复位
+递减计数器T[6:0]等于0x40时可以产生早期唤醒中断（EWI），用于重装载计数器以避免WWDG复位，就是在0x40时产生中断，在0x40以下的时候产生复位
 定期写入WWDG_CR寄存器（喂狗）以避免WWDG复位
 
 ![image-20250402150005866](images/image-20250402150005866.png)
@@ -2825,6 +2877,10 @@ STM32内置两个看门狗
 窗口时间：
 	TWIN = TPCLK1 × 4096 × WDGTB预分频系数 × (T[5:0] - W[5:0])
 其中：TPCLK1 = 1 / FPCLK1
+
+因为当计数器等于窗口值的时候就可以喂狗了，所以并不需要再加一
+
+之所以要×4096是因为PCLK进来的时候其实是先执行了一个固定的4096分频
 
 ![image-20250402150033204](images/image-20250402150033204.png)
 
@@ -2842,6 +2898,8 @@ STM32F1系列的FLASH包含程序存储器、系统存储器和选项字节三�
 ## 闪存模块组织
 
 ![image-20250402150055452](images/image-20250402150055452.png)
+
+平时说的闪存容量只是指主存储器的闪存容量
 
 ## FLASH基本结构
 
@@ -2870,33 +2928,42 @@ KEY1 = 0x45670123
 	*((__IO uint16_t *)(0x08000000)) = 0x1234;
 
 其中：
-	#define    __IO    volatile
+	#define    __IO    volatile 作用是防止编译器优化，Keil编译器默认情况下是最低优化等级，使用了之后在无意义加减变量，多线程更改变量，读写与硬件相关的寄存器时都需要加上volatie，防止被编译器优化。就比如说编译器可能将变量优化到缓存中，这时候CPU修改变量的值再写回内存，如果现在程序中有多个线程，在中断函数中修改了原始变量的话，可能缓存并不知道被修改了，下次程序还看缓存的变量就会造成数据更改不同步的问题，使用volatile就是强制编译器去内存找。
+
+对于闪存的读取来说，是不需要对闪存进行解锁操作的，因为读取只是看看存储器，不对存储器进行更改，所需的权限很低，不用解锁，直接就能读。
 
 
 ## 程序存储器编程
 
 ![image-20250402150142044](images/image-20250402150142044.png)
 
+擦除之后就可以执行写入的流程了，STm32的闪存会在写入之前检查指定地址有没有擦除，如果没有擦除就写入，STm32则不执行写入操作，除非写入的全是0这一个数据是例外。因为不擦除就写入可能会写入错误。
+写入的第一步也是解锁，第二步需要置控制寄存器的PG(Programming)位为1，表示我们即将写入数据，第三步就是在指定的地址写入半字，需要注意的就是写入操作只能以半字的形式写入，STm32中字就是32位数据半字就是16位数据，字节就是8位数据。
+
+如果想要单独写入八位的话就比较麻烦，需要将一整页的数据都读取到SRAM中，在SRAM中就可以随意修改没有写入半字的限制，
+
 ## 程序存储器页擦除
 
 ![image-20250402150149399](images/image-20250402150149399.png)
-
-
-
-
 
 ## 程序存储器全擦除
 
 ![image-20250402150155138](images/image-20250402150155138.png)
 
+第一步是读取LOCK位，看一下芯片锁没锁，如果等于1锁住了，就执行解锁过程，也就是在KEYR寄存器，先写入KEY1再写入KEY2，这里如果当前没有锁住就不用解锁了，但是在库函数中并没有这个判断，而是不管锁住还是没有锁住，直接执行解锁过程。解锁之后首先置控制寄存器的MER(Mass Erase)位为1，然后再置STRT(Start)位为1，STRT是触发条件，置1之后芯片开始干活，而芯片检测到MER位是1就明白接下来要进行全擦除工作，内部电路就会自动执行全擦除的过程。因为擦除是需要花一段时间的，因此擦除开始之后程序要开始等待，判断状态寄存器的BSY(Busy)位是否为1，BSY表示芯片是否处于忙状态。 上面的和这个差不多
+
 ## 选项字节
 
 ![image-20250402150201401](images/image-20250402150201401.png)
 
-RDP：写入RDPRT键（0x000000A5）后解除读保护
+RDP(Read Protect)读保护配置位：写入RDPRT键（0x000000A5）后解除读保护
 USER：配置硬件看门狗和进入停机/待机模式是否产生复位
 Data0/1：用户可自定义使用
-WRP0/1/2/3：配置写保护，每一个位对应保护4个存储页（中容量）
+WRP(Write Protect 配置写保护)0/1/2/3：配置写保护，在中容量产品中，每一个位对应保护4个存储页（中容量）4个字节总共32位 也就是128页正好对应中容量产品的128页Flash主存储器存储容量。
+
+带有n的意思就是在RDP写入数据的时候要同时在nRDP写入数据的反码，如果芯片检测到这两个数据不是反码的关系，就代表数据无效，有错误，对应的功能就不执行。这个写入反码的过程硬件会自动计算并写入
+
+需要注意的是在编程过程中，任何读写闪存的操作都会使CPU暂停，直到此次闪存编程结束，因为执行代码需要读闪存，闪存忙的时候没法读。假如使用内部闪存存储数据，同时中断程序是在频繁执行的，这样在读写闪存的时候中断代码就无法执行了，可能会导致中断无法及时响应。因此这个就是外部闪存外挂设备的必要性了，可以开线程在外边的闪存存储器中使用SPI等总线设备进行存储，这样就不会占用CPU时间，不会影响设备运行。
 
 
 ## 选项字节编程
@@ -2909,9 +2976,9 @@ WRP0/1/2/3：配置写保护，每一个位对应保护4个存储页（中容量
 
 ## 选项字节擦除
 检查FLASH_SR的BSY位，以确认没有其他正在进行的闪存操作
-解锁FLASH_CR的OPTWRE位
-设置FLASH_CR的OPTER位为1
-设置FLASH_CR的STRT位为1
+解锁FLASH_CR的OPTWRE位，选项字节的解锁，在解锁闪存的锁之后还要解锁选项字节的锁才能操作选项字节，解锁的流程就是在OPTKEYR中先写入KEY1再写入KEY2，这样就能解除选项字节的小锁了
+设置FLASH_CR的OPTER位为1，表示即将擦除选项字节
+设置FLASH_CR的STRT位为1，触发芯片开始干活
 等待BSY位变为0
 读出被擦除的选择字节并做验证
 
@@ -2927,6 +2994,57 @@ WRP0/1/2/3：配置写保护，每一个位对应保护4个存储页（中容量
 	基地址： 0x1FFF F7E8
 	大小：96位
 
+
+
+```C++
+/*------------ Functions used for all STM32F10x devices -----*/
+// 前三个是和内核运行代码有关的，并不需要调用
+void FLASH_SetLatency(uint32_t FLASH_Latency);
+void FLASH_HalfCycleAccessCmd(uint32_t FLASH_HalfCycleAccess);
+void FLASH_PrefetchBufferCmd(uint32_t FLASH_PrefetchBuffer);
+// 解锁Flash
+void FLASH_Unlock(void);
+// 加锁Flash
+void FLASH_Lock(void);
+// 闪存擦除某一页
+FLASH_Status FLASH_ErasePage(uint32_t Page_Address);
+// 闪存全擦除
+FLASH_Status FLASH_EraseAllPages(void);
+// 擦除选项字节
+FLASH_Status FLASH_EraseOptionBytes(void);
+// 写入字
+FLASH_Status FLASH_ProgramWord(uint32_t Address, uint32_t Data);
+// 写入半字
+FLASH_Status FLASH_ProgramHalfWord(uint32_t Address, uint16_t Data);
+// 自定义的Data0和Data1
+FLASH_Status FLASH_ProgramOptionByteData(uint32_t Address, uint8_t Data);
+// 写保护
+FLASH_Status FLASH_EnableWriteProtection(uint32_t FLASH_Pages);
+// 读保护
+FLASH_Status FLASH_ReadOutProtection(FunctionalState NewState);
+// 用户选项配置位
+FLASH_Status FLASH_UserOptionByteConfig(uint16_t OB_IWDG, uint16_t OB_STOP, uint16_t OB_STDBY);
+// 获取选项字节当前状态
+// 获取用户配置位
+uint32_t FLASH_GetUserOptionByte(void);
+// 获取写保护状态
+uint32_t FLASH_GetWriteProtectionOptionByte(void);
+// 获取读保护状态
+FlagStatus FLASH_GetReadOutProtectionStatus(void);
+// 获取预取缓冲区状态
+FlagStatus FLASH_GetPrefetchBufferStatus(void);
+// 中断使能
+void FLASH_ITConfig(uint32_t FLASH_IT, FunctionalState NewState);
+// 获取标志位
+FlagStatus FLASH_GetFlagStatus(uint32_t FLASH_FLAG);
+// 清除标志位
+void FLASH_ClearFlag(uint32_t FLASH_FLAG);
+// 获取状态
+FLASH_Status FLASH_GetStatus(void);
+// 等待上一次操作
+FLASH_Status FLASH_WaitForLastOperation(uint32_t Timeout);
+```
+Keil的编译信息，前三个加起来就是Flash占用大小，后面两个加起来就是占用SRAM大小
 # ESP32-IDF
 
 ## WSL2搭建ESP-IDF开发环境
