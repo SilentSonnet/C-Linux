@@ -338,9 +338,9 @@ GUID                                  DEVICE
 usbipd unbind --guid [GUID]
 ```
 
-## FreeRTOS学习笔记
+## ESP32-IDF 学习笔记
 
-```
+```c++
 Helloworld
 	main // 主要工程源码目录，必须存在
 		main.c // 工程入口源码文件，必须存在
@@ -351,35 +351,65 @@ Helloworld
     build // 执行编译后，生成的bin和中金文件存放，自动生成
 ```
 
-在使用idf.py build编译后，编译器会根据代码区分出指令总线和数据总线，指令总线部分是可以执行的，比如说定义的函数；数据总线部分不可执行，只能通过字节操作访问，比如说全局变量。
+​	在使用idf.py build编译后，编译器会根据代码区分出指令总线和数据总线，指令总线部分是可以执行的，比如说定义的函数；数据总线部分不可执行，只能通过字节操作访问，比如说全局变量。
+
 **1.DRAM（数据 RAM）：**属于数据总线，存放非常量静态数据（如 .data 段和 .bss 段，通常是数值为0的全局变量）由链接器放入内部 SRAM 作为数据存储，也可以配置放入外部 RAM。也就是static变量或者说初始化为0的全局变量，它们就是存放在这里。
 **2."noinit" DRAM：** 属于数据总线，未初始化的全局变量数据，链接器接管放入内部 SRAM 作为数据存储，也可配置放入外部 RAM。在这个部分的值，启动的时候是不会被初始化的。
 **3.IRAM（指令 RAM）：** 属于指令总线，ESP-IDF 将内部 SRAM0（包含3个存储块：SRAM0、SRAM1和SRAM2）的一部分区域（SRAM0 和 SRAM1）分配为指令 RAM。一般来说，编写的中断程序就是放在这个IRAM中的，另外在应用程序用可以通过使用 IRAM_ATTR宏在源代码中指定哪些代码需要放入 IRAM 中。
-**4.IROM（代码从 flash 中运行）：**指令总线，如果一个函数必须从 flash 中加载，它将被存储在 flash 中，或者存储在 RTC 存储器中。
-DROM（数据存储在 flash 中）： 数据总线，用于存储仅读取的数据，就是程序中的常量用const修饰的变量。
-**6.RTC Slow memory（RTC 慢速存储器）：** 数据总线，RTC_NOINIT_ATTR 属性可以将某些数据存入 RTC Slow memory。存储器中的值在深度睡眠模式中保持不变。
+**4.IROM（代码从 flash 中运行）：**指令总线，如果一个函数必须从 flash 中加载，它将被存储在 flash 中，或者存储在 RTC 存储器中。如果一个函数没有显式地声明放在IRAM或者RTC存储器中，则它会放在Flash中。
+**5.DROM（数据存储在 flash 中）：** 数据总线，用于存储仅读取的数据，就是程序中的常量用const修饰的变量。
+**6.RTC Slow memory（RTC 慢速存储器）：** 数据总线，RTC_NOINIT_ATTR 属性宏可以将某些数据存入 RTC Slow memory。存储器中的值在深度睡眠模式中值保持不变。
 **7.RTC Fast memory（RTC 快速存储器）：** 具有双重作用，既可以用作指令存储器，也可以当做数据存储器，RTC Fast memory 也可以在深度睡眠模式下保持数据，并且能够快速存取。从深度睡眠模式唤醒后必须要运行的代码就是要放在RTC存储器中的。
 
-ESP32的启动流程
-刚才介绍的所有区域都可以被称为段，app_main()是ESP32的应用入口，但是在启动和到达应用入口中间还有很多的工作，具体而言如下所示：1.一级引导程序，固化在ROM中，不可修改，它是负责加载二级引导程序至RAM中运行，并检查IO0引脚，选择程序模式，当芯片上电检测到IO0引脚是低电平的话，就会进入下载模式，否则就会继续执行二级引导程序。2.二级引导程序，也就是bootloader程序，从0x8000处读取分区表，处理各种段，比如说会将IRAM内容拷贝到内存SRAM中，最后加载应用程序。3.应用程序，硬件外设和基本C语言运行环境的初始化，最后执行app_main()函数。
+**ESP32的启动流程：**
+	刚才介绍的所有区域都可以被称为段，app_main()是ESP32的应用入口，但是在启动和到达应用入口中间还有很多的工作，具体而言如下所示：
+	1.一级引导程序，固化在ROM中，不可修改，它是负责加载二级引导程序至RAM中运行，并检查GPIO0引脚，选择程序模式，当芯片上电检测到GPIO0引脚是低电平的话，就会进入下载模式，否则就会继续执行二级引导程序。
+	2.二级引导程序，也就是bootloader程序，从0x8000处读取分区表，处理各种段，比如说会将IRAM内容拷贝到内存SRAM中，最后加载应用程序。
+	3.应用程序，硬件外设和基本C语言运行环境的初始化，最后执行app_main()函数。
 
 ### FreeRTOS
 
+```C++
+// 没有OS的支持就是这种情况
+while(1)
+{
+    taskA();
+    taskB();
+    taskC();
+    taskD();
+}
+
+// 有OS的支持就是 RTOS
+while(1)
+{
+    taskA();
+} 
+
+while(1)
+{
+    taskB();
+}
+
+while(1)
+{
+    taskC();
+}
+```
+
+
+
 #### 任务创建
 
-在RTOS系统中每个模块相当于都是独立的工作的，通过时间片的方式，每个模块都可以得到执行的机会，任务运行的基本单位是Tick，也可以叫做系统时钟节拍，在ESP-IDF中一个系统节拍是1ms。使用FreeRTOS的实时应用程序可以被构建为一组独立的任务。每个任务在自己的上下文中执行，不依赖于其他任务或RTOS调度器本身。任务分为四个状态：运行、准备就绪、阻塞、挂起。
+​	在RTOS系统中每个模块相当于都是独立的工作的，通过时间片的方式，每个模块都可以得到执行的机会，任务运行的基本单位是Tick，也可以叫做系统时钟节拍，在ESP-IDF中一个系统节拍是1ms。使用FreeRTOS的实时应用程序可以被构建为一组独立的任务。每个任务在自己的上下文中执行，不依赖于其他任务或RTOS调度器本身。任务分为四个状态：运行、准备就绪、阻塞、挂起。
 
-运行：当任务实际执行时，它被称为处于运行状态。 任务当前正在使用处理器。 如果运行
+**运行：**当任务实际执行时，它被称为处于运行状态。 任务当前正在使用处理器。 如果运行
 RTOS 的处理器只有一个内核， 那么在任何给定时间内都只能有一个任务处于运行状态。
-
-准备就绪：准备就绪任务指那些能够执行（它们不处于阻塞或挂起状态），但目前没有执行的任务，因为同等或更高优先级的不同任务已经处于运行状态。
-
-阻塞：如果任务当前正在等待时间或外部事件，则该任务被认为处于阻塞状态。例如，如果一
+**准备就绪：**准备就绪任务指那些能够执行（它们不处于阻塞或挂起状态），但目前没有执行的任务，因为同等或更高优先级的不同任务已经处于运行状态。
+**阻塞：**如果任务当前正在等待时间或外部事件，则该任务被认为处于阻塞状态。例如，如果一
 个任务调用 vTaskDelay()，它将被阻塞（被置于阻塞状态），直到延迟结束-一个时间事件。任务也可以通过阻塞来等待队列、信号量、事件组、通知或信号量事件。处于阻塞状态的任务通常有一个"超时"期， 超时后任务将被超时，并被解除阻塞，即使该任务所等待的事件没有发生。“阻塞”状态下的任务不使用任何处理时间，不能被选择进入运行状态。
+**挂起：**与“阻塞”状态下的任务一样， “挂起”状态下的任务不能 被选择进入运行状态，但处于挂起状态的任务没有超时。相反，任务只有在分别通过 vTaskSuspend() 和 xTaskResume()API 调用明确命令时 才会进入或退出挂起状态。
 
-挂起：与“阻塞”状态下的任务一样， “挂起”状态下的任务不能 被选择进入运行状态，但处于挂起状态的任务没有超时。相反，任务只有在分别通过 vTaskSuspend() 和 xTaskResume()API 调用明确命令时 才会进入或退出挂起状态。
-
-优先级：每个任务均被分配了从 0 到 ( configMAX_PRIORITIES - 1 ) 的优先级，其中的configMAX_PRIORITIES 在 FreeRTOSConfig.h 中定义，低优先级数字表示低优先级任务。 空闲任务的优先级为零。
+**优先级：**每个任务均被分配了从 0 到 ( configMAX_PRIORITIES - 1 ) 的优先级，其中的configMAX_PRIORITIES 在 FreeRTOSConfig.h 中定义，低优先级数字表示低优先级任务。 空闲任务的优先级为零。
 
 ```C++
 // 这个函数是原生FreeRTOS中没有的函数，是乐鑫公司自己实现的函数，因为原生的FreeRTOS并没有支持多核CPU情况。但是原生的xTaskCreate()也是在IDF中被支持的，但实质上就是将xTaskCreatePinnedToCore()封装成了xTaskCreate()，并且内核指定为了NO_AFFINITY，来保持的函数接口不变。
@@ -407,12 +437,74 @@ TaskHandle_t xTaskCreateStaticPinnedToCore(
     StaticTask_t * constpxTaskBuffer,   // 指向任务控制块内存区域的指针
     const BaseType_t xCoreID            // 指定任务在哪个核心上运行
 );
+
 // 延时xTickToDelay个周期
+// 当程序调用这个函数的时候，立刻会进入阻塞状态，但不意味着经过这么个周期之后可以立刻得到执行
+// 也就是说这个函数只是用来保证一个最小等待时间，
 void vTaskDelay(const TickType_t xTickToDelay);
 
 //用于表示精确的接触阻塞时间
-void vTaskGetTickCount(Ticktype_t *pxPreviousWakeTime, const TickType_t xTimeIncrement);
+void vTaskGetTickCount(
+    Ticktype_t *pxPreviousWakeTime, // 保存上一次任务解除阻塞的时间
+    const TickType_t xTimeIncrement // 表示经过xTimeIncrement的时候任务会解除阻塞
+);
+
+// 程序示例
+cnt = xTaskGetTickCount(); // 获取当前系统的节拍数
+while(1)
+{
+ 	vTaskDelayUntil(&cnt, 100);   
+}
 ```
+
+
+
+IDF创建工程
+
+```
+idf.py create-project [PROJECT-NAME]
+
+idf.py flash monitor 命令是可以连着使用的
+```
+
+创建完成之后就是一个CMakeList.txt和一个main文件夹，然后就可以执行idf.py build来构建工程了。创建完工程之后就要ctrl+shift+p 点一下 ESP-IDF ADD vscode configuration folder这样就可以将ESP-IDF的头文件路径什么的都包含到这个工程中了。
+
+
+
+第一个程序
+
+```C++
+#include <stdio.h>
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h" // 创建任务就需要包含这个头文件
+#include "esp_log.h"
+
+void taskA(void *param)
+{
+    while(1)
+    {
+        // 前一个参数是一个标记，目的是方便查找某些打印日志，实际的打印内容就是后面的参数
+        ESP_LOGI("main", "Hello world");
+        // 使用演示函数来定时打印串口信息，但是这个函数延时的不是毫秒而是系统节拍
+        // 因此FreeRTOS提供了一个宏pdMS_TO_TICKS，将毫秒时间转化为具体的时间节拍数
+        vTaskDelay(pdMS_TO_TICKS(500));
+    }
+}
+
+void app_main(void)
+{
+    // 在app_main函数中创建任务
+    // 参数分别为：函数名，任务名字，堆栈空间大小，任务参数，优先级，任务句柄，分配到哪个核心运行
+    // 一般来说1核心就是应用核，0核心就是系统核心
+    xTaskCreatePinnedToCore(taskA, "HelloWorld", 2048, NULL, 3, NULL, 1);
+}
+```
+
+### 任务间的同步
+
+​	RTOS中的同步，是指不同任务之间或者任务与外部事件之间的协同工作方式，确保多个并发执行的任务按照预期的顺序或时机执行，它涉及到线程或任务间的通信和协调机制，目的是为了避免数据竞争、解决竞态条件、并确保系统的正确行为。其中队列就是FreeRTOS中一种常见的同步方式。
+
+​	互斥是指某一资源同时只允许一个访问者对其进行访问，具有唯一性和排它性。
 
 ```c++
 #include "freertos/FreeRTOS.h"
@@ -722,7 +814,7 @@ void app_main(void)
 
 ```
 
-### 原生的FreeRTOS和IDF版本的FreeRTOS的区别
+#### 原生的FreeRTOS和IDF版本的FreeRTOS的区别
 
 1. 优先级问题，多核情况并不使用，因为有多个任务可同时运行
 2. ESP-IDF自动创建空闲、定时器、app_main、IPC、ESP定时器
