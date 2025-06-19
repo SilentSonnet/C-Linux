@@ -504,7 +504,48 @@ void app_main(void)
 
 ​	RTOS中的同步，是指不同任务之间或者任务与外部事件之间的协同工作方式，确保多个并发执行的任务按照预期的顺序或时机执行，它涉及到线程或任务间的通信和协调机制，目的是为了避免数据竞争、解决竞态条件、并确保系统的正确行为。其中队列就是FreeRTOS中一种常见的同步方式。
 
-​	互斥是指某一资源同时只允许一个访问者对其进行访问，具有唯一性和排它性。
+​	互斥是指某一资源同时只允许一个访问者对其进行访问，具有唯一性和排它性。比如说要使用串口通信，任务A想要使用串口就需要获得
+
+![image-20250619183854121](C:\Users\57117\AppData\Roaming\Typora\typora-user-images\image-20250619183854121.png)
+
+```C++
+// 队列相关的函数
+// 创建一个队列，成功返回队列句柄
+QueueHandle_t xQueueCreate(
+    UBaseType_t uxQueueLength,     // 队列容量
+    UBaseType_t uxItemSize         // 每个队列项所占内存的大小（单位：字节）
+);
+// 向队列头部发送一个消息
+BaseType_t xQueueSend(
+    QueueHandle_t xQueue,          // 队列句柄
+    const void * pvItemToQueue,    // 要发送的消息指针
+    TickType_t xTicksToWait        // 等待时间
+);
+// 向队列尾部发送一个消息
+BaseType_t xQueueSendToBack(
+    QueueHandle_t xQueue,          // 队列句柄
+    const void * pvItemToQueue,    // 要发送的消息指针
+    TickType_t xTicksToWait        // 等待时间
+);
+// 从队列接收一条消息
+BaseType_t xQueueReceive(
+    QueueHandle_t xQueue,          // 队列句柄
+    void * pvBuffer,               // 指向接收消息缓冲区的指针
+    TickType_t xTicksToWait        // 等待时间
+);
+// xQueueSend 的中断版本（在中断中使用）
+BaseType_t xQueueSendFromISR(
+    QueueHandle_t xQueue,                  // 队列句柄
+    const void * pvItemToQueue,            // 要发送的消息指针
+    BaseType_t * pxHigherPriorityTaskWoken // 如果发送导致任务解除阻塞，且该任务优先级高于当前任务，则设置为 pdTRUE
+);
+
+// 注：如果 *pxHigherPriorityTaskWoken 被设置为 pdTRUE，
+// 应在中断退出前调用 portYIELD_FROM_ISR() 以触发上下文切换
+
+```
+
+
 
 ```c++
 #include "freertos/FreeRTOS.h"
