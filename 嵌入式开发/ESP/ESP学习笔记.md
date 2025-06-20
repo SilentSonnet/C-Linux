@@ -504,7 +504,7 @@ void app_main(void)
 
 ​	RTOS中的同步，是指不同任务之间或者任务与外部事件之间的协同工作方式，确保多个并发执行的任务按照预期的顺序或时机执行，它涉及到线程或任务间的通信和协调机制，目的是为了避免数据竞争、解决竞态条件、并确保系统的正确行为。其中队列就是FreeRTOS中一种常见的同步方式。
 
-​	互斥是指某一资源同时只允许一个访问者对其进行访问，具有唯一性和排它性。比如说要使用串口通信，任务A想要使用串口就需要获得
+​	互斥是指某一资源同时只允许一个访问者对其进行访问，具有唯一性和排它性。比如说要使用串口通信，任务A想要使用串口就需要获得一个互斥锁，当任务A获得互斥锁而使用串口后，其他任务也要使用串口通信就会被阻塞，直到任务A完成后释放互斥锁，其他任务获得为止。
 
 ![image-20250619183854121](C:\Users\57117\AppData\Roaming\Typora\typora-user-images\image-20250619183854121.png)
 
@@ -519,7 +519,7 @@ QueueHandle_t xQueueCreate(
 BaseType_t xQueueSend(
     QueueHandle_t xQueue,          // 队列句柄
     const void * pvItemToQueue,    // 要发送的消息指针
-    TickType_t xTicksToWait        // 等待时间
+    TickType_t xTicksToWait        // 等待时间，队列满的时候要等待才行
 );
 // 向队列尾部发送一个消息
 BaseType_t xQueueSendToBack(
@@ -533,7 +533,7 @@ BaseType_t xQueueReceive(
     void * pvBuffer,               // 指向接收消息缓冲区的指针
     TickType_t xTicksToWait        // 等待时间
 );
-// xQueueSend 的中断版本（在中断中使用）
+// xQueueSend 的中断版本（在中断函数中使用）
 BaseType_t xQueueSendFromISR(
     QueueHandle_t xQueue,                  // 队列句柄
     const void * pvItemToQueue,            // 要发送的消息指针
@@ -545,327 +545,558 @@ BaseType_t xQueueSendFromISR(
 
 ```
 
-
+示例代码
 
 ```c++
+#include <stdio.h>
+#include <string.h>
 #include "freertos/FreeRTOS.h"
-#include "freertos/task.h"
-#include "freertos/semphr.h"
-#include "freertos/event_groups.h"
+#include "freertos/task.h" // 创建任务就需要包含这个头文件
 #include "freertos/queue.h"
 #include "esp_log.h"
 
-static const char *TAG = "main";
+QueueHandle_t queue_handle = NULL;
 
-/** 任务A
-
- * @param 无
- * @return 无
-   */
-   void taskA(void *param)
-   {
-    while(1)
-    {
-        //每隔500ms打印
-        ESP_LOGI(TAG,"this is taskA");
-        vTaskDelay(pdMS_TO_TICKS(500));
-    }
-   }
-   /** 任务B
- * @param 无
- * @return 无
-   */
-   void taskB(void* param)
-   {
-    while(1)
-    {
-        //每隔700ms打印
-        ESP_LOGI(TAG,"this is taskB");
-        vTaskDelay(pdMS_TO_TICKS(700));
-    }
-   }
-
-/** 任务例程初始化
-
- * @param 无
- * @return 无
-   */
-   void rtos_task_sample(void)
-   {
-    //以下创建两个任务，任务栈大小为2048字节，优先级为3，并设定运行在CORE1上
-    xTaskCreatePinnedToCore(taskA,"taskA",2048,NULL,3,NULL,1);
-    xTaskCreatePinnedToCore(taskB,"taskB",2048,NULL,3,NULL,1);
-   }
-
-//队列句柄
-static QueueHandle_t s_testQueue;
-//定义一个队列数据内容结构体
+// 但是在实现链表的时候还是需要struct 
 typedef struct
 {
-    int num;    //里面只有一个num成员，用来记录一下数据
-}queue_packet;
+    /* data */
+    int value;
+}queue_data_t;
 
-/** 队列任务A，用于定时向队列发送queue_packet数据
-
- * @param 无
- * @return 无
-   */
-   void queue_taskA(void *param)
-   {
-    int test_cnt = 0;
-    while(1)
-    {
-        queue_packet packet;
-        packet.num = test_cnt++;
-        //发送queue_packet数据
-        xQueueSend(s_testQueue,&packet,pdMS_TO_TICKS(200));
-        ESP_LOGI(TAG,"taskA send packet,num:%d",packet.num);
-        //延时1000ms
-        vTaskDelay(pdMS_TO_TICKS(1000));
-    }
-   }
-
-/** 队列任务B，用于从队列接收数据
-
- * @param 无
- * @return 无
-   */
-   void queue_taskB(void *param)
-   {
-    while(1)
-    {
-        queue_packet packet;
-        BaseType_t ret = xQueueReceive(s_testQueue,&packet,pdMS_TO_TICKS(200));
-        if(ret == pdTRUE)
-        {
-            //如果收到数据就打印出来
-            ESP_LOGI(TAG,"taskB receive packet,num:%d",packet.num);
-        }
-    }
-   }
-
-/** 初始化队列例程
-
- * @param 无
- * @return 无
-   */
-   void rtos_queue_sample(void)
-   {
-    //初始化一个队列，队列单元内容是queue_packet结构体，最大长度是5
-    s_testQueue = xQueueCreate(5,sizeof(queue_packet));
-    //队列任务A，定时向队列发送数据
-    xTaskCreatePinnedToCore(queue_taskA,"queue_taskA",2048,NULL,3,NULL,1);
-    //队列任务B，从队列中接收数据
-    xTaskCreatePinnedToCore(queue_taskB,"queue_taskB",2048,NULL,3,NULL,1);
-   }
-
-//二进制信号量
-static SemaphoreHandle_t s_testBinSem;
-//计数信号量
-static SemaphoreHandle_t s_testCountSem;
-//互斥信号量
-static SemaphoreHandle_t s_testMuxSem;
-
-/** 信号量任务A，定时向三种信号量句柄释放信号
-
- * @param 无
-
- * @return 无
-   */
-   void sem_taskA(void* param)
-   {
-    const int count_sem_num = 5;
-    while(1)
-    {
-        //向二值信号量释放信号
-        xSemaphoreGive(s_testBinSem);
-
-        //向计数信号量释放5个信号
-        for(int i = 0;i < count_sem_num;i++)
-        {
-            xSemaphoreGive(s_testCountSem);
-        }
-       
-        //向互斥信号量释放信号
-        xSemaphoreGiveRecursive(s_testMuxSem);
-        vTaskDelay(pdMS_TO_TICKS(2000));
-
-    }
-   }
-
-void sem_taskB(void* param)
+void taskA(void *param)
 {
-    BaseType_t ret = 0;
+    // 从队列里面接收数据，并打印
+    queue_data_t data;
     while(1)
     {
-        //无限等待二进制信号量，直到获取成功才返回
-        ret = xSemaphoreTake(s_testBinSem,portMAX_DELAY);
-        if(ret == pdTRUE)
-            ESP_LOGI(TAG,"take binary semaphore");
-
-
-        //接收计数信号量，每次接收200ms，直到接收失败才结束循环
-        int sem_count = 0;
-        do
+        // 这三个参数分别是队列句柄，缓冲区，等待时间
+        if(pdTRUE == xQueueReceive(queue_handle, &data, 100))
         {
-            ret = xSemaphoreTake(s_testCountSem,pdMS_TO_TICKS(200));
-            if(ret==pdTRUE)
-            {
-                ESP_LOGI(TAG,"take count semaphore,count:%d\r\n",++sem_count);
-            }
-        }while(ret ==pdTRUE);
-        
-        //无限等待互斥信号量，直到获取成功才返回，这里用法和二进制信号量极为类似
-        ret = xSemaphoreTakeRecursive(s_testMuxSem,portMAX_DELAY);
-        if(ret == pdTRUE)
-            ESP_LOGI(TAG,"take Mutex semaphore");
-    
+            ESP_LOGI("queue", "receive queue value:%d", data.value);
+        }
     }
-
 }
 
-/** 初始化信号量例程
-
- * @param 无
- * @return 无
-   */
-   void rtos_sem_sample(void)
-   {
-    s_testBinSem = xSemaphoreCreateBinary();
-    s_testCountSem = xSemaphoreCreateCounting(5,0);
-    s_testMuxSem = xSemaphoreCreateMutex();
-    xTaskCreatePinnedToCore(sem_taskA,"sem_taskA",2048,NULL,3,NULL,1);
-    xTaskCreatePinnedToCore(sem_taskB,"sem_taskB",2048,NULL,3,NULL,1);
-   }
-
-//事件组句柄
-static EventGroupHandle_t s_testEvent;
-
-/** 事件任务A，用于定时标记事件
-
- * @param 无
- * @return 无
-   */
-   void event_taskA(void* param)
-   {
+void taskB(void *param)
+{
+    queue_data_t data;
+    memset(&data, 0, sizeof(queue_data_t));
+    // 每隔1秒向队列里面发送数据
     while(1)
     {
-        xEventGroupSetBits(s_testEvent,BIT0);
+        xQueueSend(queue_handle, &data, 100);
+        // 进行1s的延时
         vTaskDelay(pdMS_TO_TICKS(1000));
-        xEventGroupSetBits(s_testEvent,BIT1);
-        vTaskDelay(pdMS_TO_TICKS(1500));
+        data.value ++;
     }
-   }
+}
 
-/** 事件任务B，等待事件组中BIT0和BIT1位
+void app_main(void)
+{
+    queue_handle = xQueueCreate(10, sizeof(queue_data_t));
+    xTaskCreatePinnedToCore(taskA, "taskA", 2048, NULL, 3, NULL, 1);
+    xTaskCreatePinnedToCore(taskB, "taskB", 2048, NULL, 3, NULL, 1);
+}
+```
 
- * @param 无
- * @return 无
-   */
-   void event_taskB(void* param)
-   {
+
+
+#### 信号量
+
+![image-20250620093735016](C:\Users\57117\AppData\Roaming\Typora\typora-user-images\image-20250620093735016.png)
+
+信号量相当于NONOS程序中的全局标志位，就类似于所列举的例子，雨伞池里面一共有六把雨伞，每当有一个人取走一把雨伞，池里面的雨伞就会减一，直到所有的雨伞被取走了，后需要用雨伞的人就只能等待，直到有人归还雨伞。信号量分为二进制信号量、计数信号量、互斥信号量。二进制信号量就是最大计数值就是1，也就是雨伞池里面的雨伞最多就是1 。
+
+```C++
+// 创建二值信号量，成功则返回信号量句柄（二值信号量最大只有1个）
+SemaphoreHandle_t xSemaphoreCreateBinary(void);
+
+// 创建计数信号量，成功则返回信号量句柄
+SemaphoreHandle_t xSemaphoreCreateCounting(
+    UBaseType_t uxMaxCount,     // 最大信号量数
+    UBaseType_t uxInitialCount  // 初始信号量数
+);
+
+// 获取一个信号量，如果获得成功，则返回 pdTRUE
+BaseType_t xSemaphoreTake(
+    SemaphoreHandle_t xSemaphore, // 信号量句柄
+    TickType_t xTicksToWait       // 等待时间（tick 数）
+);
+
+// 释放一个信号量
+BaseType_t xSemaphoreGive(
+    SemaphoreHandle_t xSemaphore  // 信号量句柄
+);
+
+// 删除信号量（释放资源）
+void vSemaphoreDelete(
+    SemaphoreHandle_t xSemaphore  // 信号量句柄
+);
+
+```
+
+信号量示例代码
+
+这个代码使用了一个dht的温度传感器
+
+```C++
+#include <stdio.h>
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h" // 创建任务就需要包含这个头文件
+#include "freertos/semphr.h"
+#include "dht11.h"
+#include "driver/gpio.h"
+#include "esp_log.h"
+
+SemaphoreHandle_t dht11_mutex;
+
+void taskA(void *param)
+{
+    int temp, humidity;
+    while(1)
+    {
+        xSemaphoreTake(dht11_mutex, portMAX_DELAY);
+        vTaskDelay(pdMS_TO_TICKS(500));
+        if(DHT11_StartGet(&temp, &humidity))
+        {
+            ESP_LOGI("dht11", "taskA-->temp:%d,humidity:%d%%", temp / 10, humidity);
+        }
+        xSemaphoreGive(dht11_mutex);
+        vTaskDelay(pdMS_TO_TICKS(1000));
+    }
+}
+
+void taskB(void *param)
+{
+    int temp, humidity;
+    while(1)
+    {
+        xSemaphoreTake(dht11_mutex, portMAX_DELAY);
+        vTaskDelay(pdMS_TO_TICKS(500));
+        if(DHT11_StartGet(&temp, &humidity))
+        {
+            ESP_LOGI("dht11", "taskA-->temp:%d,humidity:%d%%", temp / 10, humidity);
+        }
+        xSemaphoreGive(dht11_mutex);
+        vTaskDelay(pdMS_TO_TICKS(1000));
+    }
+}
+
+void app_main(void)
+{
+    dht11_mutex = xSemaphoreCreateMutex();
+    DHT11_Init(GPIO_NUM_25);
+    xTaskCreatePinnedToCore(taskA, "taskA", 2048, NULL, 3, NULL, 1);
+    xTaskCreatePinnedToCore(taskB, "taskB", 2048, NULL, 3, NULL, 1);
+}
+```
+
+
+
+#### 互斥锁
+
+互斥锁与二进制信号量极为相似，但互斥锁实现了优先级继承
+
+```C++
+// 创建一个互斥锁
+SemaphoreHandle_t xSemaphoreCreateMutex(void);
+```
+
+​	优先级继承是为了解决优先级翻转问题，比如说有三个任务A、B、C，任务优先级A>B>C，但是任务C正在使用临界资源，当任务A就绪之后调度器切换到任务A，当任务A运行一段时间之后需要使用临界资源，但此时任务C并没有释放临界资源，此时任务A就会阻塞，任务B就绪之后调度器就会将任务B切换出来运行，当任务C释放临界资源的时候，任务A才能继续运行，因此虽然任务A的优先级大于任务B，但是任务B在没有与任务A有资源冲突的情况下，任务B反而能够运行，产生了优先级翻转。要解决的话就是使用优先级继承，让任务C暂时继承任务A的优先级，这样任务B就无法抢占任务A了。
+
+![image-20250620094718626](C:\Users\57117\AppData\Roaming\Typora\typora-user-images\image-20250620094718626.png)
+
+### 事件组
+
+
+事件位：用于指示事件是否发生，事件位通常称为事件标志。
+事件组：就是一组事件位，事件组中的事件位通过位编号来引用。
+	所谓事件就是发生了某件事，用于通知对此事件感兴趣的用户，freeRTOS中的事件组包含了一组事件位，每一位都可以单独设置为0或者1，0就是发生，1就是不发生。当一个任务设置了一个事件，如果有任务正在等待相应的事件，那么等待该事件的任务就会停止等待并返回事件编号。事件组可以等待多个事件中的任意一个或全部，提供了更灵活的同步方式。
+
+![image-20250620110110821](C:\Users\57117\AppData\Roaming\Typora\typora-user-images\image-20250620110110821.png)
+
+```C++
+// 创建一个事件组，返回事件组句柄；失败返回 NULL
+EventGroupHandle_t xEventGroupCreate(void);
+
+// 等待事件组中某个（或某些）标志位，用返回值确定哪些位已被设置
+EventBits_t xEventGroupWaitBits(
+    const EventGroupHandle_t xEventGroup,     // 事件组句柄
+    const EventBits_t uxBitsToWaitFor,        // 要等待的位（例如 (1 << 0) | (1 << 1)）
+    const BaseType_t xClearOnExit,            // 是否自动清除满足条件的位（pdTRUE/pdFALSE）
+    const BaseType_t xWaitForAllBits,         // 是否所有等待位都必须满足才返回
+    TickType_t xTicksToWait                   // 最大阻塞等待时间（tick）
+);
+
+// 设置事件组中的一个或多个标志位
+EventBits_t xEventGroupSetBits(
+    EventGroupHandle_t xEventGroup,           // 事件组句柄
+    const EventBits_t uxBitsToSet             // 要设置的标志位
+);
+
+// 清除事件组中的一个或多个标志位
+EventBits_t xEventGroupClearBits(
+    EventGroupHandle_t xEventGroup,           // 事件组句柄
+    const EventBits_t uxBitsToClear           // 要清除的标志位
+);
+
+```
+
+### 事件组示例程序
+
+
+
+```C++
+#include <stdio.h>
+#include "freertos/FreeRTOS.h"
+#include "freertos/event_groups.h"
+#include "freertos/task.h" // 创建任务就需要包含这个头文件
+#include "esp_log.h"
+
+#define NUM0_BIT BIT0
+#define NUM1_BIT BIT1
+
+static EventGroupHandle_t test_event;
+
+void taskA(void *param)
+{
+    // 定时设置不同的事件位
+    while(1)
+    {
+        xEventGroupSetBits(test_event, NUM0_BIT);
+        vTaskDelay(pdMS_TO_TICKS(1000));
+        xEventGroupSetBits(test_event, NUM1_BIT);
+        vTaskDelay(pdMS_TO_TICKS(1000));
+    }
+}
+
+void taskB(void *param)
+{
+    // 等待事件位
     EventBits_t ev;
     while(1)
     {
-        ev = xEventGroupWaitBits(s_testEvent,BIT0|BIT1,pdTRUE,pdFALSE,portMAX_DELAY);
-        if(ev & BIT0)
+        ev = xEventGroupWaitBits(test_event, NUM0_BIT | NUM1_BIT, pdTRUE, pdFALSE, pdMS_TO_TICKS(5000));
+        // 第0位是有事件的
+        if(ev & NUM0_BIT)
         {
-            ESP_LOGI(TAG,"Event BIT0 set");
+            ESP_LOGI("ev", "GET BIT0 EVENT!");
         }
-        if(ev& BIT1)
+        // 第1位是有事件的
+        if(ev & NUM1_BIT)
         {
-            ESP_LOGI(TAG,"Event BIT1 set");
-        }
-    }
-   }
-
-/** 事件例程初始化
-
- * @param 无
- * @return 无
-   */
-   void rtos_event_sample(void)
-   {
-    s_testEvent = xEventGroupCreate();
-    xTaskCreatePinnedToCore(event_taskA,"event_taskA",2048,NULL,3,NULL,1);
-    xTaskCreatePinnedToCore(event_taskB,"event_taskB",2048,NULL,3,NULL,1);
-   }
-
-//要使用任务通知，需要记录任务句柄
-static TaskHandle_t s_notifyTaskAHandle;
-static TaskHandle_t s_notifyTaskBHandle;
-
-/** 任务通知A，用于定时向任务通知B直接传输数据
-
- * @param 无
- * @return 无
-   */
-   void notify_taskA(void* param)
-   {
-    uint32_t rec_val = 0;
-    while(1)
-    {
-        if (xTaskNotifyWait(0x00, ULONG_MAX, &rec_val, pdMS_TO_TICKS(1000)) == pdTRUE)
-        {
-            ESP_LOGI(TAG,"receive notify value:%lu",rec_val);
+            ESP_LOGI("ev", "GET BIT1 EVNET!");
         }
     }
-   }
-
-/** 任务通知B，实时接收任务通知A的数据
-
- * @param 无
- * @return 无
-   */
-   void notify_taskB(void* param)
-   {
-    int notify_val = 0;
-    while(1)
-    {
-        xTaskNotify(s_notifyTaskAHandle, notify_val, eSetValueWithOverwrite);
-        notify_val++;
-        vTaskDelay(pdMS_TO_TICKS(1000));
-    }
-   }
-
-/** 任务通知例程初始化
-
- * @param 无
- * @return 无
-   */
-   void rtos_notify_sample(void)
-   {
-    xTaskCreatePinnedToCore(notify_taskA,"notify_taskA",2048,NULL,3,&s_notifyTaskAHandle,1);
-    xTaskCreatePinnedToCore(notify_taskB,"notify_taskB",2048,NULL,3,&s_notifyTaskBHandle,1);
-   }
-
-//入口函数
-void app_main(void)
-{
-    /*
-    以下是每种freeRTOS特性的测试例程的初始化函数，建议每次只开一个，否则有太多打印影响体验
-    */
-    //rtos_task_sample();
-    //rtos_queue_sample();
-    rtos_sem_sample();
-    //rtos_event_sample();
-    //rtos_notify_sample();
 }
 
+void app_main(void)
+{
+    test_event = xEventGroupCreate();
+    xTaskCreatePinnedToCore(taskA, "taskA", 2048, NULL, 3, NULL, 1);
+    xTaskCreatePinnedToCore(taskB, "taskB", 2048, NULL, 3, NULL, 1);
+} 
+```
 
+
+
+### 直达任务通知
+
+​	定义：每个RTOS任务都有一个任务通知数组。每条任务通知都有“挂起”或“非挂起”的通知状态，以及一个32位通知值。直达任务通知是直接发送至任务的事件，而不是通过中间对象（如队列、事件组或信号量）间接发送任务的事件。向任务发送“直达任务通知”会将目标任务通知设为“挂起”状态，（此挂起不是挂起任务，而是任务通知的挂起通知状态，表示任务收到了来自某个任务的通知）。
+
+![image-20250620111804647](C:\Users\57117\AppData\Roaming\Typora\typora-user-images\image-20250620111804647.png)
+
+
+
+```C++
+// === 基本任务通知发送 ===
+// 将通知直接发送给任务，ulValue 是通知值，eAction 决定如何处理通知值
+BaseType_t xTaskNotify(
+    TaskHandle_t xTaskToNotify,   // 被通知的任务句柄
+    uint32_t ulValue,             // 通知携带的值
+    eNotifyAction eAction         // 执行的操作（见枚举）
+);
+
+// 枚举：通知动作类型
+typedef enum {
+    eNoAction = 0,                // 不更改通知值，只解除阻塞
+    eSetBits,                     // 将 ulValue 的位设置到通知值（OR 操作）
+    eIncrement,                   // 将通知值加一（适用于计数信号量用途）
+    eSetValueWithOverwrite,       // 用 ulValue 覆盖通知值（允许覆盖）
+    eSetValueWithoutOverwrite     // 用 ulValue 设置通知值，若通知未处理则失败
+} eNotifyAction;
+
+// === 基本任务通知接收 ===
+// 等待任务通知，并返回通知值，可选择进入/退出函数时清除位
+BaseType_t xTaskNotifyWait(
+    uint32_t ulBitsToClearOnEntry,     // 进入函数时清除的通知位
+    uint32_t ulBitsToClearOnExit,      // 退出函数时清除的通知位
+    uint32_t *pulNotificationValue,    // 输出通知值的指针（可为 NULL）
+    TickType_t xTicksToWait            // 最大等待时间（tick）
+);
+
+// === 计数型通知（类似二值/计数信号量） ===
+// 给目标任务发送“+1”的通知，默认 eIncrement 动作
+BaseType_t xTaskNotifyGive(
+    TaskHandle_t xTaskToNotify         // 被通知的任务
+);
+
+// 接收通知值（自减），如果当前为 0，则阻塞等待，返回前会自动 -1
+uint32_t ulTaskNotifyTake(
+    BaseType_t xClearCountOnExit,     // 是否清零通知值（pdTRUE）或减1（pdFALSE）
+    TickType_t xTicksToWait           // 等待时间
+);
+
+// === 中断中使用版本（FromISR 后缀） ===
+// 在中断中发送通知
+BaseType_t xTaskNotifyFromISR(
+    TaskHandle_t xTaskToNotify,
+    uint32_t ulValue,
+    eNotifyAction eAction,
+    BaseType_t *pxHigherPriorityTaskWoken // 若唤醒高优先级任务，需手动切换上下文
+);
+
+// 在中断中执行“+1”型通知（用于 xTaskNotifyGive 的中断版）
+BaseType_t xTaskNotifyGiveFromISR(
+    TaskHandle_t xTaskToNotify,
+    BaseType_t *pxHigherPriorityTaskWoken
+);
+
+```
+
+直达任务通知示例代码
+
+```c++
+#include <stdio.h>
+#include "freertos/FreeRTOS.h"
+#include "freertos/event_groups.h"
+#include "freertos/task.h" // 创建任务就需要包含这个头文件
+#include "esp_log.h"
+
+
+
+static TaskHandle_t taskA_handle;
+static TaskHandle_t taskB_handle;
+
+void taskA(void *param)
+{
+    // 定时发送一个任务通知值
+    uint32_t value = 0;
+    vTaskDelay(pdMS_TO_TICKS(200));
+    while(1)
+    {
+        xTaskNotify(taskB_handle, value, eSetValueWithoutOverwrite);
+        vTaskDelay(pdMS_TO_TICKS(1000));
+        value ++;
+    }
+}
+
+void taskB(void *param)
+{
+    // 接收任务通知并打印
+    uint32_t value;
+    while(1)
+    {
+        // 第一个参数是进入的时候清除哪些位，第二个参数是退出的时候清除哪些位，第三个是直达通知的值，第四个是等待时间
+        // ULONG_MAX就是全部
+        xTaskNotifyWait(0x00, ULONG_MAX, &value, portMAX_DELAY);
+        ESP_LOGI("ev", "notify wait value:%lu", value);
+    }
+}
+
+void app_main(void)
+{
+    // 这个程序如果不加延时函数的话会崩溃掉，因为创建完任务A之后任务A就会直接运行，这样就会向任务B发送任务通知
+    // 但是此时任务B还没有创建成功，因此访问的任务句柄就是一个无效的句柄，因此就会崩溃掉了
+    // 解决的方式就是在任务A中加一个阻塞延时函数，等待任务B创建完成
+    xTaskCreatePinnedToCore(taskA, "taskA", 2048, NULL, 3, &taskA_handle, 1);
+    xTaskCreatePinnedToCore(taskB, "taskB", 2048, NULL, 3, &taskB_handle, 1);
+} 
 ```
 
 #### 原生的FreeRTOS和IDF版本的FreeRTOS的区别
 
 1. 优先级问题，多核情况并不使用，因为有多个任务可同时运行
-2. ESP-IDF自动创建空闲、定时器、app_main、IPC、ESP定时器
+2. ESP-IDF自动创建空闲、定时器、app_main、IPC、ESP定时器。空闲任务在每个核心上面都会创建一个，它的优先级是0，第二个是ESP32定时器任务，优先级是1，第三个app_main应用入口，第四个IPC任务，每个核心都会创建一个，用于处理多核协调，优先级是24也就是最高优先级，最后一个是ESP定时器任务，负责定时器的回调，优先级是22 。
 3. ESP-IDF不适用原生FreeRTOS的内存堆管理，实现了自己的堆
 4. 创建任务使用xTaskCreatePinnedToCore()
 5. 删除任务避免删除另外一个核的人物
-6. 临界区使用自旋锁确保同步
-7. 如果任务重用到浮点运算，则创建任务的时候必须指定具体运行在哪个核上，不能由系统自动安排
+6. 临界区使用自旋锁确保同步，因为在ESP32双核系统中，仅仅禁用中断并不能构成临界区，因为存在其它核心意味着共享资源仍然可以同时访问，因此需要采取自旋锁的方式来保护临界区资源。
+7. 如果任务重用到浮点运算，则创建任务的时候必须指定具体运行在哪个核上，不能由系统自动安排，这是由ESP32的FPU寄存器的特性决定的。
 
 总的来说，建议如下：
 
 1. 程序应用开发创建任务指定内核，建议不要使用tskNO_AFFINITY
 2. 通常，负责处理无线网络的任务(例如WiFi或蓝牙)，将被固定到CPU0(因此名称PRO_CPU)，而处理应用程序其余部分的任务将被固定到CPU1(因此名称为APP_CPU)
+
+# ESP32-外设
+
+## GPIO驱动LED
+
+高低电平跳变代码
+
+```C++
+#include "stdio.h"
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
+#include "driver/gpio.h"
+
+#define LED_GPIO GPIO_NUM_27
+
+void led_run_task(void *param)
+{
+    int gpio_level = 0;
+    while(1)
+    {
+        gpio_level = gpio_level ? 0 : 1;
+        gpio_set_level(LED_GPIO, gpio_level);
+        vTaskDelay(pdMS_TO_TICKS(500));
+    }
+}
+
+void app_main(void)
+{
+    gpio_config_t led_cfg = {
+        // 这个按位掩码用于指定GPIO，因为是可以
+        .pin_bit_mask = (1 << LED_GPIO),
+        // 是否使能上拉
+        .pull_up_en = GPIO_PULLUP_DISABLE,
+        .pull_down_en = GPIO_PULLDOWN_DISABLE,
+        .mode = GPIO_MODE_OUTPUT,
+        .intr_type = GPIO_INTR_DISABLE,
+    };
+    gpio_config(&led_cfg);
+
+    xTaskCreatePinnedToCore(led_run_task, "LED_RUN", 2048, NULL, 3, NULL, 1);
+} 
+```
+
+
+
+PWM示例代码
+
+```C++
+#include "stdio.h"
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
+#include "driver/gpio.h"
+#include "driver/ledc.h"
+
+#define LED_GPIO GPIO_NUM_27
+#define FULL_EV_BIT0 BIT0
+#define EMPTY_EV_BIT1 BIT1
+
+
+static EventGroupHandle_t ledc_event_handle;
+// 加了IRAM_ATTR的宏就是在内存中执行的，所以效率会很高
+bool IRAM_ATTR ledc_finish_cb(const ledc_cb_param_t *param, void *user_arg)
+{
+    BaseType_t taskWoken;
+    // 首先判断占空比的状态
+    if(param->duty)
+    {
+        xEventGroupSetBitsFromISR(ledc_event_handle, FULL_EV_BIT0, &taskWoken);
+    }
+    else
+    {
+        xEventGroupSetBitsFromISR(ledc_event_handle, EMPTY_EV_BIT1, &taskWoken);
+    }
+    return taskWoken;
+}
+
+void led_run_task(void *param)
+{
+    EventBits_t ev;
+    while(1)
+    {
+        ev = xEventGroupWaitBits(ledc_event_handle, FULL_EV_BIT0 | EMPTY_EV_BIT1, pdTRUE, pdFALSE, pdMS_TO_TICKS(5000));
+        if(ev & FULL_EV_BIT0)
+        {
+            // 开启渐变呼吸灯模式，这个函数的意思就是从零开始用2000毫秒的事件来进行渐变
+            ledc_set_fade_with_time(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_0, 0, 2000);
+            // 启动渐变
+            ledc_fade_start(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_0, LEDC_FADE_NO_WAIT);
+        }
+        if(ev & EMPTY_EV_BIT1)
+        {
+            // 开启渐变呼吸灯模式，这个函数的意思就是从零开始用2000毫秒的事件来进行渐变
+            ledc_set_fade_with_time(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_0, 8191, 2000);
+            // 启动渐变
+            ledc_fade_start(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_0, LEDC_FADE_NO_WAIT);
+        }
+        ledc_cbs_t cbs = 
+        {
+            .fade_cb = ledc_finish_cb,
+        };
+        ledc_cb_register(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_0, &cbs, NULL);
+    }
+}
+
+void app_main(void)
+{
+    gpio_config_t led_cfg = {
+        // 这个按位掩码用于指定GPIO，因为是可以
+        .pin_bit_mask = (1 << LED_GPIO),
+        // 是否使能上拉
+        .pull_up_en = GPIO_PULLUP_DISABLE,
+        .pull_down_en = GPIO_PULLDOWN_DISABLE,
+        .mode = GPIO_MODE_OUTPUT,
+        .intr_type = GPIO_INTR_DISABLE,
+    };
+    gpio_config(&led_cfg);
+
+    // 还需要初始化一下定时器
+    ledc_timer_config_t ledc_timer = {
+        .speed_mode = LEDC_LOW_SPEED_MODE,
+        .timer_num = LEDC_TIMER_0,
+        .clk_cfg = LEDC_AUTO_CLK,
+        .freq_hz = 5000,
+        // 分辨率，就是将一个周期划分为多少份来进行控制
+        .duty_resolution = LEDC_TIMER_13_BIT,
+    };
+    ledc_timer_config(&ledc_timer);
+
+    // 初始化LEDC通道
+    ledc_channel_config_t ledc_channel = {
+        .speed_mode = LEDC_LOW_SPEED_MODE,
+        .channel = LEDC_CHANNEL_0,
+        .timer_sel = LEDC_TIMER_0,
+        .gpio_num = LED_GPIO,
+        // 占空比，在这里先设置为0，也就是不亮的状态
+        .duty = 0,
+        .intr_type = LEDC_INTR_DISABLE,
+    };
+    ledc_channel_config(&ledc_channel);
+
+    // 因为用到了PWM模块，所以需要调用接口开启PWM模块
+    ledc_fade_func_install(0);
+    // 开启渐变呼吸灯模式，这个函数的意思就是从零开始用2000毫秒的事件来进行渐变
+    ledc_set_fade_with_time(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_0, 8191, 2000);
+    // 启动渐变
+    ledc_fade_start(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_0, LEDC_FADE_NO_WAIT);
+
+    // 这里创建了一个事件组
+    ledc_event_handle = xEventGroupCreate();
+
+    // 设置回调函数
+    ledc_cbs_t cbs = 
+    {
+        .fade_cb = ledc_finish_cb,
+    };
+    ledc_cb_register(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_0, &cbs, NULL);
+
+    xTaskCreatePinnedToCore(led_run_task, "LED_RUN", 2048, NULL, 3, NULL, 1);
+} 
+```
+
+
+
+### RMT
+
+
+
+### ADC
+
+
+
