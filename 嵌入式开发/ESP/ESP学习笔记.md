@@ -1100,3 +1100,112 @@ void app_main(void)
 
 
 
+挂载的意思就是把硬盘磁盘SD卡连接到文件系统的目录，这样我们才能在文件系统中访问这些存储设备，而挂载点实际就是文件系统的一个目录入口，这里SD卡的挂在目录就是/sdcard，挂在成功就意味着我们可以使用标准的C文件操作接口。
+
+GPIO交换矩阵
+
+GPIO34 35 36 39这几个引脚只能作为输入，如果作为输出的话IDF编译不能用
+
+![image-20250622104820959](C:\Users\57117\AppData\Roaming\Typora\typora-user-images\image-20250622104820959.png)
+
+
+
+ESP32的程序编译完成后会分成几个部分，最少是三个bin文件，一个是bootloader，一个是app，还有一个是partition分区bin文件，这个分区bin文件是由分区表文件生成的。
+
+![image-20250622174130326](C:\Users\57117\AppData\Roaming\Typora\typora-user-images\image-20250622174130326.png)
+
+类型分区中app一般是应用程序，data一般用于表示存储数据，
+
+encrypted表示将这个分区进行加密，readonly表示只允许对这个分区进行读操作，
+
+nvs表示非易失性存储区，就是掉电之后数据依然能保存，在ESP32中专门预留了一块区域用于保存几个特定的信息，第一个就是存每台设备的WiFi物理层的校准数据，第二个是存WiFi数据，比如说ESP-IDF帮我们保存的SSID和密码，第三个就是存我们应用自己的数据了。offset的位置是空的并非没有指定存取区域，而是在ESP-IDF中还默认有个bootloader的程序，这个程序在分区表中的起始地址是0x1000，分区表本身也需要存储，存储地址是0x8000，大小是0x1000，也就是除开bootloader和分区表本身，nvs真正可以用的区域是从0x9000开始的，也就是上面第一行的真实存储地址就是0x9000，分区大小是0x6000。phy表示用于分区存储WiFi的物理层数据，这样可以保证每个设备可以单独配置WiFi的物理层，但是在默认情况下是不启用的，IDF直接将PHY初始化数据编译至应用程序中，从而节省分区表空间，所以在应用开发中并不会用到。
+
+factory就是默认的程序分区，上电后程序会从这里启动，需要注意的是如果存在SubType = ota的分区，那么bootloader会先检查这个ota分区里面的内容，再决定启用哪个app分区里面的程序。除此之外app分区的偏移地址必须与0x10000也就是64kb对齐。
+
+![image-20250622181032833](C:\Users\57117\AppData\Roaming\Typora\typora-user-images\image-20250622181032833.png)
+
+如果有ota功能的话，otadata是用于存储当前所选的ota应用程序的信息，这个分区的大小需要设置为0x2000，ota_0就是ota 的应用程序分区，启动加载器将根据这个ota数据分区中的数据，来决定启动哪个ota应用程序分区中的程序，在使用ota功能的时候要至少拥有两个ota应用程序分区，
+
+### ESP32的NVS
+
+应用nvs时，一般用于存储一些配置数据，状态数据，一般不会存储大量的数据，在嵌入式系统中nvs主要是在flash上进行键值对的存储。要把东西存到Flash中，按照底层的操作习惯需要先指定一个地址，然后对这个地址执行擦除操作才能写入，读取的时候也需要根据这个地址，指定读取长度，如果存的项比较多，在代码中又比较分散，这样对Flash的地址就很难管理了，因为很难知道我们要存的内容与其他地址有没有冲突，会不会被误擦除。nvs就是帮我们做了检查判断这些的操作，不需要我们指定地址操作，相当于是个轻量型的文件系统。在nvs中存一个值的话不需要指定地址，但需要指定一个键就称之为key然后在这个索引下存我们的值也就是value
+
+![image-20250623092442432](C:\Users\57117\AppData\Roaming\Typora\typora-user-images\image-20250623092442432.png)
+
+对nvs的操作还需要指定一个命名空间，这样的目的是考虑到了在不同的功能模块中，键名是有可能取到一样的
+
+
+
+
+
+### ESP32的WiFi工作模式
+
+#### STA模式
+
+这种模式是ESP32最常用的模式，ESP32可以连接到任意已经存在的WiFi网络，从而允许ESP32与网络上的其他设备进行通信，类似于一台普通的WiFi客户端设备
+
+#### AP模式
+
+在这种模式下ESP32创建自己的WiFi网络，成为一个小型的WiFi路由器，它可以接受其他WiFi终端设备连接，这种模式多用于设备配网，
+
+#### STA+AP模式
+
+在这种模式下，ESP32同时工作在STA和AP两种模式下，既可以连接到已有的WiFi网络，也可以提供WiFi热点，这时候ESP32就是充当一个网桥或中继器的角色。
+
+
+
+在使用WiFi的时候需要使用到nvs，是因为默认状态下当我们使用一组SSID和密码连接成功后，IDF的会帮我们把这组SSID和密码保存到nvs中，下次系统启动的时候，启动STA模式并且启动连接后，就会用这组SSID和密码进行连接，因此就需要初始化一下nvs。
+
+
+
+```C++
+//WIFI STA初始化
+esp_err_t wifi_sta_init(void)
+{   
+    //用于初始化tcpip协议栈，IDF中使用的是LWIP
+    ESP_ERROR_CHECK(esp_netif_init());  
+    //创建一个默认系统事件调度循环，因为WiFi连接过程中会出现各种事件，这些事件都是通过回调函数来通知
+    //之后可以注册回调函数来处理系统的一些事件
+    ESP_ERROR_CHECK(esp_event_loop_create_default());     
+    //使用默认配置创建STA对象
+    esp_netif_create_default_wifi_sta();    
+
+    //初始化WIFI
+    //先是定义一个WiFi初始化配置结构体，然后设置到这个WiFi初始化函数去
+    //这个步骤会设置WiFi的缓冲区数量，加密功能等，这里直接按照默认设置即可
+    wifi_init_config_t cfg = WIFI_INIT_CONFIG_DEFAULT();
+    ESP_ERROR_CHECK(esp_wifi_init(&cfg));
+    
+    //注册事件
+    ESP_ERROR_CHECK(esp_event_handler_register(WIFI_EVENT,ESP_EVENT_ANY_ID,&event_handler,NULL));
+    ESP_ERROR_CHECK(esp_event_handler_register(IP_EVENT,IP_EVENT_STA_GOT_IP,&event_handler,NULL));
+
+    //WIFI配置
+    wifi_config_t wifi_config = 
+    { 
+        .sta = 
+        { 
+            .ssid = DEFAULT_WIFI_SSID,              //WIFI的SSID
+            .password = DEFAULT_WIFI_PASSWORD,      //WIFI密码
+	        .threshold.authmode = WIFI_AUTH_WPA2_PSK,   //加密方式
+            
+            .pmf_cfg = 
+            {
+                // 是否启用保护管理帧
+                .capable = true,
+                // 是否只和启用保护管理帧的设备连接
+                .required = false
+            },
+        },
+    };
+    
+    //启动WIFI
+    ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE_STA) );         //设置工作模式为STA
+    ESP_ERROR_CHECK(esp_wifi_set_config(WIFI_IF_STA, &wifi_config) );   //设置wifi配置
+    ESP_ERROR_CHECK(esp_wifi_start() );                         //启动WIFI
+    
+    ESP_LOGI(TAG, "wifi_init_sta finished.");
+    return ESP_OK;
+}
+```
+
