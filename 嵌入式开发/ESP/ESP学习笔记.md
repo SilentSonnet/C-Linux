@@ -1226,3 +1226,45 @@ smartconfig操作过程相对简单，工作原理是首先让芯片处于混杂
 ![image-20250623203131827](images/image-20250623203131827.png)
 
 ![image-20250623203541022](images/image-20250623203541022.png)
+
+### MQTT协议
+
+​	MQTT协议（Message Queuing Telemetry Transport，消息队列遥测传输协议）是一种基于发布订阅（piblish/subscribe）模式的“轻量级”通讯协议，该协议构建于TCP/IP协议上，由IBM在1999年发布。MQTT最大优点在于，可以以极少的代码和有限的带宽，为远程设备提供实时可靠谱的消息服务。
+
+1.MQTT基本格式
+
+![image-20250624093857949](C:\Users\57117\AppData\Roaming\Typora\typora-user-images\image-20250624093857949.png)
+
+![image-20250624093916888](C:\Users\57117\AppData\Roaming\Typora\typora-user-images\image-20250624093916888.png)
+
+![image-20250624093946104](C:\Users\57117\AppData\Roaming\Typora\typora-user-images\image-20250624093946104.png)
+
+DUP是重复分发标志，为0时表示这个报文是第一次发送，为1时表示这个报文是重发报文，QoS表示的是通讯质量，QoS等于0时表示最多只能接收一次，QoS等于1时表示接收方最少接收到一次，QoS等于2时接收方智能收到一次，RETAIN如果为1则MQTT服务器将会为该主题保存该RETAIN消息，到新的订阅者订阅该主题时服务器会将这个消息立即发送给新的订阅者，
+
+![image-20250624094942996](C:\Users\57117\AppData\Roaming\Typora\typora-user-images\image-20250624094942996.png)
+
+MQTT可变包头与载荷
+
+不一定每个报文都有，内容根据报文类型不同而不同
+
+![image-20250624095633066](C:\Users\57117\AppData\Roaming\Typora\typora-user-images\image-20250624095633066.png)
+
+协议名长度高字节固定为0，低字节要么是4要么是6，协议名有两个选择，要么是MQTT要么是MQlsdp，3.1.1版本以后就是MQTT了，协议等级漏了一个5，也就是3/4/5,5的话就表示MQTT5.0，4表示MQTT3.1.1,3表示MQTT3.1，保持连接就是保活事件，一般是30-1200秒，连接标志是重点，用于指示载荷，payload由哪些内容组成，连接标志对应的位为1，也就是下面的八个位都为1，那么在载荷payload中就会包含相应的内容，如果连接标志包含所有的内容，载荷payload必须按客户端标示符。
+
+遗嘱就是当服务器检测到客户端非正常断开连接时，就会向客户端遗嘱主题中发布相应的遗嘱消息，假设不使用遗嘱工鞥，那么载荷payload内容就是如这个图所示
+
+![image-20250624100119137](C:\Users\57117\AppData\Roaming\Typora\typora-user-images\image-20250624100119137.png)
+
+
+
+![image-20250624100656553](C:\Users\57117\AppData\Roaming\Typora\typora-user-images\image-20250624100656553.png)
+
+而CONNECT ACK这个连接确认标志如果为1，说明服务器使用已存在的会话，与客户端恢复通讯，也就是说服务器不会清除这个客户端之前持久化会话所保存的数据，
+
+![image-20250624100948310](C:\Users\57117\AppData\Roaming\Typora\typora-user-images\image-20250624100948310.png)
+
+![image-20250624102210128](C:\Users\57117\AppData\Roaming\Typora\typora-user-images\image-20250624102210128.png)
+
+服务质量要求最大等级，比如说有个客户端要向主题发布一条消息，那么他这个发布报指定的QoS等级就不能高于这里的QoS。
+
+![image-20250624102523104](C:\Users\57117\AppData\Roaming\Typora\typora-user-images\image-20250624102523104.png)
