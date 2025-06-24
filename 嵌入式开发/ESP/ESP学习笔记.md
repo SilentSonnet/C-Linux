@@ -1268,3 +1268,7 @@ MQTT可变包头与载荷
 服务质量要求最大等级，比如说有个客户端要向主题发布一条消息，那么他这个发布报指定的QoS等级就不能高于这里的QoS。
 
 ![image-20250624102523104](C:\Users\57117\AppData\Roaming\Typora\typora-user-images\image-20250624102523104.png)
+
+### JSON
+
+![image-20250624173241865](C:\Users\57117\AppData\Roaming\Typora\typora-user-images\image-20250624173241865.png)
