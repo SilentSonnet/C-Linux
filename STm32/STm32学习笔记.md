@@ -339,8 +339,6 @@ uint8_t GPIO_ReadOutputDataBit(GPIO_TypeDef* GPIOx, uint16_t GPIO_Pin);
 uint16_t GPIO_ReadOutputData(GPIO_TypeDef* GPIOx);
 ```
 
-
-1
 ### 浮空/上拉/下拉输入
 
 ![image-20250320162834121](images\image-20250320162834121.png)
