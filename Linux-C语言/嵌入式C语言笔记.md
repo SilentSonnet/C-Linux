@@ -128,8 +128,6 @@ cp /etc/vimrc ~/.vimrc
 
 
 
-## 
-
 ### 怎么写好代码
 
 以helloworld程序为例对写程序的思路提出如下要求:
