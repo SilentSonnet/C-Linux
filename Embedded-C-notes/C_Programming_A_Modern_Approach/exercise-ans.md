@@ -1,6 +1,8 @@
 # C语言程序设计-现代方法-课后习题
 
-## 第二章
+## 第一章 C语言概述
+
+## 第二章 C语言基本概念
 
 ### 练习题
 
@@ -422,7 +424,7 @@ int main(void)
 }
 ```
 
-## 第三章
+## 第三章 格式化输入/输出
 
 ### 练习题
 
@@ -435,6 +437,28 @@ int main(void)
 (d) printf("%-6.2g", .0000009979);
 ```
 
+```C
+#include<stdio.h>
+int main(void)
+{
+	printf("%6d,%4d\n", 86, 1040);
+	printf("%12.5e\n", 30.253);
+	printf("%.4f\n", 83.162);
+	printf("%-6.2g\n", .0000009979);
+  
+  return 0;
+}
+```
+
+输出为：
+
+```
+    86,1040
+ 3.02530e+01
+83.1620
+1e-06
+```
+
 2. 编写 printf 函数调用，以下列格式显示 float 型变量 x。
 
 ```
@@ -443,6 +467,15 @@ int main(void)
 (c) 定点十进制表示形式，栏宽 8，左对齐，小数点后保留 3 位数字。
 (d) 定点十进制表示形式，栏宽 6，右对齐，小数点后无数字。
 ```
+
+```C
+(a)printf("%-8.1e",x);
+(b)printf("%10.6e",x);
+(c)printf("%-8.3f",x);
+(d)printf("%6.f",x);
+```
+
+默认情况下printf的输出是右对齐的，%m.pX的的m就是栏宽，也就是输出的总字符数。
 
 3. 说明下列每对 scanf 格式串是否等价？如果不等价，请指出它们的差异。
 
@@ -453,19 +486,100 @@ int main(void)
 (d) "%f,%f"与"%f, %f"。
 ```
 
- *4. 假设 scanf 函数调用的格式如下：
+```
+(a)等价。scanf在搜索整数的时候会忽略掉前面一个或多个的空格，所以对于任意的输入，二者等价。
+(b)不等价。根据普通字符'-'左右是否有空格一共可分为四种类型的输入：
+   1. 1·-·2·-·3
+   2. 1·-2·-3
+   3. 1-·2-·3
+   4. 1-2-3
+   对于格式串"%d-%d-%d"来说只有3、4可以接收，但是对于格式串"%d -%d -%d"来说四种类型都可以接收，因此二者并不是对于任意输入都有相同的输出结果，二者并不等价。
+(c)等价。对于任意的输入不影响接收到的float类型数据，但是需要注意转换说明后的空格会导致scanf一直在等待下一个非空的字符而一直等待不退出。
+(d)等价。道理同(b)，二者都是能够接收3、4类型的输入。
+```
 
-`scanf("%d%f%d", &i, &x, &j);` 
+*4. 假设 scanf 函数调用的格式如下：`scanf("%d%f%d", &i, &x, &j);` 如果用户输入3 5 6 调用执行后，变量 i、x 和 j 的值分别是多少？（假设变量 i 和变量 j 都是 int 型，变量 x 是 float型。）
 
-如果用户输入3 5 6 调用执行后，变量 i、x 和 j 的值分别是多少？（假设变量 i 和变量 j 都是 int 型，变量 x 是 float型。）
+```C
+#include<stdio.h>
+int main(void)
+{
+  int i, j;
+  float x;
+	printf("Enter three number: ");
+	scanf("%d%f%d", &i, &x, &j);
+	printf("%d\n%f\n%d\n", i, x, j);
+  
+  return 0;
+}
+```
 
-*5. 假设 scanf 函数调用的格式如下：
+输出：
 
-`scanf("%f%d%f", &x, &i, &y);` 
+```
+Enter three number: 3 5 6
+3
+5.000000
+6
+```
 
- 如果用户输入3 45.6 789 调用执行后，变量 x、i 和 y 的值分别是多少？（假设变量 x 和变量 y 都是 float 型，变量 i 是 int型。）
+*5. 假设 scanf 函数调用的格式如下：`scanf("%f%d%f", &x, &i, &y);` 如果用户输入3 45.6 789 调用执行后，变量 x、i 和 y 的值分别是多少？（假设变量 x 和变量 y 都是 float 型，变量 i 是 int型。）
+
+```c
+#include<stdio.h>
+int main(void)
+{
+  int i;
+  float x, y;
+	printf("Enter three number: ");
+	scanf("%f%d%f", &x, &i, &y);
+	printf("%f\n%i\n%f\n", x, i, y);
+  
+  return 0;
+}
+```
+
+输出：
+
+```
+Enter three number: 3 45.6 789
+3.000000
+45
+0.600000
+```
 
 6. 指出如何修改 3.2 节中的 addfrac.c 程序，使用户可以输入在字符/的前后都有空格的分数。
+
+```C
+#include <stdio.h>
+
+int main(void)
+{
+  int num1, denom1, num2, denom2, result_num, result_denom;
+
+  printf("Enter first fraction: ");
+  scanf("%d/%d", &num1, &denom1);
+
+  printf("Enter second fraction: ");
+  // 在scanf的格式串中'/'的左右两边增加空格即可，其中前面的空格是必须的，后面的是可选的。
+  // 因为格式串中一个空格可以匹配输入任意数量的空格，包括零个。
+  // scanf("%d /%d", &i, &j);
+  // scanf("%d / %d", &i, &j);
+  scanf("%d/%d", &num2, &denom2);
+
+  result_num = num1 * denom2 + num2 * denom1;
+  result_denom = denom1 * denom2;
+  printf("The sum is %d/%d\n", result_num, result_denom);
+
+  return 0;
+}
+```
+
+```
+*如果想在scanf普通字符前后都能够输入任意的空格就写成形如：
+scanf("%d /%d", &i, &j);
+scanf("%d / %d", &i, &j);
+```
 
 ### 编程题
 
@@ -659,7 +773,7 @@ int main(void)
 }
 ```
 
-## 第四章
+## 第四章 表达式
 
 ### 练习题
 
@@ -682,7 +796,44 @@ int main(void)
 		printf("%d", (i + 5) % (j + 2) / k); 
 ```
 
+```C
+#include<stdio.h>
+int main(void)
+{
+  int i, j, k;
+  i = 5; 
+  j = 3; 
+  printf("%d %d\n", i / j, i % j);
+  i = 2; 
+  j = 3; 
+  printf("%d\n", (i + 10) % j); 
+  i = 7; 
+  j = 8; 
+  k = 9; 
+  printf("%d\n", (i + 10) % k / j);
+  i = 1; 
+  j = 2; 
+  k = 3; 
+  printf("%d\n", (i + 5) % (j + 2) / k); 
+  
+  return 0;
+}
+```
+
+输出：
+
+```
+1 2
+0
+1
+0
+```
+
 \*2. 如果 i 和 j 都是正整数，(-i) / j 的值和-(i / j)的值是否总一样？验证你的答案。
+
+```
+
+```
 
 3. 下列表达式在 C89 中的值是多少？（如果表达式有多个可能的值，都列出来。）
 
@@ -971,7 +1122,7 @@ int main(void)
 }
 ```
 
-## 第五章
+## 第五章 选择语句
 
 ### 练习题
 
@@ -979,34 +1130,65 @@ int main(void)
 
 ```C
 (a) i = 2; 
-j = 3; 
-k = i * j == 6; 
-printf("%d", k); 
+		j = 3; 
+		k = i * j == 6; 
+		printf("%d", k); 
 (b) i = 5; 
-j = 10; 
-k = 1; 
-printf("%d", k > i < j); 
+		j = 10; 
+		k = 1; 
+		printf("%d", k > i < j); 
 (c) i = 3; 
-j = 2; k = 1; printf("%d", i < j == j < k); 
-(d) i = 3; j = 4; k = 5; printf("%d", i % j + i < k); 
+		j = 2; 
+		k = 1; 
+		printf("%d", i < j == j < k); 
+(d) i = 3; 
+		j = 4; 
+		k = 5; 
+		printf("%d", i % j + i < k); 
 ```
 
 下列代码片段给出了逻辑运算符的示例。假设 i、j 和 k 都是 int 型变量，请给出每道题的输出结果。
 
-```
-(a) i = 10; j = 5; printf("%d", !i < j); 
-(b) i = 2; j = 1; printf("%d", !!i + !j); 
-(c) i = 5; j = 0; k = -5; printf("%d", i && j || k); 
-(d) i = 1; j = 2; k = 3; printf("%d", i < j || k); 
+```C
+(a) i = 10; 
+		j = 5; 
+		printf("%d", !i < j); 
+(b) i = 2; 
+		j = 1; 
+		printf("%d", !!i + !j); 
+(c) i = 5; 
+		j = 0; 
+		k = -5; 
+		printf("%d", i && j || k); 
+(d) i = 1;
+		j = 2; 
+		k = 3; 
+		printf("%d", i < j || k); 
 ```
 
  *3. 下列代码片段给出了逻辑表达式的短路行为的示例。假设 i、j 和 k 都是 int 型变量，请给出每道题的输出结果。
 
-```
-(a) i = 3; j = 4; k = 5; printf("%d", i < j || ++j < k); printf("%d %d %d", i, j, k);
-(b) i = 7; j = 8; k = 9; printf("%d", i – 7 && j++ < k); printf("%d %d %d", i, j, k); 
-(c) i = 7; j = 8; k = 9; printf("%d", (i = j) || (j = k)); printf("%d %d %d", i, j, k); 
-(d) i = 1; j = 1; k = 1; printf("%d", ++i || ++j && ++k); printf("%d %d %d", i, j, k); 
+```C
+(a) i = 3; 
+		j = 4; 
+		k = 5; 
+		printf("%d", i < j || ++j < k); 
+		printf("%d %d %d", i, j, k);
+(b) i = 7; 
+		j = 8; 
+		k = 9; 
+		printf("%d", i – 7 && j++ < k); 
+		printf("%d %d %d", i, j, k); 
+(c) i = 7; 
+		j = 8; 
+		k = 9; 
+		printf("%d", (i = j) || (j = k)); 
+		printf("%d %d %d", i, j, k); 
+(d) i = 1; 
+		j = 1; 
+		k = 1; 
+		printf("%d", ++i || ++j && ++k); 
+		printf("%d %d %d", i, j, k); 
 ```
 
 *4. 编写一个表达式，要求这个表达式根据 i 小于、等于、大于 j 这 3 种情况，分别取值为-1、0、+1。
@@ -1209,7 +1391,7 @@ You entered the number forty-five.
 
 提示：把数分解为两个数字。用一个 switch 语句显示第一位数字对应的单词（“twenty”“thirty”等），用第二个 switch 语句显示第二位数字对应的单词。不要忘记 11～19 需要特殊处理。
 
-## 第六章
+## 第六章 循环
 
 ### 练习题
 
@@ -1425,7 +1607,7 @@ e = 1 + 1/1! + 1/2! + 1/3! + ⋯
 
 
 
-## 第七章
+## 第七章 基本类型
 
 ### 练习题
 
@@ -1533,7 +1715,7 @@ e = 1 + 1/1! + 1/2! + 1/3! + ⋯
 
 ### 编程题
 
-## 第八章
+## 第八章 数组
 
 ### 练习题
 
@@ -1570,7 +1752,7 @@ Repeated digit(s): 7 9
 
 17. 编写程序打印n×n的幻方（1, 2, …, n2的方阵排列，且每行、每列和每条对角线上的和都相等）。由 用户指定n的值：  181  182  This program creates a magic square of a specified size.  The size must be an odd number between 1 and 99.  Enter size of magic square: 5    17   24    1    8   15    23    5    7   14   16     4    6   13   20   22    10   12   19   21    3    11   18   25    2    9  把幻方存储在一个二维数组中。起始时把数1放在第0行的中间，剩下的数2, 3, …, n2依次向上移动 一行并向右移动一列。当可能越过数组边界时需要“绕回”到数组的另一端。例如，如果需要把下 一个数放到第1行，我们就将其存储到第n1行（最后一行）；如果需要把下一个数放到第n列， 我们就将其存储到第 0列。如果某个特定的数组元素已被占用，那就把该数存储在前一个数的正下 方。如果你的编译器支持变长数组，则声明数组有n行n列，否则声明数组有99行99列。
 
-## 第九章
+## 第九章 函数
 
 ### 练习题
 
@@ -1580,7 +1762,7 @@ Repeated digit(s): 7 9
 
  1.编写程序，要求用户输入一串整数（把这串整数存储在数组中），然后通过调用 selection_sort 函数来排序这些整数。在给定n个元素的数组后，selection_sort函数必须做下列工作：  (a) 搜索数组找出最大的元素，然后把它移到数组的最后；  (b) 递归地调用函数本身来对前n1个数组元素进行排序。  2.修改第5章的编程题5，用函数计算所得税的金额。在输入应纳税所得额后，函数返回税金。  3.修改第8章的编程题9，使其包含下列函数：  void generate_random_walk(char walk[10][10]);  void print_array(char walk[10][10]);  main 函数首先调用 generate_random_walk，该函数把所有数组元素都初始化为字符'.'，然后将 其中一些字符替换为A~Z的字母，详见原题的描述。接着，main函数调用print_array函数来显 示数组。  4.修改第8章的编程题16，使其包含下列函数：  void read_word(int counts[26]);  bool equal_array(int counts1[26], int counts2[26]);  main函数将调用read_word两次，每次用于读取用户输入的一个单词。读取单词时，read_word用 单词中的字母更新 counts 数组，详见原题的描述。（main 将声明两个数组，每个数组用于一个单 词。这些数组用于跟踪单词中每个字母出现的次数。）接下来，main 函数调用equal_array 函数， 以前面提到的两个数组作为参数。如果两个数组中的元素相同（表明这两个单词是变位词）， equal_array 返回true，否则返回false。  5.修改第8章的编程题17，使其包含下列函数：  void create_magic_square(int n, int magic_square[n][n]);  void print_magic_square(int n, int magic_square[n][n]);  获得用户输入的数n之后，main函数调用create_magic_square 函数，另一个调用参数是在main 内部声明的n×n的数组。create_magic_square函数用1, 2, …, n2填充数组，如原题所述。接下来， main 函数调用 print_magic_square，按原题描述的格式显示数组。注意：如果你的编译器不支持 变长数组，请把main中的数组声明为99×99而不是n×n，并使用下面的原型：  void create_magic_square(int n, int magic_square[99][99]);  void print_magic_square(int n, int magic_square[99][99]);  6.编写函数计算下面多项式的值：  5 4 3 2 x x x x x 3 2 5 7 6       编写程序要求用户输入x的值，调用该函数计算多项式的值并显示函数返回的值。 7.如果换一种方法计算 nx，9.6节的power函数速度可以更快。我们注意到，如果n是2的幂，则可以 通过自乘的方法计算 nx。例如， 4x是 2x的平方，所以 4x可以用两次乘法计算，而不需要三次乘 法。这种方法甚至可以用于n不是2的幂的情况。如果n是偶数，则  2 /2 n n  x x x 217  n n x x  1 ；如果n是奇数，则   。编写计算 nx的递归函数（递归在n=0时结束，此时函数返回1）。为了测试该函数，写 一个程序要求用户输入x和n的值，调用power计算 nx，然后显示函数的返回值。  8.编写函数模拟掷骰子的游戏（两个骰子）。第一次掷的时候，如果点数之和为7或11则获胜；如果点 数之和为2、3或12则落败；其他情况下的点数之和称为“目标”，游戏继续。在后续的投掷中，如 果玩家再次掷出“目标”点数则获胜，掷出 7 则落败，其他情况都忽略，游戏继续进行。每局游戏 结束时，程序询问用户是否再玩一次，如果用户输入的回答不是y或Y，程序会显示胜败的次数然后 终止。  You rolled: 8  Your point is 8  You rolled: 3  You rolled: 10  You rolled: 8  You win!  Play again? y  You rolled: 6  Your point is 6  You rolled: 5  You rolled: 12  You rolled: 3  You rolled: 7  You lose!  Play again? y  You rolled: 11  You win!  Play again? n Wins: 2 Losses: 1  编写三个函数：main、roll_dice和play_game。下面给出了后两个函数的原型：  int roll_dice(void);  bool play_game(void);  218  roll_dice 应生成两个随机数（每个都在1~6范围内），并返回它们的和。play_game应进行一次掷 骰子游戏（调用roll_dice 确定每次掷的点数），如果玩家获胜则返回 true，如果玩家落败则返回 false。play_game 函数还要显示玩家每次掷骰子的结果。main函数反复调用play_game函数，记 录获胜和落败的次数，并显示“you win”和“you lose”消息。提示：使用rand函数生成随机数。 关于如何调用rand和相关的srand函数，见8.2节deal.c程序中的例子。
 
-## 第十章
+## 第十章 程序结构
 
 ### 练习题
 
@@ -1590,7 +1772,7 @@ Repeated digit(s): 7 9
 
  1.修改10.2节的栈示例使它存储字符而不是整数。接下来，增加main函数，用来要求用户输入一串圆 括号或花括号，然后指出它们之间的嵌套是否正确：  Enter parenteses and/or braces: ((){}{()}) Parenteses/braces are nested properly  提示：读入左圆括号或左花括号时，把它们像字符一样压入栈中。当读入右圆括号或右花括号时， 把栈顶的项弹出，并且检查弹出项是否是匹配的圆括号或花括号。（如果不是，那么圆括号或花括号 嵌套不正确。）当程序读入换行符时，检查栈是否为空。如果为空，那么圆括号或花括号匹配；如果 栈不为空（或者如果曾经调用过stack_underflow 函数），那么圆括号或花括号不匹配。如果调用 stack_overflow 函数，程序显示信息Stack overflow，并且立刻终止。 2.修改 10.5节的poker.c程序，把数组num_in_rank 和数组num_in_suit 移到main 函数中。main 函 数将把这两个数组作为实际参数传递给read_cards函数和analyze_hand函数。  3. 把数组num_in_rank、num_in_suit和card_exists从10.5节的poker.c程序中去掉。程序改用5×2 的数组来存储牌。数组的每一行表示一张牌。例如，如果数组名为 hand，则 hand[0][0]存储第一 张牌的点数，hand[0][1]存储第一张牌的花色。  4.修改 10.5节的 poker.c程序，使其能识别牌的另一种类别——“同花大顺”（同花色的A、K、Q、J 和10）。同花大顺的级别高于其他所有的类别。  5. 修改10.5节的poker.c程序，使其能识别“小A顺”（即A、2、3、4和5）。  6.有些计算器（尤其是惠普的计算器）使用逆波兰表示法（Reverse Polish Notation，RPN）来书写数学 表达式。在这一表示法中，运算符放置在操作数的后面而不是放在操作数中间。例如，在逆波兰表 示法中1+2将表示为1 2 +，而1+2*3将表示为1 2 3 * +。逆波兰表达式可以很方便地用栈求值。算 法从左向右读取运算符和操作数，并执行下列步骤。  (1) 当遇到操作数时，将其压入栈中。  (2) 当遇到运算符时，从栈中弹出它的操作数，执行运算并把结果压入栈中。  编写程序对逆波兰表达式求值。操作数都是个位的整数，运算符为+、-、*、/和=。遇到运算符= 时，将显示栈顶项，随后清空栈并提示用户计算新的表达式。这一过程持续进行，直到用户输入一 个既不是运算符也不是操作数的字符为止：  Enter an RPN expression: 1 2 3 * + = Value of expression: 7  Enter an RPN expression: 5 8 * 4 9 - / = Value of expression: -8  Enter an RPN expression: q  如果栈出现上溢，程序将显示消息Expression is too complex并终止。如果栈出现下溢（例如遇 到表达式1 2 + +），程序将显示消息Not enough operands in expression 并终止。提示：把10.2 节的栈代码整合到你的程序中。使用scanf(" %c", &ch)读取运算符和操作数。  7.编写程序，提示用户输入一个数并显示该数，使用字符模拟七段显示器的效果：  Enter a number: 491-9014 非数字的字符都将被忽略。在程序中用一个名为 MAX_DIGITS 的宏来控制数的最大位数，MAX_DIG-  ITS 的值为 10。如果数中包含的数位大于这个数，多出来的数位将被忽略。提示：使用两个外部数 组，一个是segments 数组（见第8章的练习题6），用于存储表示数字和段之间对应关系的数据； 另一个是digits数组，这是一个3行（因为显示出来的每个数字高度都是3个字符）、MAX_DIGITS× 4列（数字的宽度是3个字符，但为了可读性需要在数字之间增加一个空格）的字符数组。编写4个 函数：main、clear_digits_array、process_digit和print_digits_array。下面是后3个函数 的原型：  void clear_digits_array(void);  void process_digit(int digit, int position);  void print_digits_array(void);  clear_digits_array函数在digits数组的所有元素中存储空白字符。process_digit函数把digit 的七段表示存储到digits数组的指定位置（位置为0~MAX_DIGITS1）。print_digits_array函数 分行显示digits数组的每一行，产生的输出如示例图所示。
 
-## 第十一章
+## 第十一章 指针
 
 ### 练习题
 
@@ -1600,7 +1782,7 @@ Repeated digit(s): 7 9
 
  1.修改第2章的编程题7，使其包含下列函数：  255 void pay_amount(int dollars, int *twenties, int *tens, int *fives, int *ones); 函数需要确定：为支付参数dollars表示的付款金额，所需20美元、10美元、5美元和1美元钞票 的最小数目。twenties参数所指向的变量存储所需20美元钞票的数目，tens、fives和ones参数 类似。  2.修改第5章的编程题8，使其包含下列函数：  void find_closest_flight(int desired_time,                           int *departure_time,                           int *arrival_time);  函数需查出起飞时间与desired_time（用从午夜开始的分钟数表示）最接近的航班。该航班的起飞 时间和抵达时间（也都用从午夜开始的分钟数表示）将分别存储在departure_time 和arrival_time 所指向的变量中。  3.修改第6章的编程题3，使其包含下列函数：  void reduce(int numerator, int denominator,             int *reduced_numerator,             int *reduced_denominator);  numerator 和 denominator 分别是分数的分子和分母。reduced_numerator 和 reduced_deno-  minator 是指向变量的指针，相应变量中分别存储把分数化为最简形式后的分子和分母。  256  4.修改 10.5节的 poker.c程序，把所有的外部变量移到 main 函数中，并修改各个函数，使它们通过参 数进行通信。analyze_hand函数需要修改变量straight、flush、four、three和pairs，所以它 需要以指向这些变量的指针作为参数。
 
-## 第十二章
+## 第十二章 指针和数组
 
 ### 练习题
 
