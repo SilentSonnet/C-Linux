@@ -831,8 +831,16 @@ int main(void)
 
 \*2. 如果 i 和 j 都是正整数，(-i) / j 的值和-(i / j)的值是否总一样？验证你的答案。
 
-```
+**ANS：**这个题我是认为出的有问题的，因为如果这两者的值是不相同的，那只能是在C89标准下不同的CPU环境中才能验证，因为C89标准之下在进行除法和取余运算的时候既可能向上舍入也可能向下舍入，但是在C99标准之下都是趋零截尾的，因此在C99标准之下都是相同的。
 
+```
+cc -std=<标准> source.c -o output
+c89 / c90 : ANSI C 标准（早期版本）
+gnu89     : C89 + GNU 扩展
+c99       : ISO C99 标准
+gnu99     : C99 + GNU 扩展
+c11       : ISO C11 标准
+gnu11     : C11 + GNU 扩展
 ```
 
 3. 下列表达式在 C89 中的值是多少？（如果表达式有多个可能的值，都列出来。）
@@ -844,7 +852,76 @@ int main(void)
 (d) -8 / -5 
 ```
 
+**ANS：**
+
+```
+8 / 5 对于C89为1。
+-8 / 5 对于C89既可能是-1也可能是-2，需要视具体的实现。
+8 / -5 对于C89既可能是-1也可能是-2，需要视具体的实现。
+-8 / -5 对于C89既可能是-1也可能是-2，需要视具体的实现。
+纠正：最后一道题写错了，因为负号的优先级是最高的，因此这个相当于是8 / 5因此是确定性的1。
+```
+
+```C
+#include<stdio.h>
+int main(void)
+{
+  printf("8 / 5 is %d\n", 8 / 5);
+  printf("-8 / 5 is %d\n", -8 / 5);
+  printf("8 / -5 is %d\n", 8 / -5);
+  printf("-8 / -5 is %d\n", -8 / -5);
+  
+  return 0;
+}
+```
+
+**输出：**
+
+```
+使用的机器环境是MacbookAir M4
+Apple clang version 17.0.0 (clang-1700.3.19.1)
+Target: arm64-apple-darwin25.0.0
+Thread model: posix
+InstalledDir: /Library/Developer/CommandLineTools/usr/bin
+8 / 5 is 1
+-8 / 5 is -1
+8 / -5 is -1
+-8 / -5 is 1
+```
+
 4. 对 C99 重复上题。
+
+**ANS：**
+
+```
+8 / 5 对于C99趋向于零截尾，因此是1。
+-8 / 5 对于C99趋向于零截尾，因此是-1。
+8 / -5 对于C99趋向于零截尾，因此是-1。
+-8 / -5 对于C99趋向于零截尾，因此是1。但是注意负号的优先级是最高的，这个相当于是8 / 5。
+```
+
+```C
+#include<stdio.h>
+int main(void)
+{
+  printf("8 / 5 is %d\n", 8 / 5);
+  printf("-8 / 5 is %d\n", -8 / 5);
+  printf("8 / -5 is %d\n", 8 / -5);
+  printf("-8 / -5 is %d\n", -8 / -5);
+  
+  return 0;
+}
+```
+
+**输出：**
+
+```
+8 / 5 is 1
+-8 / 5 is -1
+8 / -5 is -1
+-8 / -5 is 1
+```
+
 5. 下列表达式在 C89 中的值是多少？（如果表达式有多个可能的值，都列出来。）
 
 ```c
@@ -854,12 +931,66 @@ int main(void)
 (d) -8 % -5 
 ```
 
+**ANS：**
+
+```
+8 % 5 对于C89为3。
+-8 % 5 对于C89既可能是-3也可能是3，需要视具体的实现。
+8 % -5 对于C89既可能是-3也可能是-3，需要视具体的实现。
+-8 % -5 负号的优先级是最高的，因此这个相当于是8 % 5因此对于C89是确定性的3。
+```
+
+```C
+#include<stdio.h>
+int main(void)
+{
+  printf("8 %% 5 is %d\n", 8 % 5);
+  printf("-8 %% 5 is %d\n", -8 % 5);
+  printf("8 %% -5 is %d\n", 8 % -5);
+  printf("-8 %% -5 is %d\n", -8 % -5);
+  
+  return 0;
+}
+```
+
+**输出：**
+
+```
+使用的机器环境是MacbookAir M4
+Apple clang version 17.0.0 (clang-1700.3.19.1)
+Target: arm64-apple-darwin25.0.0
+Thread model: posix
+InstalledDir: /Library/Developer/CommandLineTools/usr/bin
+8 % 5 is 3
+-8 % 5 is -3
+8 % -5 is 3
+-8 % -5 is -3
+```
+
 6. 对 C99 重复上题。
-7. 本章计算 UPC 校验位方法的最后几步是：把总的结果减去 1，相减后的结果除以 10 取余数，用 9 减去余数。换成下面的步骤也可以：总的结果除以 10 取余数，用 10 减去余数。这样做为什么可行？
 
-8. 如果把表达式 9 - ((total - 1) % 10)改成(10 - (total % 10)) % 10，upc.c程序是否仍然正确？
 
-9. 给出下列程序片段的输出结果。假设 i、j 和 k 都是 int 型变量。
+
+```
+#include<stdio.h>
+int main(void)
+{
+  printf("8 %% 5 is %d\n", 8 % 5);
+  printf("-8 %% 5 is %d\n", -8 % 5);
+  printf("8 %% -5 is %d\n", 8 % -5);
+  printf("-8 %% -5 is %d\n", -8 % -5);
+  
+  return 0;
+}
+```
+
+
+
+6. 本章计算 UPC 校验位方法的最后几步是：把总的结果减去 1，相减后的结果除以 10 取余数，用 9 减去余数。换成下面的步骤也可以：总的结果除以 10 取余数，用 10 减去余数。这样做为什么可行？
+
+7. 如果把表达式 9 - ((total - 1) % 10)改成(10 - (total % 10)) % 10，upc.c程序是否仍然正确？
+
+8. 给出下列程序片段的输出结果。假设 i、j 和 k 都是 int 型变量。
 
 ```C
 (a) i = 7; 
@@ -881,6 +1012,39 @@ int main(void)
 		printf("%d %d %d", i, j, k); 
 ```
 
+```C
+#include<stdio.h>
+int main(void)
+{
+  	int i, j;
+  	i = 7; 
+		j = 8;
+		i *= j + 1; 
+		printf("%d %d\n", i, j);
+		i = j = k = 1;  
+		i += j += k; 
+		printf("%d %d %d\n", i, j, k); 
+		i = 1; 
+		j = 2; 
+		k = 3; 
+		i -= j -= k; 
+		printf("%d %d %d\n", i, j, k); 
+		i = 2; 
+		j = 1; 
+		k = 0; 
+		i *= j *= k;  
+		printf("%d %d %d\n", i, j, k); 
+  
+  return 0;
+}
+```
+
+```
+
+```
+
+
+
 10. 给出下列程序片段的输出结果。假设 i 和 j 都是 int 型变量。
 
 ```C
@@ -897,6 +1061,33 @@ int main(void)
 		j = 8; 
 		j = (i = 6) + (j = 3); 
 		printf("%d %d", i, j); 
+```
+
+```C
+#include<stdio.h>
+int main(void)
+{
+  	int i, j;
+  	i = 6;  
+		j = i += i; 
+		printf("%d %d\n", i, j); 
+		i = 5; 
+		j = (i -= 2) + 1;  
+		printf("%d %d\n", i, j); 
+		i = 7; 
+		j = 6 + (i = 2.5); 
+		printf("%d %d\n", i, j); 
+		i = 2; 
+		j = 8; 
+		j = (i = 6) + (j = 3); 
+		printf("%d %d\n", i, j); 
+  
+  	return 0;
+}
+```
+
+```
+
 ```
 
 *11. 给出下列程序片段的输出结果。假设 i、j 和 k 都是 int 型变量。
@@ -920,7 +1111,39 @@ int main(void)
 		printf("%d %d %d", i, j, k); 
 ```
 
-给出下列程序片段的输出结果。假设 i 和 j 都是 int 型变量。
+```C
+#include<stdio.h>
+int main(void)
+{
+		int i, j, k;
+		i = 1; 
+		printf("%d \n", i++ - 1); 
+		printf("%d\n", i); 
+		i = 10; 
+		j = 5; 
+		printf("%d \n", i++ - ++j); 
+		printf("%d %d\n", i, j); 
+		i = 7; 
+		j = 8; 	
+		printf("%d \n", i++ - --j); 
+		printf("%d %d\n", i, j); 
+		i = 3; 
+		j = 4; 
+		k = 5; 
+		printf("%d \n", i++ - j++ + --k); 
+		printf("%d %d %d\n", i, j, k); 
+		
+		return 0;
+}
+```
+
+```
+
+```
+
+
+
+12. 给出下列程序片段的输出结果。假设 i 和 j 都是 int 型变量。
 
 ```C
 (a) i = 5; 
@@ -937,15 +1160,77 @@ int main(void)
 		printf("%d %d", i, j); 
 ```
 
+```C
+#include<stdio.h>
+int main(void)
+{
+	int i, j;
+  i = 5; 
+  j = ++i * 3 - 2; 
+  printf("%d %d\n", i, j);
+  i = 5; 
+  j = 3 - 2 * i++; 
+  printf("%d %d\n", i, j);
+  i = 7; 
+  j = 3 * i-- + 2; 
+  printf("%d %d\n", i, j);
+  i = 7; 
+  j = 3 + --i * 2; 
+  printf("%d %d\n", i, j);
+  
+  return 0;
+}
+```
+
+```
+6 16
+6 -7
+6 23
+6 15
+```
+
 13. 表达式++i 和 i++中只有一个是与表达式(i += 1)完全相同的，是哪一个呢？验证你的答案。
 
-14. 添加圆括号，说明 C 语言编译器如何解释下列表达式。
+
+```
+// 表达式 ++i和(i += 1)的值相同，因为++i表达式的值为i+1，和(i += 1)相同，但i++表达式的值是1。
+```
+
+```C
+#include<stdio.h>
+int main(void)
+{
+	int i = 1;
+  printf("++i = %d", ++i);
+  i = 1;
+  printf("i++ = %d", i++);
+  i = 1;
+  printf("(i += 1) = %d", (i += 1);
+  
+  return 0;
+}
+```
+
+```
+++i = 2
+i++ = 1
+(i += 1) = 2
+```
+
+13. 添加圆括号，说明 C 语言编译器如何解释下列表达式。
 
 ```C
 (a) a * b – c * d + e 
 (b) a / b % c / d
 (c) – a – b + c - + d
 (d) a * - b / c - d
+```
+
+```
+(a) (((a * b) – (c * d)) + e) 
+(b) (((a / b) % c) / d)
+(c) ((((– a) – b) + c) - (+ d))
+(d) (((a * (- b)) / c) - d)
 ```
 
 15. 给出下列每条表达式语句执行以后 i 和 j 的值。（假设 i 的初始值为 1，j 的初始值为 2。）
@@ -956,6 +1241,26 @@ int main(void)
 (c) i * j / i; 
 (d) i % ++j;
 ```
+
+```C
+#include<stdio.h>
+int main(void)
+{
+	int i, j;
+	i = 1, j = 2;
+  printf("i += j = %d\n", i += j);
+  i = 1, j = 2;
+  printf("i-- = %d\n", i--);
+  i = 1, j = 2;
+  printf("i * j / i = %d\n", );
+  i = 1, j = 2;
+  printf("i %% ++j = %d\n", i % ++j);
+  
+  return 0;
+}
+```
+
+输出：
 
 ### 编程题
 
@@ -1147,7 +1452,40 @@ int main(void)
 		printf("%d", i % j + i < k); 
 ```
 
-下列代码片段给出了逻辑运算符的示例。假设 i、j 和 k 都是 int 型变量，请给出每道题的输出结果。
+```C
+#include<stdio.h>
+int main(void)
+{
+    int i, j, k;
+    i = 2; 
+    j = 3; 
+    k = i * j == 6; 
+    printf("%d\n", k); 
+    i = 5; 
+    j = 10; 
+    k = 1; 
+    printf("%d\n", k > i < j); 
+    i = 3; 
+    j = 2; 
+    k = 1; 
+    printf("%d\n", i < j == j < k); 
+    i = 3; 
+    j = 4; 
+    k = 5; 
+    printf("%d\n", i % j + i < k); 
+
+    return 0;
+}
+```
+
+```
+1
+1
+1
+0
+```
+
+2.下列代码片段给出了逻辑运算符的示例。假设 i、j 和 k 都是 int 型变量，请给出每道题的输出结果。
 
 ```C
 (a) i = 10; 
@@ -1166,7 +1504,38 @@ int main(void)
 		printf("%d", i < j || k); 
 ```
 
- *3. 下列代码片段给出了逻辑表达式的短路行为的示例。假设 i、j 和 k 都是 int 型变量，请给出每道题的输出结果。
+```C
+#include<stdio.h>
+int main(void)
+{
+    int i, j, k;
+    i = 10; 
+    j = 5; 
+    printf("%d\n", !i < j); 
+    i = 2; 
+    j = 1; 
+    printf("%d\n", !!i + !j); 
+    i = 5; 
+    j = 0; 
+    k = -5; 
+    printf("%d\n", i && j || k); 
+    i = 1;
+    j = 2; 
+    k = 3; 
+    printf("%d\n", i < j || k);
+
+    return 0;
+}
+```
+
+```
+1
+1
+1
+1
+```
+
+*3. 下列代码片段给出了逻辑表达式的短路行为的示例。假设 i、j 和 k 都是 int 型变量，请给出每道题的输出结果。
 
 ```C
 (a) i = 3; 
@@ -1191,7 +1560,65 @@ int main(void)
 		printf("%d %d %d", i, j, k); 
 ```
 
+```c
+#include<stdio.h>
+int main(void)
+{
+    int i, j, k; 
+    i = 3; 
+    j = 4; 
+    k = 5; 
+    printf("%d\n", i < j || ++j < k); 
+    printf("%d %d %d\n", i, j, k);
+    i = 7; 
+    j = 8; 
+    k = 9; 
+    printf("%d\n", i - 7 && j++ < k); 
+    printf("%d %d %d\n", i, j, k); 
+    i = 7; 
+    j = 8; 
+    k = 9; 
+    printf("%d\n", (i = j) || (j = k)); 
+    printf("%d %d %d\n", i, j, k); 
+    i = 1; 
+    j = 1; 
+    k = 1; 
+    printf("%d\n", ++i || ++j && ++k); 
+    printf("%d %d %d\n", i, j, k); 
+
+    return 0;
+}
+```
+
+```
+1
+3 4 5
+0
+7 8 9
+1
+8 8 9
+1
+2 1 1
+```
+
 *4. 编写一个表达式，要求这个表达式根据 i 小于、等于、大于 j 这 3 种情况，分别取值为-1、0、+1。
+
+```c
+#include<stdio.h>
+int main(void)
+{
+    int i, j;
+    printf("Please enter i:\n");
+    scanf("%d %d", &i, &j);
+
+  	// 一共想到了两种写法，一种就是简单的级联。
+    (i < j)? (-1) : (i == j ? 0: 1);
+  	// 另一种就是通过对非零值取反再取反会得到1或者0的特性。
+    i >= j? !!(i - j) : -1;
+
+    return 0;
+}
+```
 
 *5. 下面的 if 语句在 C 语言中是否合法？
 
@@ -1202,6 +1629,23 @@ printf("n is between 1 and 10\n");
 
 如果合法，那么当 n 等于 0 时会发生什么？
 
+```C
+// 程序是合法的但不是合理的，无法得到字面的程序期望。
+#include<stdio.h>
+int main(void)
+{
+    int n = 0;
+    if(n >= 1 <= 10)
+    printf("n is between 1 and 10\n");
+
+    return 0;
+}
+```
+
+```
+n is between 1 and 10
+```
+
 *6. 下面的 if 语句在 C 语言中是否合法？
 
 ```
@@ -1211,9 +1655,42 @@ printf("n is between 1 and 10\n");
 
 如果合法，那么当 n 等于 5 时会发生什么？
 
+```C
+// 程序是合法的但不是合理的，无法得到字面的程序期望。
+#include<stdio.h>
+int main(void)
+{
+    int n = 5;
+    if (n == 1 - 10) 
+        printf("n is between 1 and 10\n"); 
+
+    return 0;
+}
+```
+
+**没有任何的输出**
+
 7. 如果 i 的值为 17，下面的语句显示的结果是什么？如果 i 的值为-17，下面的语句显示的结果又是什么？
 
 `printf("%d\n", i >= 0 ? i : -i);` 
+
+```C
+#include<stdio.h>
+int main(void)
+{
+    int i = 17;
+    printf("%d\n", i >= 0 ? i : -i);
+    i = -17;
+    printf("%d\n", i >= 0 ? i : -i);
+
+    return 0;
+}
+```
+
+```
+17
+17
+```
 
 8. 下面的 if 语句不需要这么复杂，请尽可能地加以简化。
 
@@ -1227,19 +1704,77 @@ else if (age < 13)
   teenager = false; 
 ```
 
+```c
+#include<stdio.h>
+int main(void)
+{
+    if (13 <= age && age <= 19) 
+        teenager = true; 
+	else 
+  	    teenager = false; 
+
+    return 0;
+}
+```
+
 9. 下面两个 if 语句是否等价？如果不等价，为什么？
 
 ```C
-if (score >= 90) if (score < 60) 
-	printf("A"); printf("F"); 
-else if (score >= 80) else if (score < 70) 
-	printf("B"); printf("D"); 
-else if (score >= 70) else if (score < 80) 
-printf("C"); printf("C"); 
-else if (score >= 60) else if (score < 90) 
-printf("D"); printf("B"); 
-else else 
-printf("F"); printf("A");
+if (score >= 90) 					
+	printf("A");  
+else if (score >= 80) 
+	printf("B");  
+else if (score >= 70)
+	printf("C"); 
+else if (score >= 60) 
+	printf("D"); 
+else 
+  printf("F"); 
+```
+
+```c
+if (score < 60) 
+  printf("F");
+else if (score < 70) 
+  printf("D"); 
+else if (score < 80) 
+  printf("C"); 
+else if (score < 90) 
+  printf("B"); 
+else printf("A");
+```
+
+这两个是等价的
+
+```c
+#include <stdio.h>
+int main(void)
+{
+    int score;
+    if (score >= 90)
+        printf("A");
+    else if (score >= 80)
+        printf("B");
+    else if (score >= 70)
+        printf("C");
+    else if (score >= 60)
+        printf("D");
+    else
+        printf("F");
+
+    if (score < 60)
+        printf("F");
+    else if (score < 70)
+        printf("D");
+    else if (score < 80)
+        printf("C");
+    else if (score < 90)
+        printf("B");
+    else
+        printf("A");
+        
+    return 0;
+}
 ```
 
 5.3 节
@@ -1253,6 +1788,28 @@ switch (i % 3) {
  case 1: printf("one"); 
  case 2: printf("two"); 
 } 
+```
+
+```c
+#include <stdio.h>
+int main(void)
+{
+    i = 1;
+    switch (i % 3)
+    {
+    case 0:
+        printf("zero");
+    case 1:
+        printf("one");
+    case 2:
+        printf("two");
+    }
+    return 0;
+}
+```
+
+```
+onetwo
 ```
 
 11. 表 5-5 给出了美国佐治亚州的电话区号，以及每个区号所对应地区最大的城市。
@@ -1273,7 +1830,52 @@ switch (i % 3) {
 
 编写一个 switch 语句，其控制表达式是变量 area_code。如果 area_code 的值在表中，switch 语句打印出相应的城市名；否则 switch 语句显示消息“Area code not recognized”。使用 5.3 节讨论的方法，使 switch 语句尽可能地简单。
 
+```C
+#include <stdio.h>
+int main(void)
+{
+    int area_code;
+    printf("Please enter the area code: ");
+    scanf("%d", &area_code);
+
+    switch (area_code)
+    {
+    case 229:
+        printf("Albany");
+        break;
+    case 404:
+    case 470:
+    case 678:
+    case 770:
+        printf("Atlanta");
+        break;
+    case 478:
+        printf("Macon");
+        break;
+    case 706:
+    case 762:
+        printf("Columbus");
+        break;
+    case 912:
+        printf("Savannah");
+        break;
+    default:
+        printf("Area code not recognized");
+        break;
+    }
+    return 0;
+}
+```
+
+
+
 ### 编程题
+
+```shell
+for i in {1..11}; do touch code_5_$i.c; done
+```
+
+
 
 1. 编写一个程序，确定一个数的位数：
 
@@ -1284,6 +1886,27 @@ The number 374 has 3 digits
 
 假设输入的数最多不超过 4 位。提示：利用 if 语句进行数的判定。例如，如果数在 0 和 9 之间，那么位数为 1；如果数在 10 和 99 之间，那么位数为 2。
 
+```C
+#include<stdio.h>
+int main(void)
+{
+    int number;
+    printf("Enter a number:");
+    scanf("%d", &number);
+
+    if(number > 999)
+        printf("4\n");
+    else if(number > 99)
+        printf("3\n");
+    else if(number > 9)
+        printf("2\n");
+    else
+        printf("1\n");
+
+    return 0;
+}
+```
+
 2. 编写一个程序，要求用户输入 24 小时制的时间，然后显示 12 小时制的格式：
 
 ```
@@ -1293,11 +1916,70 @@ Equivalent 12-hour time: 9:11 PM
 
 注意不要把 12:00 显示成 0:00。
 
+```
+#include<stdio.h>
+int main(void)
+{
+    int hour, min;
+    printf("Enter a 24-hour time:");
+    scanf("%d : %d" ,&hour ,&min);
+
+    if(hour <= 12)
+        printf("Equivalent 12-hour time:%d:%.2d AM\n", hour, min);
+    else if(hour > 12)
+        printf("Equivalent 12-hour time:%d:%.2d PM\n", hour - 12, min);
+
+    return 0;
+}
+```
+
 3. 修改 5.2 节的 broker.c 程序，做出下面两种改变。
    (a) 不再直接输入交易额，而是要求用户输入股票的数量和每股的价格。
    (b) 增加语句用来计算经纪人竞争对手的佣金（少于 2000 股时佣金为每股 33 美元+3 美分，2000 股或更多股时佣金为每股 33 美元+2美分）。在显示原有经纪人佣金的同时，也显示出竞争对手的佣金。
 
-4. 表 5-6 中展示了用于测量风力的蒲福风级的简化版本。
+```C
+#include <stdio.h>
+
+int main(void)
+{
+    float stock, number;
+    float commission, competitor_comission, value;
+
+    printf("Enter value of trade: ");
+    //scanf("%f", &value);
+    scanf("%f %f", &stock, &number);
+    value = stock * number;
+
+    if (value < 2500.00f)
+        commission = 30.00f + .017f * value;
+    else if (value < 6250.00f)
+        commission = 56.00f + .0066f * value;
+    else if (value < 20000.00f)
+        commission = 76.00f + .0034f * value;
+    else if (value < 50000.00f)
+        commission = 100.00f + .0022f * value;
+    else if (value < 500000.00f)
+        commission = 155.00f + .0011f * value;
+    else
+        commission = 255.00f + .0009f * value;
+
+    if (commission < 39.00f)
+        commission = 39.00f;
+
+    if(stock < 2000)
+        competitor_comission = stock * 0.03 + 33;
+    else 
+        competitor_comission = stock * 0.02 + 33;
+    
+
+    printf("Commission: $%.2f\t", commission);
+    printf("Competitor: $%.2f\n", competitor_comission);
+
+    return 0;
+}
+```
+
+3. 表 5-6 中展示了用于测量风力的蒲福风级的简化版本。
 
 **表 5-7  简化的蒲福风级**
 
@@ -1312,26 +1994,142 @@ Equivalent 12-hour time: 9:11 PM
 
 编写一个程序，要求用户输入风速（海里/小时），然后显示相应的描述。
 
+```C
+#include<stdio.h>
+int main(void)
+{
+    int speed;
+    printf("Enter the speed:");
+    scanf("%d", &speed);
+
+    if(speed < 1)
+        printf("Calm\n");
+    else if(1 <= speed && speed <= 3)
+        printf("Light Air\n");
+    else if(4 <= speed && speed <= 27)
+        printf("Breeze\n");
+    else if(28 <= speed && speed <= 47)
+        printf("Gale\n");
+    else if(48 <= speed && speed <= 63)
+        printf("Storm\n");
+    else if(speed > 63)
+        printf("Hurricane\n");
+
+    return 0;
+}
+```
+
 5. 在美国的某个州，单身居民需要缴纳表 5-7 中列出的所得税。
 
-**表 5-8  每日航班信息**
+**表 5-7 美国某州单身居民个人所得税缴纳标准**
 
-|  起飞时间  |  抵达时间  |
-| :--------: | :--------: |
-| 8:00 a.m.  | 10:16 a.m. |
-| 9:43 a.m.  | 11:52 a.m. |
-| 11:19 a.m. | 1:31 p.m.  |
-| 12:47 p.m. | 3:00 p.m.  |
-| 2:00 p.m.  | 4:08 p.m.  |
-| 3:45 p.m.  | 5:55 p.m.  |
-| 7:00 p.m.  | 9:20 p.m.  |
-| 9:45 p.m.  | 11:58 p.m. |
+| 收入（美元） |             税金计算方式              |
+| ------------ | :-----------------------------------: |
+| 未超过 750   |               收入的 1%               |
+| 750 ～ 2250  |  7.50 美元 + 超出 750 美元部分的 2%   |
+| 2250 ～ 3750 | 37.50 美元 + 超出 2250 美元部分的 3%  |
+| 3750 ～ 5250 | 82.50 美元 + 超出 3750 美元部分的 4%  |
+| 5250 ～ 7000 | 142.50 美元 + 超出 5250 美元部分的 5% |
+| 超过 7000    | 230.00 美元 + 超出 7000 美元部分的 6% |
 
 编写一个程序，要求用户输入应纳税所得额，然后显示税金。
 
+```C
+#include<stdio.h>
+int main(void)
+{
+    int income;
+    float tax;
+    printf("Enter your income:");
+    scanf("%d", &income);
+
+  
+  	// 同样是犯了没有优化判断结构的问题。
+    if(income < 750)
+        printf("The tax is:%.2f\n", income * 0.01f);
+    else if(750 <= income && income <= 2250)
+        printf("The tax is:%.2f\n", (income - 750) * 0.02 + 7.5f);
+    else if(2250 <= income && income <= 3750)
+        printf("The tax is:%.2f\n", (income - 2250) * 0.03 + 37.5f);
+    else if(3750 <= income && income <= 5250)
+        printf("The tax is:%.2f\n", (income - 3750) * 0.04 + 82.5f);
+    else if(5250 <= income && income <= 7000)
+        printf("The tax is:%.2f\n", (income - 5250) * 0.05 + 142.5f);
+    else if(income > 7000)
+        printf("The tax is:%.2f\n", (income - 7000) * 0.06 + 230.0f);
+
+
+    return 0;
+}
+```
+
+```C
+#include <stdio.h>
+
+int main(void)
+{
+    int income;
+    float tax;
+
+    printf("Enter your income: ");
+    scanf("%d", &income);
+
+    if (income < 750)
+        tax = income * 0.01f;
+    else if (income <= 2250)
+        tax = 7.50f + (income - 750) * 0.02f;
+    else if (income <= 3750)
+        tax = 37.50f + (income - 2250) * 0.03f;
+    else if (income <= 5250)
+        tax = 82.50f + (income - 3750) * 0.04f;
+    else if (income <= 7000)
+        tax = 142.50f + (income - 5250) * 0.05f;
+    else
+        tax = 230.00f + (income - 7000) * 0.06f; 
+
+    printf("The tax is: %.2f\n", tax);
+
+    return 0;
+}
+
+```
+
 6. 修改 4.1 节的 upc.c 程序，使其可以检测 UPC 的有效性。在用户输入 UPC 后，程序将显示 VALID 或NOT VALID。
 
-7. 编写一个程序，从用户输入的 4 个整数中找出最大值和最小值：
+
+```C
+#include <stdio.h>
+
+int main(void)
+{
+    int d, i1, i2, i3, i4, i5, j1, j2, j3, j4, j5,
+        first_sum, second_sum, total, check_number;
+
+    printf("Enter the first (single) digit: ");
+    scanf("%1d", &d);
+    printf("Enter first group of five digits: ");
+    scanf("%1d%1d%1d%1d%1d", &i1, &i2, &i3, &i4, &i5);
+    printf("Enter second group of five digits: ");
+    scanf("%1d%1d%1d%1d%1d", &j1, &j2, &j3, &j4, &j5);
+    printf("Enter the check number: ");
+    scanf("%1d", &check_number);
+
+    first_sum = d + i2 + i4 + j1 + j3 + j5;
+    second_sum = i1 + i3 + i5 + j2 + j4;
+    total = 3 * first_sum + second_sum;
+
+    if ((9 - ((total - 1) % 10)) == check_number)
+        printf("VALID\n");
+    else 
+        printf("NOT VALID\n");
+
+    printf("Check digit: %d\n", 9 - ((total - 1) % 10));
+
+    return 0;
+}
+```
+
+6. 编写一个程序，从用户输入的 4 个整数中找出最大值和最小值：
 
 ```
 Enter four integers: 21 43 10 35
@@ -1340,6 +2138,42 @@ Smallest: 10
 ```
 
  要求尽可能少用 if 语句。提示：4 条 if 语句就足够了。
+
+```c
+// 我以为我写的不是最优解，但是网上的更加复杂，我的想法就是单次扫描即可完成任务。
+#include<stdio.h>
+int main(void)
+{
+    int i, j, k, l, max, min;
+    printf("Enter four integers:");
+    scanf("%d%d%d%d", &i, &j, &k, &l);
+
+    if(i > j)
+    {
+        max = i;
+        min = j;
+    }
+    else 
+    {
+        max = j;
+        min = i;
+    }
+    if(max < k)
+        max = k;
+    else if(min > k)
+        min = k;
+
+    if(max < l)
+        max = l;
+    else if(min > l)
+        min = l;
+    
+    printf("Largest:%d\n", max);
+    printf("Smallest:%d\n", min);
+
+    return 0;
+}
+```
 
 8. 表 5-8 给出了从一个城市到另一个城市的每日航班信息。
 
@@ -1428,17 +2262,17 @@ for (i = 5, j = i - 1; i > 0, j > 0; --i, j = i - 1)
     printf("%d ", i);
 ```
 
-1. 下列哪条语句和其他两条语句不等价（假设循环体都是一样的）？
+4. 下列哪条语句和其他两条语句不等价（假设循环体都是一样的）？
 
 (a) `for (i = 0; i < 10; i++) ...`
 (b) `for (i = 0; i < 10; ++i) ...`
 (c) `for (i = 0; i++ < 10; ) ...`
 
-1. 下列哪条语句和其他两条语句不等价（假设循环体都是一样的）？
+5. 下列哪条语句和其他两条语句不等价（假设循环体都是一样的）？
 
 (a) `while (i < 10) {...}`
- (b) `for (; i < 10;) {...}`
- (c) `do {...} while (i < 10);`
+(b) `for (; i < 10;) {...}`
+(c) `do {...} while (i < 10);`
 
 1. 把练习题 1 中的程序片段改写为一条 for 语句。
 
@@ -1457,8 +2291,6 @@ for (i = 10; i >= 1; i /= 2)
 
 10. 说明如何用等价的 goto 语句替换 continue 语句。
 
-------
-
 1. 下列程序片段的输出是什么？
 
 ```c
@@ -1471,8 +2303,6 @@ for (i = 0; i < 10; i++) {
 printf("%d\n", sum);
 ```
 
-------
-
 1. 下面的“素数判定”循环作为示例出现在 6.4 节中：
 
 ```c
@@ -1483,8 +2313,6 @@ for (d = 2; d < n; d++)
 
 这个循环不是很高效。没有必要用 n 除以 2～n-1 的所有数来判断它是否为素数。事实上，只需要检查不大于 n 的平方根的除数即可。利用这一点来修改循环。
  提示：不要试图计算出 n 的平方根，用 d*d 和 n 进行比较。
-
-------
 
 6.5 节
 
@@ -1546,8 +2374,6 @@ Commission: $144.00
 Enter value of trade: 0  
 ```
 
-
-
 5. 第 4 章的编程题 1 要求编写程序显示出两位数的逆序。设计一个更具一般性的程序，可以处理一位、两位、三位或者更多位的数。提示：使用 do 循环将输入的数重复除以 10，直到值达到 0 为止。
 
 6. 编写程序，提示用户输入一个数 n，然后显示出 1~n 的所有偶数平方值。例如，如果用户输入 100，那么程序应该显示出下列内容：
@@ -1559,8 +2385,6 @@ Enter value of trade: 0
 64  
 100  
 ```
-
-
 
 7. 重新安排程序 square3.c，在 for 循环中对变量 i 进行初始化、判定以及自增操作。不需要重写程序，特别是不要使用任何乘法。
 
@@ -1591,8 +2415,6 @@ Enter a date (mm/dd/yy): 0/0/0
 5/17/07 is the earliest date  
 ```
 
-
-
 11. 数学常量 e 的值可以用一个无穷级数表示：
 
 e = 1 + 1/1! + 1/2! + 1/3! + ⋯  
@@ -1616,11 +2438,9 @@ e = 1 + 1/1! + 1/2! + 1/3! + ⋯
 1. 给出下列整型常量的十进制值。
 
 ```
- (a) 077 
-
- (b) 0x77
-
- (c) 0XABC
+(a) 077 
+(b) 0x77
+(c) 0XABC
 ```
 
 7.2 节
@@ -1628,29 +2448,20 @@ e = 1 + 1/1! + 1/2! + 1/3! + ⋯
 2. 下列哪些常量在 C 语言中不是合法的？区分每一个合法的常量是整数还是浮点数。
 
 ```
- (a) 010E2
-
- (b) 32.1E+5
-
- (c) 0790
-
- (d) 100_000
-
- (e) 3.978e-2
+(a) 010E2
+(b) 32.1E+5
+(c) 0790
+(d) 100_000
+(e) 3.978e-2
 ```
-
-
 
 3. 下列哪些类型在 C 语言中不是合法的？
 
 ```
- (a) short unsigned int
-
- (b) short float
-
- (c) long double
-
- (d) unsigned long
+(a) short unsigned int
+(b) short float
+(c) long double
+(d) unsigned long
 ```
 
 7.3 节
@@ -1658,62 +2469,250 @@ e = 1 + 1/1! + 1/2! + 1/3! + ⋯
 4. 如果变量 c 是 char 类型，那么下列哪条语句是非法的？
 
 ```
- (a) i += c; /* i has type int */ 
-
- (b) c = 2 * c – 1; 
-
- (c) putchar(c); 
-
- (d) printf(c); 
+(a) i += c; /* i has type int */ 
+(b) c = 2 * c – 1; 
+(c) putchar(c); 
+(d) printf(c); 
 ```
-
-
 
 5. 下列哪条不是书写数 65 的合法方式？（假设字符集是 ASCII。）
 
 ```
- (a) 'A' 
-
- (b) 0b1000001 
-
- (c) 0101 
-
- (d) 0x41 
+(a) 'A' 
+(b) 0b1000001 
+(c) 0101 
+(d) 0x41 
 ```
-
-
 
 6. 对于下面的数据项，指明 char、short、int、long 类型中哪种类型是足以存储数据的最小类型。
 
 ```
- (a) 一个月的天数
-
- (b) 一年的天数
-
- (c) 一天的分钟数
-
- (d) 一天的秒数
+(a) 一个月的天数
+(b) 一年的天数
+(c) 一天的分钟数
+(d) 一天的秒数
 ```
 
-
-
-7. 对于下面的字符转义，给出等价的八进制转义。（假定字符集是 ASCII。）可以参考附录 E，其中列
-
-出了 ASCII 字符的数值码。
+7. 对于下面的字符转义，给出等价的八进制转义。（假定字符集是 ASCII。）可以参考附录 E，其中列出了 ASCII 字符的数值码。
 
 ```
- (a) \b 
-
- (b) \n 
-
- (c) \r 
-
- (d) \t
+(a) \b 
+(b) \n 
+(c) \r 
+(d) \t
 ```
-
-
 
 ### 编程题
+
+1. 如果 i * i 超出了 int 类型的最大取值，那么 6.3 节的程序 square2.c 将失败（通常会显示奇怪的答案）。运行该程序，并确定导致失败的 n 的最小值。尝试把变量 i 的类型改成 short 并再次运行该程序。（不要忘记更新 printf 函数调用中的转换说明！）然后尝试将其改成 long。从这些实验中，你能总结出在你的机器上用于存储整数类型的位数是多少吗？
+
+2. 修改 6.3 节的程序 square2.c，每 24 次平方运算后暂停，并显示下列信息：Press Enter to continue...显示完上述消息后，程序应该使用 getchar 函数读入一个字符。getchar 函数读到用户输入的回车键才允许程序继续。
+
+3. 修改 7.1 节的程序 sum2.c，对 double 型值组成的数列求和。
+4. 编写可以把字母格式的电话号码翻译成数值格式的程序：
+
+156122 第 7 章 基本类型
+
+Enter phone number: CALLATT
+
+2255288
+
+（如果没有电话在身边，参考这里给出的字母在键盘上的对应关系：2=ABC、3=DEF、4=GHI、5=JKL、
+
+6=MNO、7=PQRS、8=TUV、9=WXYZ。）原始电话号码中的非字母字符（例如数字或标点符号）保持不变：
+
+Enter phone number: 1-800-COL-LECT
+
+1-800-265-5328
+
+ 
+
+可以假设任何用户输入的字母都是大写字母。
+
+5. 在十字拼字游戏中，玩家利用小卡片组成英文单词，每张卡片包含一个英文字母和面值。面值根据
+
+字母稀缺程度的不同而不同。（面值与字母的对应关系如下：1——AEILNORSTU；2——DG；3——
+
+BCMP；4——FHVWY；5——K；8——JX；10——QZ。）编写程序，通过对单词中字母的面值求和
+
+来计算单词的值：
+
+Enter a word: pitfall
+
+Scrabble value: 12
+
+ 
+
+编写的程序应该允许单词中混合出现大小写字母。提示：使用 toupper 库函数。
+
+6. 编写程序显示 sizeof(int)、sizeof(short)、sizeof(long)、sizeof(float)、sizeof(double)
+
+和 sizeof(long double)的值。
+
+7. 修改第 3章的编程题 6，使得用户可以对两个分数进行加、减、乘、除运算（在两个分数之间输入+、
+
+、*或/符号）。
+
+8. 修改第 5章的编程题 8，要求用户输入 12小时制的时间。输入时间的格式为时:分后跟 A、P、AM或
+
+PM（大小写均可）。数值时间和 AM/PM 之间允许有空白（但不强制要求有空白）。有效输入的示
+
+例如下：
+
+1:15P 
+
+1:15PM 
+
+1:15p 
+
+1:15pm 
+
+1:15 P 
+
+1:15 PM 
+
+1:15 p 
+
+1:15 pm 
+
+ 
+
+可以假定输入的格式就是上述之一，不需要进行错误判定。
+
+9. 编写程序，要求用户输入 12 小时制的时间，然后用 24 小时制显示该时间：
+
+Enter a 12-hour time: 9:11 PM
+
+Equivalent 24-hour time: 21:11
+
+ 
+
+参考编程题 8 中关于输入格式的描述。
+
+10. 编写程序统计句子中元音字母（a、e、i、o、u）的个数：
+
+Enter a sentence: And that's the way it is.
+
+Your sentence contains 6 vowels.
+
+11. 编写一个程序，要求用户输入英文名和姓，并根据用户的输入先显示姓，其后跟一个逗号，然后显
+
+示名的首字母，最后加一个点：
+
+Enter a first and last name: Lloyd Fosdick
+
+Fosdick, L.
+
+ 
+
+用户的输入中可能包含空格（名之前、名和姓之间、姓氏之后）。
+
+157 
+
+图灵社区会员 jasper_5257(2463089505@qq.com) 专享 尊重版权编程题 123 
+
+12. 编写程序对表达式求值：
+
+Enter an expression: 1+2.5*3
+
+Value of expression: 10.5
+
+表达式中的操作数是浮点数，运算符是+、、*和/。表达式从左向右求值（所有运算符的优先级都
+
+一样）。
+
+13. 编写程序计算句子的平均词长：
+
+Enter a sentence: It was deja vu all over again.
+
+Average word length: 3.4
+
+ 
+
+简单起见，程序中把标点符号看作其前面单词的一部分。平均词长显示一个小数位。
+
+14. 编写程序，用牛顿方法计算正浮点数的平方根：
+
+Enter a positive number: 3
+
+Square root: 1.73205
+
+ 
+
+设 *x* 是用户输入的数。牛顿方法需要先给出 *x* 平方根的猜测值 *y*（我们使用 1）。后续的猜测值通过计
+
+算 *y* 和 *x*/*y* 的平均值得到。表 7-6 中给出了求解 3 的平方根的过程。
+
+表 7-6 用牛顿方法求解 3 的平方根
+
+*x* 
+
+*y* 
+
+*x*/*y* 
+
+*y* 和 *x*/*y* 的平均值
+
+3 
+
+1 
+
+3 
+
+2 
+
+3 
+
+2 
+
+1.5 
+
+1.75 
+
+3 
+
+1.75 
+
+1.714 29 
+
+1.732 14 
+
+3 
+
+1.732 14 
+
+1.731 96 
+
+1.732 05 
+
+3 
+
+1.732 05 
+
+1.732 05 
+
+1.732 05 
+
+ 
+
+注意，*y* 的值逐渐接近 *x* 的平方根。为了获得更高的精度，程序中应使用 double 类型的变量代替
+
+float类型的变量。当*y*的新旧值之差的绝对值小于0.000 01和*y*的乘积时程序终止。提示：调用fabs
+
+函数求 double 类型数值的绝对值。（为了使用 fabs 函数，需要在程序的开头包含<math.h>头。）
+
+15. 编程计算正整数的阶乘：
+    Enter a positive integer: 6
+    Factorial of 6: 720
+
+(a) 用 short 类型变量存储阶乘的值。为了正确打印出 *n* 的阶乘，*n* 的最大值是多少？
+(b) 用 int 类型变量重复(a)。
+(c) 用 long 类型变量重复(a)。
+(d) 如果你的编译器支持 long long 类型，用 long long 类型变量重复(a)。
+(e) 用 float 类型变量重复(a)。
+(f) 用 double 类型变量重复(a)。
+(g) 用 long double 类型变量重复(a)。
+在(e)~(g)这几种情况下，程序会显示阶乘的近似值，不一定是准确值。
 
 ## 第八章 数组
 
@@ -1943,9 +2942,31 @@ Repeated digit(s): 7 9
 
 ### 练习题
 
-1.给定以下代码，主线程main中的断言有可能触发吗？  # include   # include   # include   # include   atomic_int x = 0, y = 0, z = 0;  int w_x(void * arg)  {   atomic_store_explicit(& x, 1, memory_order_relaxed);   return 0;  }  int w_y(void * arg)  {   atomic_store_explicit(& y, 1, memory_order_relaxed);   return 0;  }int if_x_wz(void * arg)  {   while (! atomic_load_explicit(& x, memory_order_relaxed));   if (atomic_load_explicit(& y, memory_order_relaxed))     z = 1;   return 0;  }  int if_y_wz(void * arg)  {   while (! atomic_load_explicit(& y, memory_order_relaxed));   if (atomic_load_explicit(& x, memory_order_relaxed))     z = 1;   return 0;  }  int main(void)  {   thrd_t t0, t1, t2, t3;   thrd_create(& t0, w_x, 0);   thrd_create(& t1, w_y, 0);   thrd_create(& t2, if_x_wz, 0);   thrd_create(& t3, if_y_wz, 0);   thrd_join(t0, & (int){0});   thrd_join(t1, & (int){0});   thrd_join(t2, & (int){0});   thrd_join(t3, & (int){0});   assert(z == 1);  }  2.如果将以上程序中的memory_order_relaxed全部替换为memory_order_seq_cst，主线程main中 的断言有可能触发吗？
+1. 给定以下代码，主线程main中的断言有可能触发吗？  
+
+   ```C
+   # include   
+   # include   
+   # include   
+   # include   
+   atomic_int x = 0, y = 0, z = 0;  
+   int w_x(void * arg)  
+   {   
+     atomic_store_explicit(& x, 1, memory_order_relaxed);   
+     return 0;  
+   }  
+   int w_y(void * arg)  
+   {   
+     atomic_store_explicit(& y, 1, memory_order_relaxed);   return 0;  }int if_x_wz(void * arg)  {   while (! atomic_load_explicit(& x, memory_order_relaxed));   if (atomic_load_explicit(& y, memory_order_relaxed))     z = 1;   return 0;  }  int if_y_wz(void * arg)  {   while (! atomic_load_explicit(& y, memory_order_relaxed));   if (atomic_load_explicit(& x, memory_order_relaxed))     z = 1;   return 0;  }  int main(void)  {   thrd_t t0, t1, t2, t3;   thrd_create(& t0, w_x, 0);   thrd_create(& t1, w_y, 0);   thrd_create(& t2, if_x_wz, 0);   thrd_create(& t3, if_y_wz, 0);   thrd_join(t0, & (int){0});   thrd_join(t1, & (int){0});   thrd_join(t2, & (int){0});   thrd_join(t3, & (int){0});   assert(z == 1);  }  
+   ```
+
+   
+
+2. 如果将以上程序中的memory_order_relaxed全部替换为memory_order_seq_cst，主线程main中 的断言有可能触发吗？
 
 ### 编程题
 
- 1.用原子操作函数atomic_fetch_add和atomic_fetch_sub改写前面的atomic.c，使之同样能够避免 数据竞争。  2.统计1~1 000 000 000的所有整数中，各数位之和为奇数的有几个。要求：先用一个线程来统计并打印 所用的时间，再用10个线程分段各自统计并打印总体所用的时间。 
+1. 用原子操作函数atomic_fetch_add和atomic_fetch_sub改写前面的atomic.c，使之同样能够避免 数据竞争。  
+
+2. 统计1~1 000 000 000的所有整数中，各数位之和为奇数的有几个。要求：先用一个线程来统计并打印 所用的时间，再用10个线程分段各自统计并打印总体所用的时间。 
 
