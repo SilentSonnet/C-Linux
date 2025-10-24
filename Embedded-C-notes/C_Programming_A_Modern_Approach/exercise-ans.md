@@ -934,6 +934,7 @@ int main(void)
 **ANS：**
 
 ```
+// 答案写错完了
 8 % 5 对于C89为3。
 -8 % 5 对于C89既可能是-3也可能是3，需要视具体的实现。
 8 % -5 对于C89既可能是-3也可能是-3，需要视具体的实现。
@@ -967,9 +968,20 @@ InstalledDir: /Library/Developer/CommandLineTools/usr/bin
 -8 % -5 is -3
 ```
 
+```
+更正
+在C89标准中，操作数是负数时的除法运算比较容易理解，而操作数是负数时的模运算容易混淆，对此我们可以通过除法进行转换计算。由于C89和C99都要确保（ a / b ）* b + a % b的结果总是等于a，因此我们可以通过除法运算推算出模运算的结果，也就是说a % b == a - （ a / b ）* b，这样更加有利于理解。例如，C89下-9/7的结果可能为-1或者-2 。因此-9%7的值可能是-2或者5。
+
+参考答案
+(a) 8 % 5 的运算结果为3，操作数为整数，结果为余数。
+(b) -8 % 5 由于在C89下（-8/5）的运算结果为-1或者-2，因此-8%5的运算结果为-3或者2 。
+(c) 8 % -5 由于在C89下（8/-5）的运算结果为-1或者-2，因此-8%5的运算结果为-3或者2 。
+(d) -8 % -5 C89下（-8/-5）的运算结果为1，因此-8%-5的运算结果为-3 。
+```
+
+
+
 6. 对 C99 重复上题。
-
-
 
 ```
 #include<stdio.h>
@@ -984,13 +996,43 @@ int main(void)
 }
 ```
 
+```
+8 % 5 is 3
+-8 % 5 is -3
+8 % -5 is 3
+-8 % -5 is -3
+```
 
+```
+在C99标准中，操作数是负数时的除法运算比较容易理解，均是向0取整。此时模运算%的运算结果和运算符和操作数左侧操作数符号相同，可以沿用 a / b ）* b + a % b的结果总是等于a的定义，推测出模运算的结果。
+(a) 8 % 5 的运算结果为3，操作数为整数，结果为余数。
+(b) -8 % 5 由于在C99下（-8 / 5）的运算结果为-1，因此-8 % 5的运算结果为-3 。
+(c) 8 % -5 由于在C99下（8 / -5）的运算结果为-1，因此-8 % 5的运算结果为3
+(d) -8 % -5 由于在C99下（-8 / -5）的运算结果为1，因此-8 % 5的运算结果为-3
+```
 
-6. 本章计算 UPC 校验位方法的最后几步是：把总的结果减去 1，相减后的结果除以 10 取余数，用 9 减去余数。换成下面的步骤也可以：总的结果除以 10 取余数，用 10 减去余数。这样做为什么可行？
+7. 本章计算 UPC 校验位方法的最后几步是：把总的结果减去 1，相减后的结果除以 10 取余数，用 9 减去余数。换成下面的步骤也可以：总的结果除以 10 取余数，用 10 减去余数。这样做为什么可行？
 
-7. 如果把表达式 9 - ((total - 1) % 10)改成(10 - (total % 10)) % 10，upc.c程序是否仍然正确？
+**这道题不会，看的习题解析**
 
-8. 给出下列程序片段的输出结果。假设 i、j 和 k 都是 int 型变量。
+```
+该章中的UPC校验方法可以表示为：首先把第1位、第3位、第5位、第7位、第9位和第11位数字相加；然后把第2位、第4位、第6位、第8位和第10位数字相加；接着把第一次加法的结果乘以3，再和第二次加法的结果相加；随后把上述结果减去1；相减后的结果除以10取余数；最后用9减去上一步得到的余数。
+检验过程中假设加法运算的结果为total，计算校验位的基本操作步骤可以表示为：9-((total-1)%10)。从公式化简似乎可以得到(10 - total % 10)。但是当我们考虑结果取值范围就会发现，原公式的取值范围是0~9；而化简后公式的取值范围是1~10，即当total为10的整数倍时，两者结果不同。其主要原因是不能将9-((total-1)%10)简单等价于(10 - total % 10)。原算法通过9求补数的方式保证了运算结果0的校验位是0，转换后不能保证该运算结果。
+
+也就是说，修改UPC校验算法为总的结果除以10取余数，用10减去余数的方式与原有方式所生成的校验位在实际应用中可行，但是并不能保证与原有计算方法完全一致。
+```
+
+8. 如果把表达式 9 - ((total - 1) % 10)改成(10 - (total % 10)) % 10，upc.c程序是否仍然正确？
+
+**这道题不会，看的习题解析**
+
+```
+参考练习题7，UPC校验方法中如果将表达式替换为(10 - (total % 10)) % 10，其运算结果是正确的。先将表达式9 - ((total - 1) % 10)转换成(10 - total % 10)，再对10取模，就可以保证校验位正确地转换。再次取模的目的是按10求补数后，将0的补数转化成最终校验位0 。
+
+也就是说，UPC校验程序使用(10 - (total % 10)) % 10的计算方法可以实现与9 - ((total - 1) % 10)相同的效果，因此是正确的。
+```
+
+9. 给出下列程序片段的输出结果。假设 i、j 和 k 都是 int 型变量。
 
 ```C
 (a) i = 7; 
@@ -1016,7 +1058,7 @@ int main(void)
 #include<stdio.h>
 int main(void)
 {
-  	int i, j;
+  	int i, j, k;
   	i = 7; 
 		j = 8;
 		i *= j + 1; 
@@ -1040,10 +1082,11 @@ int main(void)
 ```
 
 ```
-
+63 8
+3 2 1
+2 -1 3
+0 0 0
 ```
-
-
 
 10. 给出下列程序片段的输出结果。假设 i 和 j 都是 int 型变量。
 
@@ -1087,7 +1130,10 @@ int main(void)
 ```
 
 ```
-
+12 12
+3 4
+2.5 8.5 // 这个写错了，注意输出，变量要服从格式符！所以应该是2 8
+6 9
 ```
 
 *11. 给出下列程序片段的输出结果。假设 i、j 和 k 都是 int 型变量。
@@ -1138,10 +1184,15 @@ int main(void)
 ```
 
 ```
-
+0
+2
+4
+11 6
+0
+8 7
+3
+4 5 4
 ```
-
-
 
 12. 给出下列程序片段的输出结果。假设 i 和 j 都是 int 型变量。
 
@@ -1217,7 +1268,7 @@ i++ = 1
 (i += 1) = 2
 ```
 
-13. 添加圆括号，说明 C 语言编译器如何解释下列表达式。
+14. 添加圆括号，说明 C 语言编译器如何解释下列表达式。
 
 ```C
 (a) a * b – c * d + e 
@@ -1249,18 +1300,26 @@ int main(void)
 	int i, j;
 	i = 1, j = 2;
   printf("i += j = %d\n", i += j);
-  i = 1, j = 2;
   printf("i-- = %d\n", i--);
-  i = 1, j = 2;
-  printf("i * j / i = %d\n", );
-  i = 1, j = 2;
+  printf("i * j / i = %d\n", i * j / i);
   printf("i %% ++j = %d\n", i % ++j);
   
   return 0;
 }
 ```
 
-输出：
+```
+3
+2 // 这个地方是一个陷阱，我写成了i的值，其实要写出表达式的值，i的值在表达式的值算出之后才会产生副作用。
+2
+2
+
+电脑程序输出结果
+i += j = 3
+i-- = 3
+i * j / i = 2
+i % ++j = 2
+```
 
 ### 编程题
 
@@ -1620,6 +1679,11 @@ int main(void)
 }
 ```
 
+```
+参考答案：
+i > j ? 1 : ( i < j ? - 1 : 0)
+```
+
 *5. 下面的 if 语句在 C 语言中是否合法？
 
 ```
@@ -1631,6 +1695,7 @@ printf("n is between 1 and 10\n");
 
 ```C
 // 程序是合法的但不是合理的，无法得到字面的程序期望。
+// 如果为了表示取值在1~10之间，可以使用表达式n>=0 && n<=10的形式。
 #include<stdio.h>
 int main(void)
 {
@@ -1710,7 +1775,7 @@ int main(void)
 {
     if (13 <= age && age <= 19) 
         teenager = true; 
-	else 
+		else 
   	    teenager = false; 
 
     return 0;
@@ -1745,6 +1810,9 @@ else printf("A");
 ```
 
 这两个是等价的
+
+**答案解析**
+两条if级联语句的输出结果相同，但是不能认为它们是等价的，因为两者的逻辑判断顺序和结构不同，只是一种算法的两种实现。
 
 ```c
 #include <stdio.h>
@@ -2199,12 +2267,79 @@ Closest departure time is 12:47 p.m., arriving at 3:00 p.m.
 
 提示：把输入用从午夜开始的分钟数表示。将这个时间与表格里（也用从午夜开始的分钟数表示）的起飞时间相比。例如，13:15 从午夜开始是 13×60+15 = 795 分钟，与下午 12:47（从午夜开始是767 分钟）最接近。
 
+```c
+#include<stdio.h>
+int main(void)
+{
+    int hour, min, cmp;
+    int flight1, flight2, flight3, flight4, flight5, flight6, flight7, flight8;
+    printf("Enter a 24-hour time: ");
+    scanf("%d : %d", &hour, &min);
+
+    flight1 = 8 * 60;
+    flight2 = 9 * 60 + 43;
+    flight3 = 11 * 60 + 19;
+    flight4 = 12 * 60 + 47;
+    flight5 = 14 * 60;
+    flight6 = 15 * 60 + 45;
+    flight7 = 19 * 60;
+    flight8 = 21 * 60 + 45;
+
+    cmp = hour * 60 + min;
+    if(cmp < (flight1 + flight2) / 2) // 小于第一个航班，那么第一个航班就是最接近的。
+        printf("Closest departure time is 8:00 a.m., arriving at 10:16 a.m.\n");
+    else if(cmp < (flight2 + flight3) / 2)
+         printf("Closest departure time is 9:43 a.m., arriving at 11:52 a.m.\n");
+    else if(cmp < (flight3 + flight4) / 2)
+         printf("Closest departure time is 11:19 a.m., arriving at 1:31 p.m.\n");
+    else if(cmp < (flight4 + flight5) / 2)
+         printf("Closest departure time is 12.47 p.m., arriving at 3:00 p.m.\n");
+    else if(cmp < (flight5 + flight6) / 2)                  
+         printf("Closest departure time is 2:00 p.m., arriving at 4:08 p.m.\n");
+    else if(cmp < (flight6 + flight7) / 2)
+        printf("Closest departure time is 3:45 p.m., arriving at 5:55 p.m.\n");
+    else if(cmp <(flight7 + flight8) / 2)
+        printf("Closest departure time is 7:00 p.m., arriving at 9:20 p.m.\n");
+    else
+        printf("Closest departure time is 9:45 p.m., arriving at 11:58 p.m.\n");
+        
+    return 0;
+}
+```
+
+```
+alancong@AlanCongdeMacBook-Air chapter_5 % ./a.out 
+Enter a 24-hour time: 13:15
+Closest departure time is 12.47 p.m., arriving at 3:00 p.m.
+```
+
 9. 编写一个程序，提示用户输入两个日期，然后显示哪一个日期更早：
 
 ```
 Enter first date (mm/dd/yy): 3/6/08
 Enter second date (mm/dd/yy): 5/17/07
 5/17/07 is earlier than 3/6/08 
+```
+
+```C
+#include<stdio.h>
+int main(void)
+{
+    int month1, day1, year1;
+    int month2, day2, year2;
+    printf("Enter first date (mm/dd/yy): ");
+    scanf("%d / %d / %d", &month1, &day1, &year1);
+    printf("Enter second date (mm/dd/yy): ");
+    scanf("%d / %d / %d", &month2, &day2, &year2);
+
+
+    if((year1 * 10000 + month1 * 100 + day1) > (year2 * 10000 + month2 * 100 + day2))
+        printf("%d/%d/%d is earlier than %d/%d/%d\n", month2, day2, year2, month1, day1, year1);
+    else
+        printf("%d/%d/%d is earlier than %d/%d/%d\n", month1, day1, year1, month2, day2, year2);
+
+    return 0;
+}
 ```
 
 10. 利用 switch 语句编写一个程序，把用数字表示的成绩转换为字母表示的等级。
@@ -2216,6 +2351,48 @@ Letter grade: B
 
 使用下面的等级评定规则：A 为 90～100，B 为 80～89，C 为 70～79，D 为 60～69，F 为 0～59。如果成绩高于 100 或低于 0，则显示出错消息。提示：把成绩拆分成 2 个数字，然后使用 switch 语句判定十位上的数字。
 
+```C
+#include<stdio.h>
+int main(void)
+{
+    int grade, number;
+    printf("Enter numerical grade: ");
+    scanf("%d", &grade);
+
+    if(grade < 0 || grade > 100)
+    {
+        printf("Input Error\n");
+        return 0;
+    }
+
+    number = grade / 10;
+
+    printf("Letter grade: ");
+    switch (number)
+    {
+    case 10: case 9:
+        printf("A\n");
+        break;
+    case 8:
+        printf("B\n");
+        break;
+    case 7:
+        printf("C\n");
+        break;
+    case 6:
+        printf("D\n");
+        break;
+    case 5: case 4: case 3: case 2: case 1: case 0:
+        printf("F\n");
+        break;
+    default:
+        break;
+    }
+
+    return 0;
+}
+```
+
 11. 编写一个程序，要求用户输入一个两位数，然后显示该数的英文单词：
 
 ```
@@ -2224,6 +2401,76 @@ You entered the number forty-five.
 ```
 
 提示：把数分解为两个数字。用一个 switch 语句显示第一位数字对应的单词（“twenty”“thirty”等），用第二个 switch 语句显示第二位数字对应的单词。不要忘记 11～19 需要特殊处理。
+
+```c
+#include <stdio.h>
+
+int main(void)
+{
+    int number, ones, tens;
+
+    printf("Enter a two-digit number: ");
+    scanf("%d", &number);
+
+    if (number < 10 || number > 99) 
+    {
+        printf("Error: input must be a two-digit number.\n");
+        return 1;
+    }
+
+    printf("You entered the number ");
+
+    if (number >= 10 && number < 20)
+    {
+        switch (number)
+        {
+            case 10: printf("ten\n"); break;
+            case 11: printf("eleven\n"); break;
+            case 12: printf("twelve\n"); break;
+            case 13: printf("thirteen\n"); break;
+            case 14: printf("fourteen\n"); break;
+            case 15: printf("fifteen\n"); break;
+            case 16: printf("sixteen\n"); break;
+            case 17: printf("seventeen\n"); break;
+            case 18: printf("eighteen\n"); break;
+            case 19: printf("nineteen\n"); break;
+        }
+    }
+    else
+    {
+        tens = number / 10;
+        ones = number % 10;
+
+        switch (tens)
+        {
+            case 2: printf("twenty"); break;
+            case 3: printf("thirty"); break;
+            case 4: printf("forty"); break;
+            case 5: printf("fifty"); break;
+            case 6: printf("sixty"); break;
+            case 7: printf("seventy"); break;
+            case 8: printf("eighty"); break;
+            case 9: printf("ninety"); break;
+        }
+
+        switch (ones)
+        {
+            case 0: printf("\n"); break;
+            case 1: printf("-one\n"); break;
+            case 2: printf("-two\n"); break;
+            case 3: printf("-three\n"); break;
+            case 4: printf("-four\n"); break;
+            case 5: printf("-five\n"); break;
+            case 6: printf("-six\n"); break;
+            case 7: printf("-seven\n"); break;
+            case 8: printf("-eight\n"); break;
+            case 9: printf("-nine\n"); break;
+        }
+    }
+
+    return 0;
+}
+```
 
 ## 第六章 循环
 
@@ -2775,7 +3022,12 @@ Repeated digit(s): 7 9
 
 ### 练习题
 
-11.2节  1. 如果i是变量，且p指向i，那么下列哪些表达式是i的别名？   (a) *p (b) &p (c) *&p (d) &*p    (e) *i (f) &i (g) *&i (h) &*i  11.3节  2. 如果i是int类型变量，且p和q是指向int的指针，那么下列哪些赋值是合法的？   (a) p = i;  (b) *p = &i; (c) &p = q;(d) p = &q;  (g) p = *q;  11.4 节  (e) p = *&q; (f) p = q;   (h) *p = q; ( i) *p = *q;  3.假设下列函数用来计算数组a中元素的和以及平均值，且数组a长度为n。avg和sum指向函数需要 修改的变量。但是，这个函数有几个错误，请找出这些错误并修改。  void avg_sum(double a[], int n, double *avg, double *sum)  {   int i;   sum = 0.0;   for (i = 0; i 
+11.2节  
+
+1. 如果i是变量，且p指向i，那么下列哪些表达式是i的别名？  
+   (a) *p 
+   (b) &p 
+   (c) *&p (d) &*p    (e) *i (f) &i (g) *&i (h) &*i  11.3节  2. 如果i是int类型变量，且p和q是指向int的指针，那么下列哪些赋值是合法的？   (a) p = i;  (b) *p = &i; (c) &p = q;(d) p = &q;  (g) p = *q;  11.4 节  (e) p = *&q; (f) p = q;   (h) *p = q; ( i) *p = *q;  3.假设下列函数用来计算数组a中元素的和以及平均值，且数组a长度为n。avg和sum指向函数需要 修改的变量。但是，这个函数有几个错误，请找出这些错误并修改。  void avg_sum(double a[], int n, double *avg, double *sum)  {   int i;   sum = 0.0;   for (i = 0; i 
 
 ### 编程题
 
