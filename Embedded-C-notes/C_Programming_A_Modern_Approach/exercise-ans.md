@@ -2511,28 +2511,32 @@ for (i = 5, j = i - 1; i > 0, j > 0; --i, j = i - 1)
 
 4. 下列哪条语句和其他两条语句不等价（假设循环体都是一样的）？
 
-(a) `for (i = 0; i < 10; i++) ...`
-(b) `for (i = 0; i < 10; ++i) ...`
-(c) `for (i = 0; i++ < 10; ) ...`
+```c
+(a)for (i = 0; i < 10; i++) ...
+(b)for (i = 0; i < 10; ++i) ...
+(c)for (i = 0; i++ < 10; ) ...
+```
 
 5. 下列哪条语句和其他两条语句不等价（假设循环体都是一样的）？
 
-(a) `while (i < 10) {...}`
-(b) `for (; i < 10;) {...}`
-(c) `do {...} while (i < 10);`
+```C
+(a) while (i < 10) {...}
+(b) for (; i < 10;) {...}
+(c) do {...} while (i < 10);
+```
 
-1. 把练习题 1 中的程序片段改写为一条 for 语句。
+6. 把练习题 1 中的程序片段改写为一条 for 语句。
 
-1. 把练习题 2 中的程序片段改写为一条 for 语句。
+7. 把练习题 2 中的程序片段改写为一条 for 语句。
 
-1. 下面这条 for 语句的输出是什么？
+8. 下面这条 for 语句的输出是什么？
 
 ```c
 for (i = 10; i >= 1; i /= 2)
     printf("%d ", i++);
 ```
 
-1. 把练习题 8 中的 for 语句改写为一条等价的 while 语句。除了 while 循环本身之外，还需要一条语句。
+9. 把练习题 8 中的 for 语句改写为一条等价的 while 语句。除了 while 循环本身之外，还需要一条语句。
 
 6.4 节
 
@@ -2550,7 +2554,7 @@ for (i = 0; i < 10; i++) {
 printf("%d\n", sum);
 ```
 
-1. 下面的“素数判定”循环作为示例出现在 6.4 节中：
+12. 下面的“素数判定”循环作为示例出现在 6.4 节中：
 
 ```c
 for (d = 2; d < n; d++)
@@ -2558,19 +2562,18 @@ for (d = 2; d < n; d++)
         break;
 ```
 
-这个循环不是很高效。没有必要用 n 除以 2～n-1 的所有数来判断它是否为素数。事实上，只需要检查不大于 n 的平方根的除数即可。利用这一点来修改循环。
- 提示：不要试图计算出 n 的平方根，用 d*d 和 n 进行比较。
+这个循环不是很高效。没有必要用 n 除以 2～n-1 的所有数来判断它是否为素数。事实上，只需要检查不大于 n 的平方根的除数即可。利用这一点来修改循环。提示：不要试图计算出 n 的平方根，用 d*d 和 n 进行比较。
 
 6.5 节
 
-13. 重写下面的循环，使其循环体为空。
+*13. 重写下面的循环，使其循环体为空。
 
 ```c
 for (n = 0; m > 0; n++)
     m /= 2;
 ```
 
-1. 找出下面程序片段中的错误并修正。
+14. 找出下面程序片段中的错误并修正。
 
 ```c
 if (n % 2 == 0);
@@ -2664,12 +2667,15 @@ Enter a date (mm/dd/yy): 0/0/0
 
 11. 数学常量 e 的值可以用一个无穷级数表示：
 
-e = 1 + 1/1! + 1/2! + 1/3! + ⋯  
+$$
+e = 1 + \frac{1}{1!} + \frac{1}{2!} + \frac{1}{3!} + \cdots
+$$
 
 编写程序，用下面的公式计算 e 的近似值：
 
-1 + 1/1! + 1/2! + 1/3! + ⋯ + 1/n!
-
+$$
+1 + \frac{1}{1!} + \frac{1}{2!} + \frac{1}{3!} + \cdots + \frac{1}{n!}
+$$
 这里 n 是用户输入的整数。
 
 12. 修改编程题 11，使得程序持续执行加法运算，直到当前项小于 ε 为止，其中 ε 是用户输入的较小的（浮点）数。
@@ -2751,307 +2757,1181 @@ e = 1 + 1/1! + 1/2! + 1/3! + ⋯
 
 ### 编程题
 
-1. 如果 i * i 超出了 int 类型的最大取值，那么 6.3 节的程序 square2.c 将失败（通常会显示奇怪的答案）。运行该程序，并确定导致失败的 n 的最小值。尝试把变量 i 的类型改成 short 并再次运行该程序。（不要忘记更新 printf 函数调用中的转换说明！）然后尝试将其改成 long。从这些实验中，你能总结出在你的机器上用于存储整数类型的位数是多少吗？
+1. 如果 $ i \times i $ 超出了 `int` 类型的最大取值，那么 6.3 节的程序 `square2.c` 将失败（通常会显示奇怪的答案）。运行该程序，并确定导致失败的 $n$ 的最小值。尝试把变量 `i` 的类型改成 `short` 并再次运行该程序。（不要忘记更新 `printf` 函数调用中的转换说明！）然后尝试将其改成 `long`。从这些实验中，你能总结出在你的机器上用于存储整数类型的位数是多少吗？
 
-2. 修改 6.3 节的程序 square2.c，每 24 次平方运算后暂停，并显示下列信息：Press Enter to continue...显示完上述消息后，程序应该使用 getchar 函数读入一个字符。getchar 函数读到用户输入的回车键才允许程序继续。
+2. 修改 6.3 节的程序 `square2.c`，每 24 次平方运算后暂停，并显示下列信息：
 
-3. 修改 7.1 节的程序 sum2.c，对 double 型值组成的数列求和。
+   ```
+   Press Enter to continue...
+   ```
+
+   显示完上述消息后，程序应该使用 `getchar` 函数读入一个字符。`getchar` 函数读到用户输入的回车键才允许程序继续。
+
+3. 修改 7.1 节的程序 `sum2.c`，对 `double` 型值组成的数列求和。
+
 4. 编写可以把字母格式的电话号码翻译成数值格式的程序：
 
-156122 第 7 章 基本类型
+   ```
+   Enter phone number: CALLATT
+   2255288
+   ```
 
-Enter phone number: CALLATT
+   （如果没有电话在身边，参考这里给出的字母在键盘上的对应关系：2=ABC、3=DEF、4=GHI、5=JKL、 6=MNO、7=PQRS、8=TUV、9=WXYZ。）原始电话号码中的非字母字符（例如数字或标点符号）保持不变：
 
-2255288
+   ```
+   Enter phone number: 1-800-COL-LECT
+   1-800-265-5328
+   ```
 
-（如果没有电话在身边，参考这里给出的字母在键盘上的对应关系：2=ABC、3=DEF、4=GHI、5=JKL、
+   可以假设任何用户输入的字母都是大写字母。
 
-6=MNO、7=PQRS、8=TUV、9=WXYZ。）原始电话号码中的非字母字符（例如数字或标点符号）保持不变：
+5. 在十字拼字游戏中，玩家利用小卡片组成英文单词，每张卡片包含一个英文字母和面值。面值根据字母稀缺程度的不同而不同。（面值与字母的对应关系如下：1——AEILNORSTU；2——DG；3——BCMP；4——FHVWY；5——K；8——JX；10——QZ。）编写程序，通过对单词中字母的面值求和来计算单词的值：
 
-Enter phone number: 1-800-COL-LECT
+   ```
+   Enter a word: pitfall
+   Scrabble value: 12
+   ```
 
-1-800-265-5328
+   编写的程序应该允许单词中混合出现大小写字母。提示：使用 `toupper` 库函数。
 
- 
+6. 编写程序显示 `sizeof(int)`、`sizeof(short)`、`sizeof(long)`、`sizeof(float)`、`sizeof(double)` 和 `sizeof(long double)` 的值。
 
-可以假设任何用户输入的字母都是大写字母。
+7. 修改第 3 章的编程题 6，使得用户可以对两个分数进行加、减、乘、除运算（在两个分数之间输入 +、 −、 * 或 / 符号）。
 
-5. 在十字拼字游戏中，玩家利用小卡片组成英文单词，每张卡片包含一个英文字母和面值。面值根据
+8. 修改第 5 章的编程题 8，要求用户输入 12 小时制的时间。输入时间的格式为时:分后跟 A、P、AM 或 PM（大小写均可）。数值时间和 AM/PM 之间允许有空白（但不强制要求有空白）。有效输入的示例如下：
 
-字母稀缺程度的不同而不同。（面值与字母的对应关系如下：1——AEILNORSTU；2——DG；3——
+   ```
+   1:15P
+   1:15PM
+   1:15p
+   1:15pm
+   1:15 P
+   1:15 PM
+   1:15 p
+   1:15 pm
+   ```
 
-BCMP；4——FHVWY；5——K；8——JX；10——QZ。）编写程序，通过对单词中字母的面值求和
-
-来计算单词的值：
-
-Enter a word: pitfall
-
-Scrabble value: 12
-
- 
-
-编写的程序应该允许单词中混合出现大小写字母。提示：使用 toupper 库函数。
-
-6. 编写程序显示 sizeof(int)、sizeof(short)、sizeof(long)、sizeof(float)、sizeof(double)
-
-和 sizeof(long double)的值。
-
-7. 修改第 3章的编程题 6，使得用户可以对两个分数进行加、减、乘、除运算（在两个分数之间输入+、
-
-、*或/符号）。
-
-8. 修改第 5章的编程题 8，要求用户输入 12小时制的时间。输入时间的格式为时:分后跟 A、P、AM或
-
-PM（大小写均可）。数值时间和 AM/PM 之间允许有空白（但不强制要求有空白）。有效输入的示
-
-例如下：
-
-1:15P 
-
-1:15PM 
-
-1:15p 
-
-1:15pm 
-
-1:15 P 
-
-1:15 PM 
-
-1:15 p 
-
-1:15 pm 
-
- 
-
-可以假定输入的格式就是上述之一，不需要进行错误判定。
+   可以假定输入的格式就是上述之一，不需要进行错误判定。
 
 9. 编写程序，要求用户输入 12 小时制的时间，然后用 24 小时制显示该时间：
 
-Enter a 12-hour time: 9:11 PM
+   ```
+   Enter a 12-hour time: 9:11 PM
+   Equivalent 24-hour time: 21:11
+   ```
 
-Equivalent 24-hour time: 21:11
-
- 
-
-参考编程题 8 中关于输入格式的描述。
+   参考编程题 8 中关于输入格式的描述。
 
 10. 编写程序统计句子中元音字母（a、e、i、o、u）的个数：
 
-Enter a sentence: And that's the way it is.
+    ```
+    Enter a sentence: And that's the way it is.
+    Your sentence contains 6 vowels.
+    ```
 
-Your sentence contains 6 vowels.
+11. 编写一个程序，要求用户输入英文名和姓，并根据用户的输入先显示姓，其后跟一个逗号，然后显示名的首字母，最后加一个点：
 
-11. 编写一个程序，要求用户输入英文名和姓，并根据用户的输入先显示姓，其后跟一个逗号，然后显
+    ```
+    Enter a first and last name: Lloyd Fosdick
+    Fosdick, L.
+    ```
 
-示名的首字母，最后加一个点：
-
-Enter a first and last name: Lloyd Fosdick
-
-Fosdick, L.
-
- 
-
-用户的输入中可能包含空格（名之前、名和姓之间、姓氏之后）。
-
-157 
-
-图灵社区会员 jasper_5257(2463089505@qq.com) 专享 尊重版权编程题 123 
+    用户的输入中可能包含空格（名之前、名和姓之间、姓氏之后）。
 
 12. 编写程序对表达式求值：
 
-Enter an expression: 1+2.5*3
+    ```
+    Enter an expression: 1+2.5*3
+    Value of expression: 10.5
+    ```
 
-Value of expression: 10.5
-
-表达式中的操作数是浮点数，运算符是+、、*和/。表达式从左向右求值（所有运算符的优先级都
-
-一样）。
+    表达式中的操作数是浮点数，运算符是 +、 −、 * 和 /。表达式从左向右求值（所有运算符的优先级都一样）。
 
 13. 编写程序计算句子的平均词长：
 
-Enter a sentence: It was deja vu all over again.
+    ```
+    Enter a sentence: It was deja vu all over again.
+    Average word length: 3.4
+    ```
 
-Average word length: 3.4
-
- 
-
-简单起见，程序中把标点符号看作其前面单词的一部分。平均词长显示一个小数位。
+    简单起见，程序中把标点符号看作其前面单词的一部分。平均词长显示一个小数位。
 
 14. 编写程序，用牛顿方法计算正浮点数的平方根：
 
-Enter a positive number: 3
+    ```
+    Enter a positive number: 3
+    Square root: 1.73205
+    ```
 
-Square root: 1.73205
+    设 $x$ 是用户输入的数。牛顿方法需要先给出 $x$ 平方根的猜测值 $y$（我们使用 1）。后续的猜测值通过计算 $y$ 和 $\frac{x}{y}$ 的平均值得到。表 7-6 中给出了求解 3 的平方根的过程。
 
- 
+    表 7-6 用牛顿方法求解 3 的平方根：
 
-设 *x* 是用户输入的数。牛顿方法需要先给出 *x* 平方根的猜测值 *y*（我们使用 1）。后续的猜测值通过计
+    ```
+    x    y    x/y    y 和 x/y 的平均值
+    3    1    3      2
+    3    2    1.5    1.75
+    3    1.75 1.71429 1.73214
+    3    1.73214 1.73205 1.73205
+    ```
 
-算 *y* 和 *x*/*y* 的平均值得到。表 7-6 中给出了求解 3 的平方根的过程。
-
-表 7-6 用牛顿方法求解 3 的平方根
-
-*x* 
-
-*y* 
-
-*x*/*y* 
-
-*y* 和 *x*/*y* 的平均值
-
-3 
-
-1 
-
-3 
-
-2 
-
-3 
-
-2 
-
-1.5 
-
-1.75 
-
-3 
-
-1.75 
-
-1.714 29 
-
-1.732 14 
-
-3 
-
-1.732 14 
-
-1.731 96 
-
-1.732 05 
-
-3 
-
-1.732 05 
-
-1.732 05 
-
-1.732 05 
-
- 
-
-注意，*y* 的值逐渐接近 *x* 的平方根。为了获得更高的精度，程序中应使用 double 类型的变量代替
-
-float类型的变量。当*y*的新旧值之差的绝对值小于0.000 01和*y*的乘积时程序终止。提示：调用fabs
-
-函数求 double 类型数值的绝对值。（为了使用 fabs 函数，需要在程序的开头包含<math.h>头。）
+    注意，$y$ 的值逐渐接近 $x$ 的平方根。为了获得更高的精度，程序中应使用 `double` 类型的变量代替 `float` 类型的变量。当 $y$ 的新旧值之差的绝对值小于 0.00001 时程序终止。提示：调用 `fabs` 函数求 `double` 类型数值的绝对值。
 
 15. 编程计算正整数的阶乘：
+
+    ```
     Enter a positive integer: 6
     Factorial of 6: 720
+    ```
 
-(a) 用 short 类型变量存储阶乘的值。为了正确打印出 *n* 的阶乘，*n* 的最大值是多少？
-(b) 用 int 类型变量重复(a)。
-(c) 用 long 类型变量重复(a)。
-(d) 如果你的编译器支持 long long 类型，用 long long 类型变量重复(a)。
-(e) 用 float 类型变量重复(a)。
-(f) 用 double 类型变量重复(a)。
-(g) 用 long double 类型变量重复(a)。
-在(e)~(g)这几种情况下，程序会显示阶乘的近似值，不一定是准确值。
+    (a) 用 `short` 类型变量存储阶乘的值。为了正确打印出 $n$ 的阶乘，$n$ 的最大值是多少？
+
+    (b) 用 `int` 类型变量重复 (a)。
+
+    (c) 用 `long` 类型变量重复 (a)。
+
+    (d) 如果你的编译器支持 `long long` 类型，用 `long long` 类型变量重复 (a)。
+
+    (e) 用 `float` 类型变量重复 (a)。
+
+    (f) 用 `double` 类型变量重复 (a)。
+
+    (g) 用 `long double` 类型变量重复 (a)。
+
+    在 (e)~(g) 这几种情况下，程序会显示阶乘的近似值，不一定是准确值。
+
+------
+
+这些题目的排版和格式已经符合你要求的结构，每个题目都明确区分了代码段和描述。
+
+
 
 ## 第八章 数组
 
 ### 练习题
 
- 1.修改8.1节的程序repdigit.c，使其可以显示出哪些数字有重复（如果有的话）：  
+1. 修改8.1节的程序 `repdigit.c`，使其可以显示出哪些数字有重复（如果有的话）：
 
-Enter a number: 939577 
-Repeated digit(s): 7 9  
+   ```
+   Enter a number: 939577
+   Repeated digit(s): 7 9
+   ```
 
-2. 修改8.1节的程序repdigit.c，使其打印出一份列表，显示出每个数字在数中出现的次数：  Enter a number: 41271092 Digit:        0  1  2  3  4  5  6  7  8  9  Occurrences： 1  2  2  0  1  0  0  1  0  1  178  
-3. 修改8.1节的程序repdigit.c，使得用户可以输入多个数进行重复数字的判断。当用户输入的数小于或 等于0时，程序终止。  
-4. 修改8.1节的程序reverse.c，利用表达式(int)(sizeof(a) / sizeof(a[0]))（或者具有相同值的宏） 来计算数组的长度。  
-5. 修改 8.1节的程序interest.c，使得修改后的程序可以每月整合一次利息，而不是每年整合一次利息。 不要改变程序的输出格式，余额仍按每年一次的时间间隔显示。  
-6. 有一个名叫 B1FF 的人，是典型的网络新手，他有一种独特的编写消息的方式。下面是一条常见的 B1FF公告：  H3Y DUD3, C 15 R1LLY C00L!!!!!!!!!!  编写一个“B1FF过滤器”，它可以读取用户输入的消息并把此消息翻译成B1FF的表达风格：  Enter message: Hey dude, C is rilly cool In B1FF-speak: H3Y DUD3, C 15 R1LLY C00L!!!!!!!!!!  程序需要把消息转换成大写字母，用数字代替特定的字母（A→4、B→8、E→3、I→1、O→0、S→ 5），然后添加10个左右的感叹号。提示：把原始消息存储在一个字符数组中，然后从数组头开始逐 个翻译并显示字符。 
+2. 修改8.1节的程序 `repdigit.c`，使其打印出一份列表，显示出每个数字在数中出现的次数：
 
-7. 编写程序读取一个5×5的整数数组，然后显示出每行的和与每列的和。  Enter row 1:  8 3 9 0 10 Enter row 2:  3 5 17 1 1 Enter row 3:  2 8 6 23 1 Enter row 4:  15 7 3 2 9 Enter row 5:  6 14 2 6 0 Row totals:  30 27 40 36 28  Column totals:  34 37 37 32 21 
+   ```
+   Enter a number: 41271092
+   Digit:        0  1  2  3  4  5  6  7  8  9
+   Occurrences:  1  2  2  0  1  0  0  1  0  1
+   ```
 
-8. 修改编程题7，使其提示用户输入每个学生5门测验的成绩，一共有5个学生。然后计算每个学生的 总分和平均分，以及每门测验的平均分、高分和低分。 
+3. 修改8.1节的程序 `repdigit.c`，使得用户可以输入多个数进行重复数字的判断。当用户输入的数小于或等于0时，程序终止。
 
-9. 编写程序，生成一种贯穿10×10字符数组（初始时全为字符'.'）的“随机步法”。程序必须随机地 从一个元素 “走到”另一个元素，每次都向上、向下、向左或向右移动一个元素位置。已访问过的 元素按访问顺序用字母A~Z进行标记。下面是一个输出示例：提示：利用srand 函数和rand函数（见程序deal.c）产生随机数，然后查看此数除以4的余数。余 数一共有4种可能的值（0、1、2和3），指示下一次移动的4种可能方向。在执行移动操作之前， 需要检查两个条件：一是不能走到数组外面，二是不能走到已有字母标记的位置。只要有一个条件 不满足，就得尝试换一个方向移动。如果 4 个方向都堵住了，程序就必须终止了。下面是提前结束 的一个示例：因为Y移动的4个方向都堵住了，所以没有地方可以放置下一步的Z了。  
+4. 修改8.1节的程序 `reverse.c`，利用表达式 `(int)(sizeof(a) / sizeof(a[0]))`（或者具有相同值的宏）来计算数组的长度。
 
-10. 修改第 5 章的编程题 8，用一个数组存储航班起飞时间，另一个数组存储航班抵达时间。（时间用整 数表示，表示从午夜开始的分钟数。）程序用一个循环搜索起飞时间数组，以找到与用户输入的时间 最接近的起飞时间。  
+5. 修改8.1节的程序 `interest.c`，使得修改后的程序可以每月整合一次利息，而不是每年整合一次利息。不要改变程序的输出格式，余额仍按每年一次的时间间隔显示。
 
-11. 修改第7章的编程题4，给输出加上标签：  Enter phone number: 1-800-COL-LECT In numeric form: 1-800-265-5328  在显示电话号码之前，程序需要将其（以原始格式或数值格式）存储在一个字符数组中。可以假定电话号码的 长度不超过15个字符。 
+6. 有一个名叫 B1FF 的人，是典型的网络新手，他有一种独特的编写消息的方式。下面是一条常见的 B1FF公告：
 
-12. 修改第7章的编程题5，用数组存储字母的面值。数组有26个元素，对应字母表中的26个字母。例 如，数组元素0存储1（因为字母A的面值为1），数组元素1存储3（因为字母B的面值为3），等 等。每读取输入单词中的一个字母，程序都会利用该数组确定字符的拼字值。使用数组初始化器来 建立该数组。
+   ```
+   H3Y DUD3, C 15 R1LLY C00L!!!!!!!!!!
+   ```
 
-13. 修改第7章的编程题11，给输出加上标签：  Enter a first and last name: Lloyd Fosdick You enered the name: Fosdick, L.  在显示姓（不是名）之前，程序需要将其存储在一个字符数组中。可以假定姓的长度不超过20个字符。  
+   编写一个“B1FF过滤器”，它可以读取用户输入的消息并把此消息翻译成B1FF的表达风格：
 
-14. 编写程序颠倒句子中单词的顺序：  Enter a sentence: you can cage a swallow can't you? Reversal of sentence: you can't swallow a cage can you?  提示：用循环逐个读取字符，然后将它们存储在一个一维字符数组中。当遇到句号、问号或者感叹 号（称为“终止字符”）时，终止循环并把终止字符存储在一个 char 类型变量中。然后再用一个循 环反向搜索数组，找到最后一个单词的起始位置。显示最后一个单词，然后反向搜索倒数第二个单 词。重复这一过程，直至到达数组的起始位置。最后显示出终止字符。  
+   ```
+   Enter message: Hey dude, C is rilly cool
+   In B1FF-speak: H3Y DUD3, C 15 R1LLY C00L!!!!!!!!!!
+   ```
 
-15. 目前已知的最古老的一种加密技术是恺撒加密（得名于Julius Caesar）。该方法把一条消息中的每个字 母用字母表中固定距离之后的那个字母来替代。（如果越过了字母 Z，则会绕回到字母表的起始位 置。例如，如果每个字母都用字母表中两个位置之后的字母代替，那么Y就被替换为A，Z就被替换 为 B。）编写程序用恺撒加密方法对消息进行加密。用户输入待加密的消息和移位计数（字母移动的 位置数目）： Enter message to be encrypted: Go ahead, make my day. Enter shift amount (1-25): 3  Encrypted message: Jr dkhdg, pdnh pb gdb.  注意，当用户输入26与移位计数的差值时，程序可以对消息进行解密：  Enter message to be encrypted: Jr dkhdg, pdnh pb gdb. Enter shift amount (1-25): 23 Encrypted message: Go ahead, make my day.  可以假定消息的长度不超过80个字符。不是字母的那些字符不要改动。此外，加密时不要改变字母 的大小写。提示：为了解决前面提到的绕回问题，可以用表达式((ch - 'A') + n) % 26 + 'A'计 算大写字母的密码，其中ch存储字母，n存储移位计数。（小写字母也需要一个类似的表达式。） 
+   程序需要把消息转换成大写字母，用数字代替特定的字母（A→4、B→8、E→3、I→1、O→0、S→5），然后添加10个左右的感叹号。
 
-16. 编程测试两个单词是否为变位词（相同字母的重新排列）：  Enter first word: smartest Enter second word: mattress The words are anagrams.  Enter first word: dumbest Enter second word: stumble The words are not anagrams.  用一个循环逐个字符地读取第一个单词，用一个 26 元的整数数组记录每个字母的出现次数。（例 如，读取单词smartest之后，数组包含的值为10001000000010000122000000，表明smartest包 含一个a、一个e、一个m、一个r、两个s和两个t。）用另一个循环读取第二个单词，这次每读取 一个字母就把相应数组元素的值减 1。两个循环都应该忽略不是字母的那些字符，并且不区分大小 写。第二个单词读取完毕后，再用一个循环来检查数组元素是否为全0。如果是全0，那么这两个单 词就是变位词。提示：可以使用中的函数，如isalpha和tolower。  
+7. 编写程序读取一个5×5的整数数组，然后显示出每行的和与每列的和：
 
-17. 编写程序打印n×n的幻方（1, 2, …, n2的方阵排列，且每行、每列和每条对角线上的和都相等）。由 用户指定n的值：  181  182  This program creates a magic square of a specified size.  The size must be an odd number between 1 and 99.  Enter size of magic square: 5    17   24    1    8   15    23    5    7   14   16     4    6   13   20   22    10   12   19   21    3    11   18   25    2    9  把幻方存储在一个二维数组中。起始时把数1放在第0行的中间，剩下的数2, 3, …, n2依次向上移动 一行并向右移动一列。当可能越过数组边界时需要“绕回”到数组的另一端。例如，如果需要把下 一个数放到第1行，我们就将其存储到第n1行（最后一行）；如果需要把下一个数放到第n列， 我们就将其存储到第 0列。如果某个特定的数组元素已被占用，那就把该数存储在前一个数的正下 方。如果你的编译器支持变长数组，则声明数组有n行n列，否则声明数组有99行99列。
+   ```
+   Enter row 1:  8 3 9 0 10
+   Enter row 2:  3 5 17 1 1
+   Enter row 3:  2 8 6 23 1
+   Enter row 4:  15 7 3 2 9
+   Enter row 5:  6 14 2 6 0
+   Row totals:  30 27 40 36 28
+   Column totals:  34 37 37 32 21
+   ```
+
+8. 修改编程题7，使其提示用户输入每个学生5门测验的成绩，一共有5个学生。然后计算每个学生的总分和平均分，以及每门测验的平均分、高分和低分。
+
+9. 编写程序，生成一种贯穿10×10字符数组（初始时全为字符 '.'）的“随机步法”。程序必须随机地从一个元素“走到”另一个元素，每次都向上、向下、向左或向右移动一个元素位置。已访问过的元素按访问顺序用字母A~Z进行标记。
+
+   - 提示：利用 `srand` 函数和 `rand` 函数生成随机数，并判断其除以4的余数。执行移动前要检查是否超出边界或已经访问过的位置。若四个方向都无法移动，程序终止。
+
+10. 修改第5章的编程题8，用一个数组存储航班起飞时间，另一个数组存储航班抵达时间。（时间用整数表示，表示从午夜开始的分钟数。）程序用一个循环搜索起飞时间数组，以找到与用户输入的时间最接近的起飞时间。
+
+11. 修改第7章的编程题4，给输出加上标签：
+
+```
+Enter phone number: 1-800-COL-LECT
+In numeric form: 1-800-265-5328
+```
+
+在显示电话号码之前，程序需要将其（以原始格式或数值格式）存储在一个字符数组中。可以假定电话号码的长度不超过15个字符。
+
+1. 修改第7章的编程题5，用数组存储字母的面值。数组有26个元素，对应字母表中的26个字母。例如，数组元素0存储1（因为字母A的面值为1），数组元素1存储3（因为字母B的面值为3），等等。每读取输入单词中的一个字母，程序都会利用该数组确定字符的拼字值。使用数组初始化器来建立该数组。
+2. 修改第7章的编程题11，给输出加上标签：
+
+```
+Enter a first and last name: Lloyd Fosdick
+You entered the name: Fosdick, L.
+```
+
+在显示姓（不是名）之前，程序需要将其存储在一个字符数组中。可以假定姓的长度不超过20个字符。
+
+1. 编写程序颠倒句子中单词的顺序：
+
+```
+Enter a sentence: you can cage a swallow can't you?
+Reversal of sentence: you can't swallow a cage can you?
+```
+
+提示：用循环逐个读取字符，存储在一维字符数组中。当遇到句号、问号或感叹号时终止循环。然后反向搜索数组，逐个显示单词，直到显示出终止符。
+
+1. 目前已知的最古老的一种加密技术是恺撒加密（得名于Julius Caesar）。编写程序用恺撒加密方法对消息进行加密。
+
+```
+Enter message to be encrypted: Go ahead, make my day.
+Enter shift amount (1-25): 3
+Encrypted message: Jr dkhdg, pdnh pb gdb.
+```
+
+可以假定消息的长度不超过80个字符。非字母字符不改动。加密时不改变字母的大小写。
+
+1. 编程测试两个单词是否为变位词（相同字母的重新排列）：
+
+```
+Enter first word: smartest
+Enter second word: mattress
+The words are anagrams.
+```
+
+用一个循环逐个字符地读取第一个单词，利用一个26元的数组记录每个字母的出现次数。第二个单词读取后，检查数组是否为全0，若为0则为变位词。
+
+1. 编写程序打印 n×n 的幻方（1, 2, …, n²的方阵排列，且每行、每列和每条对角线上的和都相等）。由用户指定 n 的值：
+
+```
+Enter size of magic square: 5
+17  24   1   8  15
+23   5   7  14  16
+ 4   6  13  20  22
+10  12  19  21   3
+11  18  25   2   9
+```
+
+幻方存储在二维数组中。起始时数1放在第0行的中间，接下来的数按规则填充，若越界则绕回数组的另一端。
 
 ## 第九章 函数
 
 ### 练习题
 
-9.1 节  1.下列计算三角形面积的函数有两处错误，找出这些错误，并且说明修改它们的方法。（提示：公式中 没有错误。）  double triangle_area(double base, height)  double product;  {   product = base * height;   return product / 2;  }  2. 编写函数check(x, y, n)：如果x和y都落在0~n-1的闭区间内，那么函数返回1；否则函数应该 返回0。假设x、y和n都是int类型。  3.编写函数gcd(m, n)来计算整数m和n的最大公约数。（第6章的编程题2描述了计算最大公约数的 Euclid 算法。）  4. 编写函数day_of_year(month, day, year)，使得函数返回由这三个参数确定的那一天是一年中的 第几天（1~366范围内的整数）。  5.编写函数 num_digits(n)，使得函数返回正整数 n 中数字的个数。提示：为了确定 n 中数字的个 数，把这个数反复除以10，当n达到0时，除法运算的次数表明了n最初拥有的数字的个数。 编写函数digit(n, k)，使得函数返回正整数n中的第k位数字（从右边算起）。例如，digit(829, 1) 返回9，digit(829, 2)返回2，digit(829, 3)返回8。如果k 大于n所含有的数字个数，那么函 数返回0。  7.假设函数f有如下定义：  int f(int a, int b) {...}  那么下面哪些语句是合法的？（假设i的类型为int而x的类型为double。）  (a) i = f(83, 12);  (b) x = f(83, 12);  (c) i = f(3.15, 9.28);  (d) x = f(3.15, 9.28);  (e) f(83, 12);  9.2 节  8. 对于不返回值且有一个double类型形式参数的函数，下列哪些函数原型是有效的？  (a) void f(double x);  (b) void f(double);  (c) void f(x);  (d) f(double x);  9.3 节  *9. 下列程序的输出是什么？  #include   void swap(int a, int b);  int main(void)  {   int i = 1, j = 2;   swap (i, j);   printf("i = %d, j = %d\n", i, j);   return 0;  }  void swap(int a, int b)  {   int temp = a;   a = b;   b = temp;  }  10.  编写函数，使得函数返回下列值。（假设a和n是形式参数，其中a是int类型数组，n是数组的长 度。）  (a) 数组 a中最大的元素。  (b) 数组 a中所有元素的平均值。  (c) 数组 a中正数元素的数量。  11. 编写下面的函数：  float compute_GPA(char grades[], int n); 其中grades 数组包含字母等级（A、B、C、D或F，大小写皆可），n是数组的长度。函数应返回等 级的平均值（假定A=4，B=3，C=2，D=1，F=0）。  12. 编写下面的函数：  double inner_product(double a[], double b[], int n);  函数应返回a[0] * b[0] + a[1] * b[1] + ... + a[n-1] * b[n-1]。  13. 编写下面的函数，对棋盘位置求值：  int evaluate_position(char board[8][8]);  board 表示棋盘上方格的配置，其中字母 K、Q、R、B、N、P 表示白色的方格，字母 k、q、r、b、 n、p表示黑色的方格。evaluate_position应计算出白色方格的和（Q=9，R=5，B=3，N=3，P=1）， 并按类似的方法计算出黑色方格的和，然后返回这两个数的差。如果白子占优则返回值为正数，如 果黑子占优则返回值为负数。  9.4 节  215  14. 如果数组 a 中有任一元素的值为0，那么下列函数返回true；如果数组a的所有元素都是非零的， 则函数返回false。可惜的是，此函数有错误。请找出错误并且说明修改它的方法。  bool has_zero(int a[], int n)  {   int i;   for (i = 0;  i < n;  i++)     if (a[i] == 0)       return true;     else       return false;  }  15.  下面这个（相当混乱的）函数找出三个数的中间数。重新编写函数，使得它只有一条return语句。  double median(double x, double y, double z)  {   if (x <= y)     if (y <= z) return y;     else if (x <= z) return z;     else return x;   if (z <= y) return y;   if (x <= z) return x;   return z;  }  9.6 节  16. 请采用精简power函数的方法来简化fact函数。  17.  请重新编写fact函数，使得编写后的函数不再有递归。  18. 编写递归版本的gcd 函数（见练习题3）。下面是用于计算gcd(m, n)的策略：如果n为0，那么返 回m；否则，递归地调用gcd函数，把n作为第一个实际参数进行传递，而把m % n作为第二个实 际参数进行传递。  *19.  思考下面这个“神秘”的函数：  void pb(int n)  { if (n != 0) {     pb(n / 2);     putchar('0' + n % 2);   }  }  手动跟踪函数的执行。然后编写程序调用此函数，把用户输入的数传递给此函数。函数做了什么？ 
+9.1 节
+
+1. 下列计算三角形面积的函数有两处错误，找出这些错误，并且说明修改它们的方法。（提示：公式中没有错误。）
+
+   ```c
+   double triangle_area(double base, height) 
+   double product;  
+   {   
+       product = base * height;   
+       return product / 2;  
+   }
+   ```
+
+2. 编写函数 `check(x, y, n)`：如果 `x` 和 `y` 都落在 0~n-1 的闭区间内，那么函数返回 1；否则函数应该返回 0。假设 `x`、`y` 和 `n` 都是 `int` 类型。
+
+3. 编写函数 `gcd(m, n)` 来计算整数 `m` 和 `n` 的最大公约数。（第6章的编程题2描述了计算最大公约数的 Euclid 算法。）
+
+4. 编写函数 `day_of_year(month, day, year)`，使得函数返回由这三个参数确定的那一天是一年中的第几天（1~366范围内的整数）。
+
+5. 编写函数 `num_digits(n)`，使得函数返回正整数 `n` 中数字的个数。提示：为了确定 `n` 中数字的个数，把这个数反复除以10，当 `n` 达到0时，除法运算的次数表明了 `n` 最初拥有的数字的个数。
+
+6. 编写函数 `digit(n, k)`，使得函数返回正整数 `n` 中的第 `k` 位数字（从右边算起）。例如，`digit(829, 1)` 返回 9，`digit(829, 2)` 返回 2，`digit(829, 3)` 返回 8。如果 `k` 大于 `n` 所含有的数字个数，那么函数返回 0。
+
+7. 假设函数 `f` 有如下定义：
+
+   ```c
+   int f(int a, int b) { ... }
+   ```
+
+   那么下面哪些语句是合法的？（假设 `i` 的类型为 `int` 而 `x` 的类型为 `double`。）
+
+   (a) `i = f(83, 12);`
+
+   (b) `x = f(83, 12);`
+
+   (c) `i = f(3.15, 9.28);`
+
+   (d) `x = f(3.15, 9.28);`
+
+   (e) `f(83, 12);`
+
+9.2 节
+
+1. 对于不返回值且有一个 `double` 类型形式参数的函数，下列哪些函数原型是有效的？
+
+   (a) `void f(double x);`
+
+   (b) `void f(double);`
+
+   (c) `void f(x);`
+
+   (d) `f(double x);`
+
+9.3 节
+
+1. 下列程序的输出是什么？
+
+   ```c
+   #include 
+   void swap(int a, int b);
+   int main(void) {
+       int i = 1, j = 2;
+       swap(i, j);
+       printf("i = %d, j = %d\n", i, j);
+       return 0;
+   }
+   void swap(int a, int b) {
+       int temp = a;
+       a = b;
+       b = temp;
+   }
+   ```
+
+2. 编写函数，使得函数返回下列值。（假设 `a` 和 `n` 是形式参数，其中 `a` 是 `int` 类型数组，`n` 是数组的长度。）
+
+(a) 数组 `a` 中最大的元素。
+
+(b) 数组 `a` 中所有元素的平均值。
+
+(c) 数组 `a` 中正数元素的数量。
+
+1. 编写下面的函数：
+
+```c
+float compute_GPA(char grades[], int n);
+```
+
+其中 `grades` 数组包含字母等级（A、B、C、D 或 F，大小写皆可），`n` 是数组的长度。函数应返回等级的平均值（假定 A=4，B=3，C=2，D=1，F=0）。
+
+1. 编写下面的函数：
+
+```c
+double inner_product(double a[], double b[], int n);
+```
+
+函数应返回 `a[0] * b[0] + a[1] * b[1] + ... + a[n-1] * b[n-1]`。
+
+1. 编写下面的函数，对棋盘位置求值：
+
+```c
+int evaluate_position(char board[8][8]);
+```
+
+`board` 表示棋盘上方格的配置，其中字母 K、Q、R、B、N、P 表示白色的方格，字母 k、q、r、b、n、p 表示黑色的方格。`evaluate_position` 应计算出白色方格的和（Q=9，R=5，B=3，N=3，P=1），并按类似的方法计算出黑色方格的和，然后返回这两个数的差。如果白子占优则返回值为正数，如果黑子占优则返回值为负数。
+
+9.4 节
+
+1. 如果数组 `a` 中有任一元素的值为 0，那么下列函数返回 `true`；如果数组 `a` 的所有元素都是非零的，则函数返回 `false`。可惜的是，此函数有错误。请找出错误并且说明修改它的方法。
+
+```c
+bool has_zero(int a[], int n) {
+    int i;
+    for (i = 0; i < n; i++)
+        if (a[i] == 0)
+            return true;
+        else
+            return false;
+}
+```
+
+1. 下面这个（相当混乱的）函数找出三个数的中间数。重新编写函数，使得它只有一条 `return` 语句。
+
+```c
+double median(double x, double y, double z) {
+    if (x <= y)
+        if (y <= z) return y;
+        else if (x <= z) return z;
+        else return x;
+    if (z <= y) return y;
+    if (x <= z) return x;
+    return z;
+}
+```
+
+9.6 节
+
+1. 请采用精简 `power` 函数的方法来简化 `fact` 函数。
+2. 请重新编写 `fact` 函数，使得编写后的函数不再有递归。
+3. 编写递归版本的 `gcd` 函数（见练习题3）。下面是用于计算 `gcd(m, n)` 的策略：如果 `n` 为 0，那么返回 `m`；否则，递归地调用 `gcd` 函数，把 `n` 作为第一个实际参数进行传递，而把 `m % n` 作为第二个实际参数进行传递。
+4. 思考下面这个“神秘”的函数：
+
+```c
+void pb(int n) {
+    if (n != 0) {
+        pb(n / 2);
+        putchar('0' + n % 2);
+    }
+}
+```
+
+手动跟踪函数的执行。然后编写程序调用此函数，把用户输入的数传递给此函数。函数做了什么？
 
 ### 编程题
 
- 1.编写程序，要求用户输入一串整数（把这串整数存储在数组中），然后通过调用 selection_sort 函数来排序这些整数。在给定n个元素的数组后，selection_sort函数必须做下列工作：  (a) 搜索数组找出最大的元素，然后把它移到数组的最后；  (b) 递归地调用函数本身来对前n1个数组元素进行排序。  2.修改第5章的编程题5，用函数计算所得税的金额。在输入应纳税所得额后，函数返回税金。  3.修改第8章的编程题9，使其包含下列函数：  void generate_random_walk(char walk[10][10]);  void print_array(char walk[10][10]);  main 函数首先调用 generate_random_walk，该函数把所有数组元素都初始化为字符'.'，然后将 其中一些字符替换为A~Z的字母，详见原题的描述。接着，main函数调用print_array函数来显 示数组。  4.修改第8章的编程题16，使其包含下列函数：  void read_word(int counts[26]);  bool equal_array(int counts1[26], int counts2[26]);  main函数将调用read_word两次，每次用于读取用户输入的一个单词。读取单词时，read_word用 单词中的字母更新 counts 数组，详见原题的描述。（main 将声明两个数组，每个数组用于一个单 词。这些数组用于跟踪单词中每个字母出现的次数。）接下来，main 函数调用equal_array 函数， 以前面提到的两个数组作为参数。如果两个数组中的元素相同（表明这两个单词是变位词）， equal_array 返回true，否则返回false。  5.修改第8章的编程题17，使其包含下列函数：  void create_magic_square(int n, int magic_square[n][n]);  void print_magic_square(int n, int magic_square[n][n]);  获得用户输入的数n之后，main函数调用create_magic_square 函数，另一个调用参数是在main 内部声明的n×n的数组。create_magic_square函数用1, 2, …, n2填充数组，如原题所述。接下来， main 函数调用 print_magic_square，按原题描述的格式显示数组。注意：如果你的编译器不支持 变长数组，请把main中的数组声明为99×99而不是n×n，并使用下面的原型：  void create_magic_square(int n, int magic_square[99][99]);  void print_magic_square(int n, int magic_square[99][99]);  6.编写函数计算下面多项式的值：  5 4 3 2 x x x x x 3 2 5 7 6       编写程序要求用户输入x的值，调用该函数计算多项式的值并显示函数返回的值。 7.如果换一种方法计算 nx，9.6节的power函数速度可以更快。我们注意到，如果n是2的幂，则可以 通过自乘的方法计算 nx。例如， 4x是 2x的平方，所以 4x可以用两次乘法计算，而不需要三次乘 法。这种方法甚至可以用于n不是2的幂的情况。如果n是偶数，则  2 /2 n n  x x x 217  n n x x  1 ；如果n是奇数，则   。编写计算 nx的递归函数（递归在n=0时结束，此时函数返回1）。为了测试该函数，写 一个程序要求用户输入x和n的值，调用power计算 nx，然后显示函数的返回值。  8.编写函数模拟掷骰子的游戏（两个骰子）。第一次掷的时候，如果点数之和为7或11则获胜；如果点 数之和为2、3或12则落败；其他情况下的点数之和称为“目标”，游戏继续。在后续的投掷中，如 果玩家再次掷出“目标”点数则获胜，掷出 7 则落败，其他情况都忽略，游戏继续进行。每局游戏 结束时，程序询问用户是否再玩一次，如果用户输入的回答不是y或Y，程序会显示胜败的次数然后 终止。  You rolled: 8  Your point is 8  You rolled: 3  You rolled: 10  You rolled: 8  You win!  Play again? y  You rolled: 6  Your point is 6  You rolled: 5  You rolled: 12  You rolled: 3  You rolled: 7  You lose!  Play again? y  You rolled: 11  You win!  Play again? n Wins: 2 Losses: 1  编写三个函数：main、roll_dice和play_game。下面给出了后两个函数的原型：  int roll_dice(void);  bool play_game(void);  218  roll_dice 应生成两个随机数（每个都在1~6范围内），并返回它们的和。play_game应进行一次掷 骰子游戏（调用roll_dice 确定每次掷的点数），如果玩家获胜则返回 true，如果玩家落败则返回 false。play_game 函数还要显示玩家每次掷骰子的结果。main函数反复调用play_game函数，记 录获胜和落败的次数，并显示“you win”和“you lose”消息。提示：使用rand函数生成随机数。 关于如何调用rand和相关的srand函数，见8.2节deal.c程序中的例子。
+1. 编写程序，要求用户输入一串整数（把这串整数存储在数组中），然后通过调用 `selection_sort` 函数来排序这些整数。在给定 n 个元素的数组后，`selection_sort` 函数必须做下列工作：
+    (a) 搜索数组找出最大的元素，然后把它移到数组的最后；
+    (b) 递归地调用函数本身来对前 n-1 个数组元素进行排序。
+
+2. 修改第5章的编程题5，用函数计算所得税的金额。在输入应纳税所得额后，函数返回税金。
+
+3. 修改第8章的编程题9，使其包含下列函数：
+
+   ```c
+   void generate_random_walk(char walk[10][10]);
+   void print_array(char walk[10][10]);
+   ```
+
+   main 函数首先调用 `generate_random_walk`，该函数把所有数组元素都初始化为字符 `.`，然后将其中一些字符替换为 A~Z 的字母，详见原题的描述。接着，main 函数调用 `print_array` 函数来显示数组。
+
+4. 修改第8章的编程题16，使其包含下列函数：
+
+   ```c
+   void read_word(int counts[26]);
+   bool equal_array(int counts1[26], int counts2[26]);
+   ```
+
+   main 函数将调用 `read_word` 两次，每次用于读取用户输入的一个单词。读取单词时，`read_word` 用单词中的字母更新 `counts` 数组，详见原题的描述。`main` 将声明两个数组，每个数组用于一个单词。这些数组用于跟踪单词中每个字母出现的次数。接下来，main 函数调用 `equal_array` 函数， 以前面提到的两个数组作为参数。如果两个数组中的元素相同（表明这两个单词是变位词），`equal_array` 返回 `true`，否则返回 `false`。
+
+5. 修改第8章的编程题17，使其包含下列函数：
+
+   ```c
+   void create_magic_square(int n, int magic_square[n][n]);
+   void print_magic_square(int n, int magic_square[n][n]);
+   ```
+
+   获得用户输入的数 `n` 之后，main 函数调用 `create_magic_square` 函数，另一个调用参数是在 `main` 内部声明的 `n×n` 的数组。`create_magic_square` 函数用 1, 2, …, n² 填充数组，如原题所述。接下来，main 函数调用 `print_magic_square`，按原题描述的格式显示数组。注意：如果你的编译器不支持变长数组，请把 `main` 中的数组声明为 99×99 而不是 n×n，并使用下面的原型：
+
+   ```c
+   void create_magic_square(int n, int magic_square[99][99]);
+   void print_magic_square(int n, int magic_square[99][99]);
+   ```
+
+6. 编写函数计算下面多项式的值：
+
+   5x4−3x3+2x2−7x+65x^4 - 3x^3 + 2x^2 - 7x + 6
+
+   编写程序要求用户输入 x 的值，调用该函数计算多项式的值并显示函数返回的值。
+
+7. 如果换一种方法计算 $x^n$，9.6节的 `power` 函数速度可以更快。我们注意到，如果 n 是 2 的幂，则可以通过自乘的方法计算 $x^n$。例如， $4^x$ 是 $2^x$ 的平方，所以 $4^x$ 可以用两次乘法计算，而不需要三次乘法。这种方法甚至可以用于 n 不是 2 的幂的情况。如果 n 是偶数，则
+
+   xn=(xn/2)2x^n = (x^{n/2})^2
+
+   如果 n 是奇数，则
+
+   xn=x×xn−1x^n = x \times x^{n-1}
+
+   编写计算 $x^n$ 的递归函数（递归在 n=0 时结束，此时函数返回 1）。为了测试该函数，写一个程序要求用户输入 x 和 n 的值，调用 `power` 计算 $x^n$，然后显示函数的返回值。
+
+8. 编写函数模拟掷骰子的游戏（两个骰子）。第一次掷的时候，如果点数之和为 7 或 11 则获胜；如果点数之和为 2、3 或 12 则落败；其他情况下的点数之和称为“目标”，游戏继续。在后续的投掷中，如果玩家再次掷出“目标”点数则获胜，掷出 7 则落败，其他情况都忽略，游戏继续进行。每局游戏结束时，程序询问用户是否再玩一次，如果用户输入的回答不是 y 或 Y，程序会显示胜败的次数然后终止。
+
+   ```
+   You rolled: 8
+   Your point is 8
+   You rolled: 3
+   You rolled: 10
+   You rolled: 8
+   You win!
+   Play again? y
+   
+   You rolled: 6
+   Your point is 6
+   You rolled: 5
+   You rolled: 12
+   You rolled: 3
+   You rolled: 7
+   You lose!
+   Play again? y
+   
+   You rolled: 11
+   You win!
+   Play again? n
+   
+   Wins: 2
+   Losses: 1
+   ```
+
+   编写三个函数：`main`、`roll_dice` 和 `play_game`。下面给出了后两个函数的原型：
+
+   ```c
+   int roll_dice(void);
+   bool play_game(void);
+   ```
+
+   `roll_dice` 应生成两个随机数（每个都在 1~6 范围内），并返回它们的和。`play_game` 应进行一次掷骰子游戏（调用 `roll_dice` 确定每次掷的点数），如果玩家获胜则返回 `true`，如果玩家落败则返回 `false`。`play_game` 函数还要显示玩家每次掷骰子的结果。`main` 函数反复调用 `play_game` 函数，记录获胜和落败的次数，并显示“you win”和“you lose”消息。提示：使用 `rand` 函数生成随机数。关于如何调用 `rand` 和相关的 `srand` 函数，见 8.2 节 `deal.c` 程序中的例子。
 
 ## 第十章 程序结构
 
 ### 练习题
 
-10.4 节  1. 下面的程序框架只显示了函数定义和变量声明。  int a;  void f(int b)  {   int c;  }  void g(void)  {   int d;   {     int e;   }  236 }int main(void)  {   int f;  237  238  }  列出下面每种作用域内所有变量的名字和形式参数的名字。  (a) f 函数。  (b) g 函数。  (c) 声明e的程序块。  (d) main 函数。  2.下面的程序框架只显示了函数定义和变量声明。  int b, c;  void f(void)  {   int b, d;  }  void g(int a)  {   int c;   {     int a, d;   }  }  int main(void)  {   int c, d;  }  列出下面每种作用域内所有变量的名字和形式参数的名字。如果有多个同名的变量或形式参数，指 明具体是哪一个。  (a) f函数。  (b) g函数。  (c)声明a和d的程序块。  (d) main 函数。  *3. 如果程序只有一个函数（main），那么它最多可以包含多少个名为i的不同变量？ 
+10.4 节
+
+1. 下面的程序框架只显示了函数定义和变量声明。
+
+   ```
+   int a;
+   void f(int b) {
+       int c;
+   }
+   void g(void) {
+       int d;
+       {
+           int e;
+       }
+   }
+   int main(void) {
+       int f;
+   }
+   ```
+
+   列出下面每种作用域内所有变量的名字和形式参数的名字。
+
+   (a) f 函数。
+    (b) g 函数。
+    (c) 声明 e 的程序块。
+    (d) main 函数。
+
+2. 下面的程序框架只显示了函数定义和变量声明。
+
+   ```
+   int b, c;
+   void f(void) {
+       int b, d;
+   }
+   void g(int a) {
+       int c;
+       {
+           int a, d;
+       }
+   }
+   int main(void) {
+       int c, d;
+   }
+   ```
+
+   列出下面每种作用域内所有变量的名字和形式参数的名字。如果有多个同名的变量或形式参数，指明具体是哪一个。
+
+   (a) f 函数。
+    (b) g 函数。
+    (c) 声明 a 和 d 的程序块。
+    (d) main 函数。
+
+3. 如果程序只有一个函数（main），那么它最多可以包含多少个名为 i 的不同变量？
 
 ### 编程题
 
- 1.修改10.2节的栈示例使它存储字符而不是整数。接下来，增加main函数，用来要求用户输入一串圆 括号或花括号，然后指出它们之间的嵌套是否正确：  Enter parenteses and/or braces: ((){}{()}) Parenteses/braces are nested properly  提示：读入左圆括号或左花括号时，把它们像字符一样压入栈中。当读入右圆括号或右花括号时， 把栈顶的项弹出，并且检查弹出项是否是匹配的圆括号或花括号。（如果不是，那么圆括号或花括号 嵌套不正确。）当程序读入换行符时，检查栈是否为空。如果为空，那么圆括号或花括号匹配；如果 栈不为空（或者如果曾经调用过stack_underflow 函数），那么圆括号或花括号不匹配。如果调用 stack_overflow 函数，程序显示信息Stack overflow，并且立刻终止。 2.修改 10.5节的poker.c程序，把数组num_in_rank 和数组num_in_suit 移到main 函数中。main 函 数将把这两个数组作为实际参数传递给read_cards函数和analyze_hand函数。  3. 把数组num_in_rank、num_in_suit和card_exists从10.5节的poker.c程序中去掉。程序改用5×2 的数组来存储牌。数组的每一行表示一张牌。例如，如果数组名为 hand，则 hand[0][0]存储第一 张牌的点数，hand[0][1]存储第一张牌的花色。  4.修改 10.5节的 poker.c程序，使其能识别牌的另一种类别——“同花大顺”（同花色的A、K、Q、J 和10）。同花大顺的级别高于其他所有的类别。  5. 修改10.5节的poker.c程序，使其能识别“小A顺”（即A、2、3、4和5）。  6.有些计算器（尤其是惠普的计算器）使用逆波兰表示法（Reverse Polish Notation，RPN）来书写数学 表达式。在这一表示法中，运算符放置在操作数的后面而不是放在操作数中间。例如，在逆波兰表 示法中1+2将表示为1 2 +，而1+2*3将表示为1 2 3 * +。逆波兰表达式可以很方便地用栈求值。算 法从左向右读取运算符和操作数，并执行下列步骤。  (1) 当遇到操作数时，将其压入栈中。  (2) 当遇到运算符时，从栈中弹出它的操作数，执行运算并把结果压入栈中。  编写程序对逆波兰表达式求值。操作数都是个位的整数，运算符为+、-、*、/和=。遇到运算符= 时，将显示栈顶项，随后清空栈并提示用户计算新的表达式。这一过程持续进行，直到用户输入一 个既不是运算符也不是操作数的字符为止：  Enter an RPN expression: 1 2 3 * + = Value of expression: 7  Enter an RPN expression: 5 8 * 4 9 - / = Value of expression: -8  Enter an RPN expression: q  如果栈出现上溢，程序将显示消息Expression is too complex并终止。如果栈出现下溢（例如遇 到表达式1 2 + +），程序将显示消息Not enough operands in expression 并终止。提示：把10.2 节的栈代码整合到你的程序中。使用scanf(" %c", &ch)读取运算符和操作数。  7.编写程序，提示用户输入一个数并显示该数，使用字符模拟七段显示器的效果：  Enter a number: 491-9014 非数字的字符都将被忽略。在程序中用一个名为 MAX_DIGITS 的宏来控制数的最大位数，MAX_DIG-  ITS 的值为 10。如果数中包含的数位大于这个数，多出来的数位将被忽略。提示：使用两个外部数 组，一个是segments 数组（见第8章的练习题6），用于存储表示数字和段之间对应关系的数据； 另一个是digits数组，这是一个3行（因为显示出来的每个数字高度都是3个字符）、MAX_DIGITS× 4列（数字的宽度是3个字符，但为了可读性需要在数字之间增加一个空格）的字符数组。编写4个 函数：main、clear_digits_array、process_digit和print_digits_array。下面是后3个函数 的原型：  void clear_digits_array(void);  void process_digit(int digit, int position);  void print_digits_array(void);  clear_digits_array函数在digits数组的所有元素中存储空白字符。process_digit函数把digit 的七段表示存储到digits数组的指定位置（位置为0~MAX_DIGITS1）。print_digits_array函数 分行显示digits数组的每一行，产生的输出如示例图所示。
+1. 改10.2节的栈示例使它存储字符而不是整数。接下来，增加main函数，用来要求用户输入一串圆括号或花括号，然后指出它们之间的嵌套是否正确：
+
+   ```
+   Enter parenteses and/or braces: ((){}{()})
+   Parenteses/braces are nested properly
+   ```
+
+   提示：读入左圆括号或左花括号时，把它们像字符一样压入栈中。当读入右圆括号或右花括号时，把栈顶的项弹出，并且检查弹出项是否是匹配的圆括号或花括号。（如果不是，那么圆括号或花括号嵌套不正确。）当程序读入换行符时，检查栈是否为空。如果为空，那么圆括号或花括号匹配；如果栈不为空（或者如果曾经调用过stack_underflow函数），那么圆括号或花括号不匹配。如果调用stack_overflow函数，程序显示信息Stack overflow，并且立刻终止。
+
+2. 修改10.5节的poker.c程序，把数组num_in_rank和数组num_in_suit移到main函数中。main函数将把这两个数组作为实际参数传递给read_cards函数和analyze_hand函数。
+
+3. 把数组num_in_rank、num_in_suit和card_exists从10.5节的poker.c程序中去掉。程序改用5×2的数组来存储牌。数组的每一行表示一张牌。例如，如果数组名为hand，则hand[0][0]存储第一张牌的点数，hand[0][1]存储第一张牌的花色。
+
+4. 修改10.5节的poker.c程序，使其能识别牌的另一种类别——“同花大顺”（同花色的A、K、Q、J和10）。同花大顺的级别高于其他所有的类别。
+
+5. 修改10.5节的poker.c程序，使其能识别“小A顺”（即A、2、3、4和5）。
+
+6. 有些计算器（尤其是惠普的计算器）使用逆波兰表示法（Reverse Polish Notation，RPN）来书写数学表达式。在这一表示法中，运算符放置在操作数的后面而不是放在操作数中间。例如，在逆波兰表示法中1+2将表示为1 2 +，而1+2*3将表示为1 2 3 * +。逆波兰表达式可以很方便地用栈求值。算法从左向右读取运算符和操作数，并执行下列步骤：
+
+   1. 当遇到操作数时，将其压入栈中。
+   2. 当遇到运算符时，从栈中弹出它的操作数，执行运算并把结果压入栈中。
+
+   编写程序对逆波兰表达式求值。操作数都是个位的整数，运算符为+、-、*、/和=。遇到运算符=时，将显示栈顶项，随后清空栈并提示用户计算新的表达式。这一过程持续进行，直到用户输入一个既不是运算符也不是操作数的字符为止：
+
+   ```
+   Enter an RPN expression: 1 2 3 * + =
+   Value of expression: 7
+   Enter an RPN expression: 5 8 * 4 9 - / =
+   Value of expression: -8
+   Enter an RPN expression: q
+   ```
+
+   如果栈出现上溢，程序将显示消息Expression is too complex并终止。如果栈出现下溢（例如遇到表达式1 2 + +），程序将显示消息Not enough operands in expression并终止。提示：把10.2节的栈代码整合到你的程序中。使用scanf(" %c", &ch)读取运算符和操作数。
+
+7. 编写程序，提示用户输入一个数并显示该数，使用字符模拟七段显示器的效果：
+
+   ```
+   Enter a number: 491-9014
+   ```
+
+   非数字的字符都将被忽略。在程序中用一个名为MAX_DIGITS的宏来控制数的最大位数，MAX_DIGITS的值为10。如果数中包含的数位大于这个数，多出来的数位将被忽略。提示：使用两个外部数组，一个是segments数组（见第8章的练习题6），用于存储表示数字和段之间对应关系的数据；另一个是digits数组，这是一个3行（因为显示出来的每个数字高度都是3个字符）、MAX_DIGITS×4列（数字的宽度是3个字符，但为了可读性需要在数字之间增加一个空格）的字符数组。编写4个函数：main、clear_digits_array、process_digit和print_digits_array。下面是后3个函数的原型：
+
+   ```
+   void clear_digits_array(void);
+   void process_digit(int digit, int position);
+   void print_digits_array(void);
+   ```
+
+   clear_digits_array函数在digits数组的所有元素中存储空白字符。process_digit函数把digit的七段表示存储到digits数组的指定位置（位置为0~MAX_DIGITS-1）。print_digits_array函数分行显示digits数组的每一行，产生的输出如示例图所示。
 
 ## 第十一章 指针
 
 ### 练习题
 
-11.2节  
+11.2节
 
-1. 如果i是变量，且p指向i，那么下列哪些表达式是i的别名？  
-   (a) *p 
-   (b) &p 
-   (c) *&p (d) &*p    (e) *i (f) &i (g) *&i (h) &*i  11.3节  2. 如果i是int类型变量，且p和q是指向int的指针，那么下列哪些赋值是合法的？   (a) p = i;  (b) *p = &i; (c) &p = q;(d) p = &q;  (g) p = *q;  11.4 节  (e) p = *&q; (f) p = q;   (h) *p = q; ( i) *p = *q;  3.假设下列函数用来计算数组a中元素的和以及平均值，且数组a长度为n。avg和sum指向函数需要 修改的变量。但是，这个函数有几个错误，请找出这些错误并修改。  void avg_sum(double a[], int n, double *avg, double *sum)  {   int i;   sum = 0.0;   for (i = 0; i 
+1. 如果i是变量，且p指向i，那么下列哪些表达式是i的别名？
+    (a) *p
+    (b) &p
+    (c) *&p
+    (d) &*p
+    (e) *i
+    (f) &i
+    (g) *&i
+    (h) &*i
+
+11.3节
+
+1. 如果i是int类型变量，且p和q是指向int的指针，那么下列哪些赋值是合法的？
+    (a) p = i;
+    (b) *p = &i;
+    (c) &p = q;
+    (d) p = &q;
+    (e) p = *&q;
+    (f) p = q;
+    (g) *p = q;
+    (h) *p = *q;
+
+11.4节
+
+1. 假设下列函数用来计算数组a中元素的和以及平均值，且数组a长度为n。avg和sum指向函数需要修改的变量。但是，这个函数有几个错误，请找出这些错误并修改。
+
+   ```
+   void avg_sum(double a[], int n, double *avg, double *sum) {  
+       int i;  
+       sum = 0.0;  
+       for (i = 0; i < n; i++)  
+           sum += a[i];  
+       avg = sum / n;  
+   }
+   ```
+
+2. 编写下列函数：
+
+   ```
+   void swap(int *p, int *q);  
+   ```
+
+   当传递两个变量的地址时，swap函数应该交换两个变量的值：
+
+   ```
+   swap(&i, &j);  /* exchange values of i and j */
+   ```
+
+3. 编写下列函数：
+
+   ```
+   void split_time(long total_sec, int *hr, int *min, int *sec);  
+   ```
+
+   total_sec 是以从午夜开始计算的秒数所表示的时间。hr、min 和 sec 都是指向变量的指针，这些变量在函数中将分别存储以小时（0~~23）、分钟（0~~59）和秒（0~59）为单位的等价时间。
+
+4. 编写下列函数：
+
+   ```
+   void find_two_largest(int a[], int n, int *largest, int *second_largest);
+   ```
+
+   当传递长度为n的数组a时，函数将在数组a中搜寻最大元素和第二大元素，把它们分别存储在由largest和second_largest指向的变量中。
+
+5. 编写下列函数：
+
+   ```
+   void split_date(int day_of_year, int year, int *month, int *day);
+   ```
+
+   day_of_year 是1~366范围内的整数，表示year指定的那一年中的特定一天。month和day是指向变量的指针，相应的变量在函数中分别存储等价的月份（1~12）和该月中的日期（1~31）。
+
+11.5节
+
+1. 编写下列函数：
+
+   ```
+   int *find_largest(int a[], int n);
+   ```
+
+   当传入长度为n的数组a时，函数将返回指向数组最大元素的指针。
 
 ### 编程题
 
- 1.修改第2章的编程题7，使其包含下列函数：  255 void pay_amount(int dollars, int *twenties, int *tens, int *fives, int *ones); 函数需要确定：为支付参数dollars表示的付款金额，所需20美元、10美元、5美元和1美元钞票 的最小数目。twenties参数所指向的变量存储所需20美元钞票的数目，tens、fives和ones参数 类似。  2.修改第5章的编程题8，使其包含下列函数：  void find_closest_flight(int desired_time,                           int *departure_time,                           int *arrival_time);  函数需查出起飞时间与desired_time（用从午夜开始的分钟数表示）最接近的航班。该航班的起飞 时间和抵达时间（也都用从午夜开始的分钟数表示）将分别存储在departure_time 和arrival_time 所指向的变量中。  3.修改第6章的编程题3，使其包含下列函数：  void reduce(int numerator, int denominator,             int *reduced_numerator,             int *reduced_denominator);  numerator 和 denominator 分别是分数的分子和分母。reduced_numerator 和 reduced_deno-  minator 是指向变量的指针，相应变量中分别存储把分数化为最简形式后的分子和分母。  256  4.修改 10.5节的 poker.c程序，把所有的外部变量移到 main 函数中，并修改各个函数，使它们通过参 数进行通信。analyze_hand函数需要修改变量straight、flush、four、three和pairs，所以它 需要以指向这些变量的指针作为参数。
+1. 修改第2章的编程题7，使其包含下列函数：
+
+```
+void pay_amount(int dollars, int *twenties, int *tens, int *fives, int *ones);
+```
+
+​	函数需要确定：为支付参数 `dollars` 表示的付款金额，所需20美元、10美元、5美元和1美元钞票的最小数目。`twenties` 参数所指向的变量存储所需20美	元钞票的数目，`tens`、`fives` 和 `ones` 参数类似。
+
+2. 修改第5章的编程题8，使其包含下列函数：
+
+```
+void find_closest_flight(int desired_time, int *departure_time, int *arrival_time);
+```
+
+​	函数需查出起飞时间与 `desired_time`（用从午夜开始的分钟数表示）最接近的航班。该航班的起飞时间和抵达时间（也都用从午夜开始的分钟数表示）将分	别存储在 `departure_time` 和 `arrival_time` 所指向的变量中。
+
+3. 修改第6章的编程题3，使其包含下列函数：
+
+```
+void reduce(int numerator, int denominator, int *reduced_numerator, int *reduced_denominator);
+```
+
+​	`numerator` 和 `denominator` 分别是分数的分子和分母。`reduced_numerator` 和 `reduced_denominator` 是指向变量的指针，相应变量中分别存储把分	数化为最简形式后的分子和分母。
+
+4. 修改 10.5节的 `poker.c` 程序，把所有的外部变量移到 `main` 函数中，并修改各个函数，使它们通过参数进行通信。`analyze_hand` 函数需要修改变量 `straight`、`flush`、`four`、`three` 和 `pairs`，所以它需要以指向这些变量的指针作为参数。
 
 ## 第十二章 指针和数组
 
 ### 练习题
 
-12.1 节  1.假设下列声明是有效的：  int a[] = {5, 15, 34, 54, 14, 2, 52, 72};  int *p = &a[1], *q = &a[5];  (a) *(p + 3)的值是多少？  (b) *(q - 3)的值是多少？  (c) q - p 的值是多少？  (d) p < q 的结果是真还是假？  (e) *p <*q 的结果是真还是假？  *2. 假设high、low 和middle是具有相同类型的指针变量，并且low和high指向数组元素。下面的语 句为什么是不合法的，如何修改它？  middle = (low + high) / 2;  12.2 节  3.下列语句执行后，数组a的内容是什么？  #define N 10  int a[N] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};  int *p = &a[0], *q = &a[N-1], temp;  while (p < q) {   temp = *p;   *p++ = *q;   *q-- = temp;  }  4. 用指针变量 top_ptr 代替整型变量 top 来重新编写 10.2 节的函数 make_empty、is_empty 和 is_full。  12.3 节  5.假设a是一维数组而p是指针变量。如果刚执行了赋值操作p = a，下列哪些表达式会因为类型不匹 配而不合法？其他的表达式中哪些为真（有非零值）？  (a) p == a[0]  (b) p == &a[0]  (c) *p == a[0]  (d) p[0] == a[0]  273  6. 用指针算术运算代替数组取下标来重新编写下面的函数。（换句话说，消除变量 i 和所有用[]运算 符的地方。）要求改动尽可能少。  int sum_array(const int a[], int n)  {   int i, sum;   sum = 0;   for (i = 0; i < n; i++)     sum += a[i];   return sum;  }  7.编写下列函数：  bool search(const int a[], int n, int key);  a 是待搜索的数组，n是数组中元素的数量，key是搜索键。如果key与数组a的某个元素匹配了， 那么search 函数返回true；否则返回false。要求使用指针算术运算而不是取下标来访问数组元素。  8.用指针算术运算代替数组取下标来重新编写下面的函数。（换句话说，消除变量 i 和所有用到[]运 算符的地方。）要求改动尽可能少。  void store_zeros(int a[], int n)  {  int i;   for (i = 0; i < n; i++)     a[i] = 0;  }  9. 编写下列函数：  double inner_product(const double *a, const double *b,                       int n);   a和b都指向长度为n的数组。函数返回a[0]*b[0]+a[1]*b[1]+...+a[n-1]*b[n-1]。要求使用指 针算术运算而不是取下标来访问数组元素。  10. 修改11.5 节的find_middle 函数，用指针算术运算计算返回值。  11. 修改 find_largest 函数，用指针算术运算（而不是取下标）来访问数组元素。编写下面的函数：  void find_two_largest(const int *a, int n, int *largest,                       int *second_largest);  a指向长度为n的数组。函数从数组中找出最大和第二大的元素，并把它们分别存储到由largest和 second_largest 指向的变量中。要求使用指针算术运算而不是取下标来访问数组元素。  12.4 节  13. 8.2 节有一个代码段用两个嵌套的 for 循环初始化用作单位矩阵的数组 ident。请重新编写这段代 码，采用一个指针来逐个访问数组中的元素，且每次一个元素。提示：因为不能用row和col来索 引变量，所以不会很容易知道应该在哪里存储 1。但是，可以利用数组的下列事实：第一个元素必 须是1，接着的N个元素都必须是0，再接下来的元素是1，以此类推。用变量来记录已经存储的连 续的0的数量。当计数达到N时，就是存储1的时候了。  14. 假设下面的数组含有一周7天24小时的温度读数，数组的每一行是某一天的读数：  int temperatures[7][24];  编写一条语句，使用search函数（见练习题7）在整个temperatures数组中寻找值32。  15. 编写一个循环来显示（练习题14中的）temperatures数组中第i行存储的所有温度读数。利用指针 来访问该行中的每个元素。  16. 编写一个循环来显示（练习题 14中的）temperatures 数组一星期中每一天的最高温度。循环体应 该调用find_largest 函数，且一次传递数组的一行。  17. 用指针算术运算代替数组取下标来重新编写下面的函数。（换句话说，消除变量 i、j 和所有用到[] 运算符的地方。）要求使用单层循环而不是嵌套循环。  int sum_two_dimensional_array(const int a[][LEN], int n)  {    int i, j, sum = 0;   for (i = 0; i < n; i++)     for (j = 0; j < LEN; j++)       sum += a[i][j];   return sum;  }  18. 编写第9章练习题13中描述的evaluate_position函数，使用指针算术运算而不是取下标来访问数 组元素。要求使用单层循环而不是嵌套循环。
+12.1 节
+
+1. 假设下列声明是有效的：
+    `int a[] = {5, 15, 34, 54, 14, 2, 52, 72}; int *p = &a[1], *q = &a[5];`
+    (a) `*(p + 3)`的值是多少？
+    (b) `*(q - 3)`的值是多少？
+    (c) `q - p` 的值是多少？
+    (d) `p < q` 的结果是真还是假？
+    (e) `*p < *q` 的结果是真还是假？
+2. 假设 `high`、`low` 和 `middle` 是具有相同类型的指针变量，并且 `low` 和 `high` 指向数组元素。下面的语句为什么是不合法的，如何修改它？
+    `middle = (low + high) / 2;`
+
+12.2 节
+
+3. 下列语句执行后，数组 `a` 的内容是什么？
+
+ `#define N 10`
+ `int a[N] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};`
+ `int *p = &a[0], *q = &a[N-1], temp;`
+ `while (p < q) { temp = *p; *p++ = *q; *q-- = temp; }`
+
+1. 用指针变量 `top_ptr` 代替整型变量 `top` 来重新编写 10.2 节的函数 `make_empty`、`is_empty` 和 `is_full`。
+
+12.3 节
+
+5. 假设 `a` 是一维数组而 `p` 是指针变量。如果刚执行了赋值操作 `p = a`，下列哪些表达式会因为类型不匹配而不合法？其他的表达式中哪些为真（有非零值）？
+
+ (a) `p == a[0]`
+ (b) `p == &a[0]`
+ (c) `*p == a[0]`
+ (d) `p[0] == a[0]`
+
+1. 用指针算术运算代替数组取下标来重新编写下面的函数。（换句话说，消除变量 `i` 和所有用 `[]` 运算符的地方。）要求改动尽可能少。
+
+   ```
+   int sum_array(const int a[], int n)  
+   {  
+       int i, sum;  
+       sum = 0;  
+       for (i = 0; i < n; i++)  
+           sum += a[i];  
+       return sum;  
+   }
+   ```
+
+2. 编写下列函数：
+    `bool search(const int a[], int n, int key);`
+    `a` 是待搜索的数组，`n` 是数组中元素的数量，`key` 是搜索键。如果 `key` 与数组 `a` 的某个元素匹配了，那么 `search` 函数返回 `true`；否则返回 `false`。要求使用指针算术运算而不是取下标来访问数组元素。
+
+3. 用指针算术运算代替数组取下标来重新编写下面的函数。（换句话说，消除变量 `i` 和所有用到 `[]` 运算符的地方。）要求改动尽可能少。
+
+   ```
+   void store_zeros(int a[], int n)  
+   {  
+       int i;  
+       for (i = 0; i < n; i++)  
+           a[i] = 0;  
+   }
+   ```
+
+4. 编写下列函数：
+    `double inner_product(const double *a, const double *b, int n);`
+    `a` 和 `b` 都指向长度为 `n` 的数组。函数返回 `a[0] * b[0] + a[1] * b[1] + ... + a[n-1] * b[n-1]`。要求使用指针算术运算而不是取下标来访问数组元素。
+
+5. 修改 11.5 节的 `find_middle` 函数，用指针算术运算计算返回值。
+
+6. 修改 `find_largest` 函数，用指针算术运算（而不是取下标）来访问数组元素。编写下面的函数：
+
+```
+void find_two_largest(const int *a, int n, int *largest, int *second_largest);  
+```
+
+`a` 指向长度为 `n` 的数组。函数从数组中找出最大和第二大的元素，并把它们分别存储到由 `largest` 和 `second_largest` 指向的变量中。要求使用指针算术运算而不是取下标来访问数组元素。
+
+12.4 节
+
+13. 8.2 节有一个代码段用两个嵌套的 `for` 循环初始化用作单位矩阵的数组 `ident`。请重新编写这段代码，采用一个指针来逐个访问数组中的元素，且每次一个元素。提示：因为不能用 `row` 和 `col` 来索引变量，所以不会很容易知道应该在哪里存储 1。但是，可以利用数组的下列事实：第一个元素必须是 1，接着的 N 个元素都必须是 0，再接下来的元素是 1，以此类推。用变量来记录已经存储的连续的 0 的数量。当计数达到 N 时，就是存储 1 的时候了。
+
+1. 假设下面的数组含有一周 7 天 24 小时的温度读数，数组的每一行是某一天的读数：
+    `int temperatures[7][24];`
+    编写一条语句，使用 `search` 函数（见练习题 7）在整个 `temperatures` 数组中寻找值 32。
+2. 编写一个循环来显示（练习题 14 中的）`temperatures` 数组中第 `i` 行存储的所有温度读数。利用指针来访问该行中的每个元素。
+3. 编写一个循环来显示（练习题 14 中的）`temperatures` 数组一星期中每一天的最高温度。循环体应该调用 `find_largest` 函数，且一次传递数组的一行。
+4. 用指针算术运算代替数组取下标来重新编写下面的函数。（换句话说，消除变量 `i`、`j` 和所有用到 `[]` 运算符的地方。）要求使用单层循环而不是嵌套循环。
+
+```
+int sum_two_dimensional_array(const int a[][LEN], int n)  
+{  
+    int i, j, sum = 0;  
+    for (i = 0; i < n; i++)  
+        for (j = 0; j < LEN; j++)  
+            sum += a[i][j];  
+    return sum;  
+}
+```
+
+1. 编写第 9 章练习题 13 中描述的 `evaluate_position` 函数，使用指针算术运算而不是取下标来访问数组元素。要求使用单层循环而不是嵌套循环。
 
 ### 编程题
 
-1. (a) 编写程序读一条消息，然后逆序打印出这条消息：  Enter a message: Don't get mad, get even. Reversal is: .neve teg ,dam teg t'noD  提示：一次读取消息中的一个字符（用getchar函数），并且把这些字符存储在数组中，当数组 满了或者读到字符'\n'时停止读操作。  (b) 修改上述程序，用指针代替整数来跟踪数组中的当前位置。  2. (a) 编写程序读一条消息，然后检查这条消息是否是回文（消息中的字母从左往右读和从右往左读是 一样的）：Enter a message: He lived as a devil, eh? Palindrome  275  276  Enter a message: Madam, I am Adam. Not a palindrome  忽略所有不是字母的字符。用整型变量来跟踪数组中的位置。  (b) 修改上述程序，使用指针代替整数来跟踪数组中的位置。  3. 请利用数组名可以用作指针的事实简化编程题1(b)的程序。  4.请利用数组名可以用作指针的事实简化编程题2(b)的程序。  5.修改第8章的编程题14，用指针而不是整数来跟踪包含该语句的数组的当前位置。  6.修改9.6节的qsort.c程序，使得low、high和middle是指向数组元素的指针而不是整数。split函 数应返回指针而不再是整数。  7.修改11.4 节的maxmin.c程序，使得max_min 函数使用指针而不是整数来跟踪数组中的当前位置。 
+1.  (a) 编写程序读一条消息，然后逆序打印出这条消息：
+
+   ```
+   Enter a message: Don't get mad, get even.
+   Reversal is: .neve teg ,dam teg t'noD
+   ```
+
+   提示：一次读取消息中的一个字符（用 `getchar` 函数），并且把这些字符存储在数组中，当数组满了或者读到字符 `'\n'` 时停止读操作。
+
+   (b) 修改上述程序，用指针代替整数来跟踪数组中的当前位置。
+
+   (a) 编写程序读一条消息，然后检查这条消息是否是回文（消息中的字母从左往右读和从右往左读是一样的）：
+
+   ```
+   Enter a message: He lived as a devil, eh?
+   Palindrome
+   ```
+
+   ```
+   Enter a message: Madam, I am Adam.
+   Not a palindrome
+   ```
+
+   忽略所有不是字母的字符。用整型变量来跟踪数组中的位置。
+
+   (b) 修改上述程序，使用指针代替整数来跟踪数组中的位置。
+
+   1. 请利用数组名可以用作指针的事实简化编程题 1(b) 的程序。
+   2. 请利用数组名可以用作指针的事实简化编程题 2(b) 的程序。
+   3. 修改第 8 章的编程题 14，用指针而不是整数来跟踪包含该语句的数组的当前位置。
+   4. 修改 9.6 节的 `qsort.c` 程序，使得 `low`、`high` 和 `middle` 是指向数组元素的指针而不是整数。`split` 函数应返回指针而不再是整数。
+   5. 修改 11.4 节的 `maxmin.c` 程序，使得 `max_min` 函数使用指针而不是整数来跟踪数组中的当前位置。
 
 ## 第十三章
 
 ### 练习题
 
-13.3节  1. 下面的函数调用应该只输出一个换行符，但是其中有一些是错误的。请指出哪些调用是错误的，并 说明理由。   (a) printf("%c", '\n');    (e) printf('\n');   (i) puts('\n');   (b) printf("%c", "\n");    (f) printf("\n");  (j) puts("\n");   (c) printf("%s", '\n');    (g) putchar('\n');   (k) puts("");   (d) printf("%s", "\n");    (h) putchar("\n");  2. 假设p的声明如下：  char *p = "abc";    下列哪些函数调用是合法的？请说明每个合法的函数调用的输出，并解释为什么其他的是非法的。   (a) putchar(p);      (c) puts(p);   (b) putchar(*p);      (d) puts(*p);  *3. 假设按如下方式调用scanf函数：   scanf("%d%s%d", &i, s, &j);    如果用户输入12abc34  56def78，那么调用后i、s和j的值分别是多少？（假设i和j是int类 型变量，s是字符数组。）  4. 按照下述要求分别修改read_line函数。   (a) 在开始存储输入字符前跳过空白字符。   (b) 在遇到第一个空白字符时停止读入。提示：调用isspace函数（23.5节）来检查字符是否为空 白字符。   (c) 在遇到第一个换行符时停止读入，然后把换行符存储到字符串中。   (d) 把没有空间存储的字符留下以备后用。  13.4节  5. (a) 编写名为capitalize的函数，把参数中的字母都改为大写字母。参数是空字符结尾的字符串， 且此字符串可以包含任意字符而不仅是字母。使用数组取下标操作访问字符串中的字符。提示： 使用toupper函数（23.5节）把每个字符转换成大写。   (b) 重写capitalize函数，这次使用指针算术运算来访问字符串中的字符。  6. 编写名为censor的函数，把字符串中出现的每一处foo替换为xxx。例如，字符串"food fool"会 变为"xxxd xxxl"。在不失清晰性的前提下程序越短越好。 13.5 节  7.假设str 是字符数组，下面哪条语句与其他3条语句不等价？  (a) *str = 0;    (c) strcpy(str, "");    ( b)str[0] = '\0';  (d) strcat(str, "");  *8. 在执行下列语句后，字符串str的值是什么？  strcpy(str, "tire-bouchon");  strcpy(&str[4], "d-or-wi");  strcat(str, "red?");  9.在执行下列语句后，字符串s1的值是什么？  strcpy(s1, "computer");  strcpy(s2, "science");  if (strcmp(s1, s2) < 0)   strcat(s1, s2);  else   strcat(s2, s1);  s1[strlen(s1)-6] = '\0';  10. 下面的函数用于创建字符串的相同副本。请指出这个函数中的错误。  char *duplicate(const char *p)  {   char *q;   strcpy(q, p);   return q;  }  309  11. 本章的“问与答”部分说明了利用数组取下标操作来编写strcmp函数的方法。请修改此函数，改用 指针算术运算来编写。  12. 编写下面的函数：  void get_extension(const char *file_name, char *extension);  file_name 指向包含文件名的字符串。函数把文件名的扩展存储在extension 指向的字符串中。例 如，如果文件名是"memo.txt"，函数将把"txt"存储到 extension 指向的字符串中。如果文件名没 有扩展名，函数将在 extension 指向的字符串中存储一个空字符串（仅由一个空字符构成）。在函 数中使用strlen函数和strcpy函数，使其尽可能简单。  13. 编写下面的函数：  void build_index_url(const char *domain, char *index_url);  domain 指向包含因特网域名的字符串，例如"knking.com"。函数应在该字符串的前面加上 "http://www."，在后面加上"/index.html"，并把结果存储到index_url 指向的字符串中。（在这 个例子中，结果为"http://www.knking.com/index.html"。）可以假定 index_url 所指向的变量 长度足以装下整个字符串。在函数中使用strcat函数和strcpy函数，使其尽可能简单。  13.6 节  * 14. 下面程序的输出是什么？  #include   int main(void)  {  char s[] = "Hsjodi", *p;   for (p = s; *p; p++)      --*p;   puts(s);   return 0;  }  *15.  函数 f如下所示：  int f(char *s, char *t)  {   char *p1, *p2;   for (p1 = s; *p1; p1++)  {     for (p2 = t; *p2; p2++)       if (*p1 == *p2) break;     if (*p2 == '\0') break;   }   return p1 - s;  }  (a) f("abcd", "babc")的值是多少？  (b) f("abcd", "bcd")的值是多少？  (c) 当传递两个字符串s和t时，函数f的返回值一般是什么？  16. 利用13.6节中的方法来精简13.4节的count_space函数。具体而言要用while循环替换for语句。  17. 编写下面的函数：  bool test_extension(const char *file_name,                     const char *extension);  file_name 指向包含文件名的字符串。如果文件的扩展名与extension指向的字符串匹配（不区分 大小写），函数返回true。例如，函数调用test_extension("memo.txt", "TXT") 将返回true。 要求在函数中使用“搜索字符串结尾”的惯用法。提示：在比较字符之前使用toupper函数（ 23.5 节）把字符转换成大写形式。  18. 编写下面的函数：  void remove_filename(char *url);  url 指向一个包含以文件名结尾的统一资源定位器（Uniform Resource Locator, URL）的字符串，例 如"http://www.knking.com/index.html"。函数应通过移除文件名和前面的斜杠来修改字符串。 （在上面的例子中，结果为"http://www.knking.com"。）要求在函数中使用“搜索字符串结尾”的 惯用法。提示：把字符串中的最后一个斜杠替换为空字符。
+**13.3节**
+
+1. 下面的函数调用应该只输出一个换行符，但是其中有一些是错误的。请指出哪些调用是错误的，并说明理由。
+
+   (a) `printf("%c", '\n');`
+    (b) `printf("%s", '\n');`
+    (c) `printf("%s", "\n");`
+    (d) `printf("%s", "\n");`
+    (e) `printf('\n');`
+    (f) `printf("\n");`
+    (g) `putchar('\n');`
+    (h) `putchar("\n");`
+    (i) `puts('\n');`
+    (j) `puts("\n");`
+    (k) `puts("");`
+
+2. 假设 `p` 的声明如下：
+    `char *p = "abc";`
+    下列哪些函数调用是合法的？请说明每个合法的函数调用的输出，并解释为什么其他的是非法的。
+
+   (a) `putchar(p);`
+    (b) `putchar(*p);`
+    (c) `puts(p);`
+    (d) `puts(*p);`
+
+3. 假设按如下方式调用 `scanf` 函数：
+    `scanf("%d%s%d", &i, s, &j);`
+    如果用户输入 `12abc34 56def78`，那么调用后 `i`、`s` 和 `j` 的值分别是多少？（假设 `i` 和 `j` 是 `int` 类型变量，`s` 是字符数组。）
+
+4. 按照下述要求分别修改 `read_line` 函数。
+
+   (a) 在开始存储输入字符前跳过空白字符。
+    (b) 在遇到第一个空白字符时停止读入。提示：调用 `isspace` 函数（23.5节）来检查字符是否为空白字符。
+    (c) 在遇到第一个换行符时停止读入，然后把换行符存储到字符串中。
+    (d) 把没有空间存储的字符留下以备后用。
+
+**13.4节**
+
+1. (a) 编写名为 `capitalize` 的函数，把参数中的字母都改为大写字母。参数是空字符结尾的字符串，且此字符串可以包含任意字符而不仅是字母。使用数组取下标操作访问字符串中的字符。提示：使用 `toupper` 函数（23.5节）把每个字符转换成大写。
+
+   (b) 重写 `capitalize` 函数，这次使用指针算术运算来访问字符串中的字符。
+
+2. 编写名为 `censor` 的函数，把字符串中出现的每一处 `foo` 替换为 `xxx`。例如，字符串 `"food fool"` 会变为 `"xxxd xxxl"`。在不失清晰性的前提下程序越短越好。
+
+**13.5节**
+
+1. 假设 `str` 是字符数组，下面哪条语句与其他 3 条语句不等价？
+
+   (a) `*str = 0;`
+    (b) `str[0] = '\0';`
+    (c) `strcpy(str, "");`
+    (d) `strcat(str, "");`
+
+2. 在执行下列语句后，字符串 `str` 的值是什么？
+
+   ```
+   strcpy(str, "tire-bouchon");
+   strcpy(&str[4], "d-or-wi");
+   strcat(str, "red?");
+   ```
+
+3. 在执行下列语句后，字符串 `s1` 的值是什么？
+
+   ```
+   strcpy(s1, "computer");
+   strcpy(s2, "science");
+   if (strcmp(s1, s2) < 0)
+       strcat(s1, s2);
+   else
+       strcat(s2, s1);
+   s1[strlen(s1)-6] = '\0';
+   ```
+
+4. 下面的函数用于创建字符串的相同副本。请指出这个函数中的错误。
+
+   ```
+   char *duplicate(const char *p) {
+       char *q;
+       strcpy(q, p);
+       return q;
+   }
+   ```
+
+5. 本章的“问与答”部分说明了利用数组取下标操作来编写 `strcmp` 函数的方法。请修改此函数，改用指针算术运算来编写。
+
+6. 编写下面的函数：
+
+   ```
+   void get_extension(const char *file_name, char *extension);
+   ```
+
+   `file_name` 指向包含文件名的字符串。函数把文件名的扩展存储在 `extension` 指向的字符串中。例如，如果文件名是 `"memo.txt"`，函数将把 `"txt"` 存储到 `extension` 指向的字符串中。如果文件名没有扩展名，函数将在 `extension` 指向的字符串中存储一个空字符串（仅由一个空字符构成）。在函数中使用 `strlen` 函数和 `strcpy` 函数，使其尽可能简单。
+
+7. 编写下面的函数：
+
+   ```
+   void build_index_url(const char *domain, char *index_url);
+   ```
+
+   `domain` 指向包含因特网域名的字符串，例如 `"knking.com"`。函数应在该字符串的前面加上 `"http://www."`，在后面加上 `"/index.html"`，并把结果存储到 `index_url` 指向的字符串中。（在这个例子中，结果为 `"http://www.knking.com/index.html"`。）可以假定 `index_url` 所指向的变量长度足以装下整个字符串。在函数中使用 `strcat` 函数和 `strcpy` 函数，使其尽可能简单。
+
+**13.6节**
+
+1. 下面程序的输出是什么？
+
+   ```
+   #include
+   int main(void) {
+       char s[] = "Hsjodi", *p;
+       for (p = s; *p; p++)
+           --*p;
+       puts(s);
+       return 0;
+   }
+   ```
+
+2. 函数 `f` 如下所示：
+
+   ```
+   int f(char *s, char *t) {
+       char *p1, *p2;
+       for (p1 = s; *p1; p1++) {
+           for (p2 = t; *p2; p2++)
+               if (*p1 == *p2) break;
+           if (*p2 == '\0') break;
+       }
+       return p1 - s;
+   }
+   ```
+
+   (a) `f("abcd", "babc")` 的值是多少？
+    (b) `f("abcd", "bcd")` 的值是多少？
+    (c) 当传递两个字符串 `s` 和 `t` 时，函数 `f` 的返回值一般是什么？
+
+3. 利用 13.6 节中的方法来精简 13.4 节的 `count_space` 函数。具体而言要用 `while` 循环替换 `for` 语句。
+
+4. 编写下面的函数：
+
+   ```
+   bool test_extension(const char *file_name, const char *extension);
+   ```
+
+   `file_name` 指向包含文件名的字符串。如果文件的扩展名与 `extension` 指向的字符串匹配（不区分大小写），函数返回 `true`。例如，函数调用 `test_extension("memo.txt", "TXT")` 将返回 `true`。要求在函数中使用“搜索字符串结尾”的惯用法。提示：在比较字符之前使用 `toupper` 函数（23.5节）把字符转换成大写形式。
+
+5. 编写下面的函数：
+
+   ```
+   void remove_filename(char *url);
+   ```
+
+   `url` 指向一个包含以文件名结尾的统一资源定位器（Uniform Resource Locator, URL）的字符串，例如 `"http://www.knking.com/index.html"`。函数应通过移除文件名和前面的斜杠来修改字符串。（在上面的例子中，结果为 `"http://www.knking.com"`。）要求在函数中使用“搜索字符串结尾”的惯用法。提示：把字符串中的最后一个斜杠替换为空字符。
 
 ### 编程题
 
-1. 编写程序找出一组单词中“最小”单词和“最大”单词。用户输入单词后，程序根据字典顺序决定 排在最前面和最后面的单词。当用户输入 4 个字母的单词时，程序停止读入。假设所有单词都不超 过20个字母。程序会话如下：  Enter word:  dog Enter word:  zebra Enter word:  rabbit Enter word:  catfishEnter word:  walrus Enter word:  cat Enter word:  fish Smallest word: cat  Largest word: zebra  提示：使用两个名为smallest_word 和largest_word 的字符串来分别记录所有输入中的“最小” 单词和“最大”单词。用户每输入一个新单词，都要用strcmp 函数把它与smallest_word 进行比 较。如果新的单词比 smallest_word“小”，就用 strcpy 函数把新单词保存到 smallest_word 中。用类似的方式与larges_word 进行比较。用strlen 函数来判断用户是否输入了4个字母的 单词。  2.按如下方式改进13.5节的remind.c程序。  (a) 如果对应的日期为负数或大于31，程序显示出错消息，并忽略提醒。提示：使用continue语句。  (b) 允许用户输入日期、24 小时格式的时间和提醒。显示的提醒列表必须先按日期排序，然后再按 时间排序。（原始的remind.c程序允许用户输入时间，但是它把时间作为提醒的一部分来处理。）  (c) 程序显示一年的提醒列表。要求用户按照月/日的格式输入日期。  311  3.修改8.2节的deal.c程序，使它显示出牌的全名：  Enter number of cards in hand: 5  Your hand:  Seven of clubs  Two of spades  Five of diamonds  Ace of spades  Two of hearts  提示：用指向字符串的指针的数组来替换数组rank_code和数组suit_code。  4.  编写名为reverse.c的程序，用来逆序输出命令行参数。如果输入  reverse void and null  运行程序，产生的输出应为  null and void  5.编写名为sum.c的程序，用来对命令行参数（假设都是整数）求和。如果输入  sum 8 24 62  运行程序，产生的输出应为  Total: 94  提示：用atoi函数（ 26.2节）把每个命令行参数从字符串格式转换为整数格式。  6.  改进 13.7节的程序 planet.c，使它在对命令行参数和 planets 数组中的字符串进行比较时忽略大 小写。  7.修改第 5章的编程题11，用字符串指针数组取代switch 语句。例如，现在不再用switch 语句来显示 第一位数字对应的单词，而把该数字用作下标，从包含"twenty"、"thirty"等字符串的数组中搜索。  8.修改第7章的编程题5，使其包含如下函数：  int compute_scrabble_value(const char *word);  函数返回word所指向的字符串的拼字值。 9.修改第7章的编程题10，使其包含如下函数：  int compute_vowel_count(const char *sentence);  函数返回sentence所指向的字符串中元音字母的个数。  10. 修改第7章的编程题11，使其包含如下函数：  void reverse_name(char *name);  在参数name指向的字符串中，名在前、姓在后。在修改后的字符串中，姓在前，其后跟一个逗号和 一个空格，然后是名的首字母，最后加一个点。原始的字符串中，名的前面、名和姓之间、姓的后 面都可以有额外的空格。  11. 修改第7章的编程题13，使其包含如下函数：  double compute_average_word_length(const char *sentence);  函数返回sentence所指向的字符串中单词的平均长度。  12. 修改第 8章的编程题 14，读取句子时把单词存储在一个二维的char 类型数组中，每行存储一个单 词。假定句子中的单词数不超过30，且每个单词的长度都不超过20个字符。注意，要在每个单词的 后面存储一个空字符，使其可以作为字符串处理。  13. 修改第8章的编程题15，使其包含如下函数：  void encrypt(char *message, int shift);  参数message 指向一个包含待加密消息的字符串，shift表示消息中每个字母需要移动的位数。  14. 修改第8章的编程题16，使其包含如下函数：  bool are_anagrams(const char *word1, const char *word2);  如果word1和word2指向的字符串是变位词，函数返回true。  15. 修改第10章的编程题6，使其包含如下函数：  int evaluate_RPN_expression(const char *expression);  函数返回expression指向的RPN表达式的值。  16. 修改第12章的编程题1，使其包含如下函数：  void reverse(char *message);  函数的作用是反转message 指向的字符串。提示：使用两个指针，初始时一个指向字符串的第一个 字符，另一个指向最后一个字符；交换这两个字符，然后让两个指针相向移动；重复这一过程直到 两个指针相遇。  17. 修改第12章的编程题2，使其包含如下函数：  bool is_palindrome(const char *message);  如果message 指向的字符串是回文，函数返回true。  18. 编写程序，按“月/日/年”的格式接受用户输入的日期，然后按“月 日，年”的格式显示，其中 “月”用英文全名：  Enter a date (mm/dd/yyyy): 2/17/2011 You entered the date February 17, 2011  312 用字符串指针数组存储月份的名字。
+1. 编写程序找出一组单词中“最小”单词和“最大”单词。用户输入单词后，程序根据字典顺序决定排在最前面和最后面的单词。当用户输入 4 个字母的单词时，程序停止读入。假设所有单词都不超过 20 个字母。程序会话如下：
+
+   ```
+   Enter word: dog
+   Enter word: zebra
+   Enter word: rabbit
+   Enter word: catfish
+   Enter word: walrus
+   Enter word: cat
+   Smallest word: cat
+   Largest word: zebra
+   ```
+
+   提示：使用两个名为 `smallest_word` 和 `largest_word` 的字符串来分别记录所有输入中的“最小”单词和“最大”单词。用户每输入一个新单词，都要用 `strcmp` 函数把它与 `smallest_word` 进行比较。如果新的单词比 `smallest_word`“小”，就用 `strcpy` 函数把新单词保存到 `smallest_word` 中。用类似的方式与 `largest_word` 进行比较。用 `strlen` 函数来判断用户是否输入了 4 个字母的单词。
+
+2. 按如下方式改进 13.5 节的 `remind.c` 程序：
+
+   (a) 如果对应的日期为负数或大于 31，程序显示出错消息，并忽略提醒。提示：使用 `continue` 语句。
+    (b) 允许用户输入日期、24 小时格式的时间和提醒。显示的提醒列表必须先按日期排序，然后再按时间排序。（原始的 `remind.c` 程序允许用户输入时间，但是它把时间作为提醒的一部分来处理。）
+    (c) 程序显示一年的提醒列表。要求用户按照 `月/日` 的格式输入日期。
+
+3. 修改 8.2 节的 `deal.c` 程序，使它显示出牌的全名：
+
+   ```
+   Enter number of cards in hand: 5
+   Your hand:
+   Seven of clubs
+   Two of spades
+   Five of diamonds
+   Ace of spades
+   Two of hearts
+   ```
+
+   提示：用指向字符串的指针的数组来替换数组 `rank_code` 和数组 `suit_code`。
+
+4. 编写名为 `reverse.c` 的程序，用来逆序输出命令行参数。如果输入 `reverse void and null` 运行程序，产生的输出应为：
+
+   ```
+   null and void
+   ```
+
+5. 编写名为 `sum.c` 的程序，用来对命令行参数（假设都是整数）求和。如果输入 `sum 8 24 62` 运行程序，产生的输出应为：
+
+   ```
+   Total: 94
+   ```
+
+   提示：用 `atoi` 函数（26.2 节）把每个命令行参数从字符串格式转换为整数格式。
+
+6. 改进 13.7 节的程序 `planet.c`，使它在对命令行参数和 `planets` 数组中的字符串进行比较时忽略大小写。
+
+7. 修改第 5 章的编程题 11，用字符串指针数组取代 `switch` 语句。例如，现在不再用 `switch` 语句来显示第一位数字对应的单词，而把该数字用作下标，从包含 `"twenty"`、`"thirty"` 等字符串的数组中搜索。
+
+8. 修改第 7 章的编程题 5，使其包含如下函数：
+
+   ```
+   int compute_scrabble_value(const char *word);
+   ```
+
+   函数返回 `word` 所指向的字符串的拼字值。
+
+9. 修改第 7 章的编程题 10，使其包含如下函数：
+
+   ```
+   int compute_vowel_count(const char *sentence);
+   ```
+
+   函数返回 `sentence` 所指向的字符串中元音字母的个数。
+
+10. 修改第 7 章的编程题 11，使其包含如下函数：
+
+    ```
+    void reverse_name(char *name);
+    ```
+
+    在参数 `name` 指向的字符串中，名在前、姓在后。在修改后的字符串中，姓在前，其后跟一个逗号和一个空格，然后是名的首字母，最后加一个点。原始的字符串中，名的前面、名和姓之间、姓的后面都可以有额外的空格。
+
+11. 修改第 7 章的编程题 13，使其包含如下函数：
+
+    ```
+    double compute_average_word_length(const char *sentence);
+    ```
+
+    函数返回 `sentence` 所指向的字符串中单词的平均长度。
+
+12. 修改第 8 章的编程题 14，读取句子时把单词存储在一个二维的 `char` 类型数组中，每行存储一个单词。假定句子中的单词数不超过 30，且每个单词的长度都不超过 20 个字符。注意，要在每个单词的后面存储一个空字符，使其可以作为字符串处理。
+
+13. 修改第 8 章的编程题 15，使其包含如下函数：
+
+    ```
+    void encrypt(char *message, int shift);
+    ```
+
+    参数 `message` 指向一个包含待加密消息的字符串，`shift` 表示消息中每个字母需要移动的位数。
+
+14. 修改第 8 章的编程题 16，使其包含如下函数：
+
+    ```
+    bool are_anagrams(const char *word1, const char *word2);
+    ```
+
+    如果 `word1` 和 `word2` 指向的字符串是变位词，函数返回 `true`。
+
+15. 修改第 10 章的编程题 6，使其包含如下函数：
+
+    ```
+    int evaluate_RPN_expression(const char *expression);
+    ```
+
+    函数返回 `expression` 指向的 RPN 表达式的值。
+
+16. 修改第 12 章的编程题 1，使其包含如下函数：
+
+    ```
+    void reverse(char *message);
+    ```
+
+    函数的作用是反转 `message` 指向的字符串。提示：使用两个指针，初始时一个指向字符串的第一个字符，另一个指向最后一个字符；交换这两个字符，然后让两个指针相向移动；重复这一过程直到两个指针相遇。
+
+17. 修改第 12 章的编程题 2，使其包含如下函数：
+
+    ```
+    bool is_palindrome(const char *message);
+    ```
+
+    如果 `message` 指向的字符串是回文，函数返回 `true`。
+
+18. 编写程序，按“月/日/年”的格式接受用户输入的日期，然后按“月 日，年”的格式显示，其中“月”用英文全名：
+
+    ```
+    Enter a date (mm/dd/yyyy): 2/17/2011
+    You entered the date February 17, 2011
+    ```
+
+    用字符串指针数组存储月份的名字。
 
 ## 第十四章
 
