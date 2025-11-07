@@ -1,7 +1,7 @@
 #include<stdio.h>
 int main(void)
 {
-    printf("\10 \12 \15 \11");
+    double temperature_readings[30][24];
 
     return 0;
 }

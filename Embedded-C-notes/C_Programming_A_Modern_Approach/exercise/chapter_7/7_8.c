@@ -1,7 +1,7 @@
 #include<stdio.h>
 int main(void)
 {
-    printf("\10 \12 \15 \11");
+    printf("\x07 \x0a \x0d \x09");
 
     return 0;
 }
