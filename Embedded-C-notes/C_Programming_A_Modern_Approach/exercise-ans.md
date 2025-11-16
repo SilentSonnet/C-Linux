@@ -4852,7 +4852,7 @@ int main(void)
         {1, 0, 1, 1, 1, 1, 1}, // 6
         {1, 1, 1, 0, 0, 0, 0}, // 7
         {1, 1, 1, 1, 1, 1, 1}, // 8
-        {1, 1, 1, 0, 1, 1, 1}, // 9
+        {1, 1, 1, 1, 0, 1, 1}, // 9
     };
     return 0;
 }
@@ -6195,73 +6195,554 @@ Enter size of magic square: 9
 
 1. 下列计算三角形面积的函数有两处错误，找出这些错误，并且说明修改它们的方法。（提示：公式中没有错误。）
 
-   ```c
-   double triangle_area(double base, height) 
-   double product;  
-   {   
-       product = base * height;   
-       return product / 2;  
-   }
-   ```
+
+```c
+double triangle_area(double base, height) 
+double product;  
+{   
+    product = base * height;   
+    return product / 2;  
+}
+```
+
+```
+这道题可能稍微有点异议吧，起码我是不太清楚少个分号和形参书写错误都是不是算一个错误，但即使根据不同的理解，也可以按照现代C语言和经典C语言的标准来改正这个函数。
+
+错误 1：形参列表里把两种风格混在一起
+double triangle_area(double base, height)
+这里 base 带了类型 double，但 height 没有类型。
+在现代原型风格（prototype）的函数定义中，每个参数都必须写类型；如果要用老式 K&R 风格（先给标识符列表，再在下一行给类型），那就所有参数都不写类型，并在下一行统一声明。
+
+错误 2：把局部变量声明放在函数头和花括号之间
+在函数头与 { 之间的那一段，只允许老式 K&R “参数类型声明”，不能用来声明普通局部变量。你这里的 double product; 放错了位置，应放进函数体的大括号里（或直接不用该临时变量）。
+```
+
+```C
+// K&R
+double triangle_area(base, height)
+double base, height;
+{
+    double product = base * height;
+    return product / 2.0;
+}
+```
+
+```C
+// 现代C语言
+double triangle_area(double base, double height) 
+{
+    double product = base * height;
+    return product / 2.0;
+}
+```
+
+```C
+#include <stdio.h>
+
+double triangle_area(double base, double height)
+{
+    double product = base * height;
+    return product / 2;
+}
+
+int main(void)
+{
+    double base = 2.0, height = 1.0;
+
+    printf("The base is %.lf and the height is %.lf\n", base, height);
+    printf("the product is %.lf\n", triangle_area(base, height));
+
+    return 0;
+}
+```
+
+```
+alancong@AlanCongdeMacBook-Air chapter_9 % ./a.out 
+The base is 2 and the height is 1
+the product is 1
+```
 
 2. 编写函数 `check(x, y, n)`：如果 `x` 和 `y` 都落在 0~n-1 的闭区间内，那么函数返回 1；否则函数应该返回 0。假设 `x`、`y` 和 `n` 都是 `int` 类型。
 
+```C
+#include<stdio.h>
+#include<stdbool.h>
+
+bool check(int x, int y, int n);
+
+int main(void)
+{
+    int x, y, n;
+    printf("Enter the x and y: ");
+    scanf("%d%d", &x, &y);
+    printf("Enter the range of n: ");
+    scanf("%d", &n);
+
+    if(check(x, y, n))
+        printf("X and Y is in the range of n!\n");
+    else 
+        printf("X and Y is not in the range of n!\n");
+
+    return 0;
+}
+
+bool check(int x, int y, int n)
+{
+    if((0 <= x && x <= n - 1) && (0 <= y && y <= n - 1))
+        return true;
+    else 
+        return false;
+}
+```
+
+```
+alancong@AlanCongdeMacBook-Air chapter_9 % ./a.out 
+Enter the x and y: 1 2
+Enter the range of n: 6
+X and Y is in the range of n!
+alancong@AlanCongdeMacBook-Air chapter_9 % ./a.out
+Enter the x and y: 5 6
+Enter the range of n: 2
+X and Y is not in the range of n!
+```
+
 3. 编写函数 `gcd(m, n)` 来计算整数 `m` 和 `n` 的最大公约数。（第6章的编程题2描述了计算最大公约数的 Euclid 算法。）
+
+```C
+#include<stdio.h>
+
+int gcd(int m, int n);
+
+int main(void)
+{
+    int m, n, temp;
+    printf("Enter two integers: ");
+    scanf("%d %d", &m, &n);
+
+    printf("Greatest common divisor: %d\n", gcd(m, n));
+    return 0;
+}
+
+int gcd(int m, int n)
+{
+    int temp;
+    while(n != 0)
+    {
+        temp = n;
+        n = m % n;
+        m = temp;
+    }
+    return m;
+}
+```
+
+```
+alancong@AlanCongdeMacBook-Air chapter_9 % ./a.out 
+Enter two integers: 6 3
+Greatest common divisor: 3
+alancong@AlanCongdeMacBook-Air chapter_9 % ./a.out
+Enter two integers: 35 37
+Greatest common divisor: 1
+```
 
 4. 编写函数 `day_of_year(month, day, year)`，使得函数返回由这三个参数确定的那一天是一年中的第几天（1~366范围内的整数）。
 
+```C
+// 这段 switch 的写法参考了网上一份小米扫地机器人相关代码，使用了 switch 的贯穿特性（fall-through）来处理边界判断。
+// 相比多个 if-else，switch 在某些编译器或连续 case 的场景下可能更高效，但具体性能依赖于编译器和上下文优化。
+
+#include <stdio.h>
+
+int day_of_year(int month, int day, int year);
+
+int main(void)
+{
+    int month, day, year;
+    printf("Enter the month/day/year: ");
+    scanf("%d / %d / %d", &month, &day, &year);
+
+    printf("The sum of the day before is : %d\n", day_of_year(month, day, year));
+    return 0;
+}
+
+int day_of_year(int month, int day, int year)
+{
+    // 1 3 5 7 8 10 12 - 31
+    int sum = 0;
+    switch (month)
+    {
+    case 12:
+    case 11:
+        sum += 31;
+    case 10:
+        sum += 31;
+    case 9:
+        sum += 31;
+    case 8:
+        sum += 31;
+    case 7:
+        sum += 30;
+    case 6:
+        sum += 31;
+    case 5:
+        sum += 30;
+    case 4:
+        sum += 31;
+    case 3:
+        if(((year % 4 == 0) && (year % 100 != 0)) || year % 400 == 0 )
+            sum += 29;
+        else 
+            sum += 28;
+    case 2:
+        sum += 31;
+    case 1:
+        break;
+    }
+
+    sum += day;
+
+    return sum;
+}
+```
+
+```C
+// 这个版本就是很常规的数组的写法，代码还可以进行简化，只不过需要用到指针，
+#include <stdio.h>
+
+int day_of_year(int month, int day, int year);
+
+int main(void)
+{
+    int month, day, year;
+
+    printf("Enter the month/day/year: ");
+    scanf("%d / %d / %d", &month, &day, &year);
+
+    printf("The sum of the day before is : %d\n", day_of_year(month, day, year));
+    return 0;
+}
+
+int day_of_year(int month, int day, int year)
+{
+
+    int days_in_months[] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+    int days_in_months_leap[] = {31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+    int sum = 0;
+
+    if ((year % 4 == 0 && year % 100 != 0) || year % 400 == 0)
+    {
+        for (int i = 0; i < month - 1; i++)
+        {
+            sum += days_in_months_leap[i];
+        }
+    }
+    else
+    {
+        for (int i = 0; i < month - 1; i++)
+        {
+            sum += days_in_months[i];
+        }
+    }
+
+    sum += day;
+
+    return sum;
+}
+
+```
+
+```C
+#include <stdio.h>
+
+int day_of_year(int month, int day, int year);
+
+int main(void)
+{
+    int month, day, year;
+    printf("Enter the month/day/year: ");
+    scanf("%d / %d / %d", &month, &day, &year);
+
+    printf("The sum of the day before is : %d\n", day_of_year(month, day, year));
+    return 0;
+}
+
+int day_of_year(int month, int day, int year)
+{
+    int normal[] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+    int leap[]   = {31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+
+    int *days_in_months;
+
+    // 判断是否为闰年
+    if ((year % 4 == 0 && year % 100 != 0) || year % 400 == 0)
+        days_in_months = leap;
+    else
+        days_in_months = normal;
+
+    int sum = 0;
+    for (int i = 0; i < month - 1; i++)
+        sum += days_in_months[i];
+
+    sum += day;
+    return sum;
+}
+```
+
+```
+alancong@AlanCongdeMacBook-Air chapter_9 % ./a.out 
+Enter the month/day/year: 12/31/2016
+The sum of the day before is : 366
+```
+
 5. 编写函数 `num_digits(n)`，使得函数返回正整数 `n` 中数字的个数。提示：为了确定 `n` 中数字的个数，把这个数反复除以10，当 `n` 达到0时，除法运算的次数表明了 `n` 最初拥有的数字的个数。
+
+```C
+// 虽然题目规定的输入是正整数n，但是我加入了零和负数的判断
+#include<stdio.h>
+
+int num_digits(int number);
+
+int main(void)
+{
+    int number;
+    printf("Enter a number : ");
+    scanf("%d", &number);
+
+    printf("The digits of number is : %d\n", num_digits(number));
+
+    return 0;
+}
+
+int num_digits(int number)
+{
+    int sum = 0;
+
+    // zero is also an one digit number!
+    if(number == 0)
+        return 1;
+    
+    if(number < 0)
+        number = -number;
+
+    while(number > 0)
+    {
+        sum ++;
+        number  /= 10;
+    }
+
+    return sum;
+}
+```
+
+```
+alancong@AlanCongdeMacBook-Air chapter_9 % ./a.out 
+Enter a number : 123
+The digits of number is : 3
+alancong@AlanCongdeMacBook-Air chapter_9 % ./a.out 
+Enter a number : 0
+The digits of number is : 1
+alancong@AlanCongdeMacBook-Air chapter_9 % ./a.out 
+Enter a number : -123
+The digits of number is : 3
+```
 
 6. 编写函数 `digit(n, k)`，使得函数返回正整数 `n` 中的第 `k` 位数字（从右边算起）。例如，`digit(829, 1)` 返回 9，`digit(829, 2)` 返回 2，`digit(829, 3)` 返回 8。如果 `k` 大于 `n` 所含有的数字个数，那么函数返回 0。
 
+```C
+#include<stdio.h>
+
+int digit(int number, int k);
+
+int main(void)
+{
+    int number, k, flag;
+    printf("Enter a number : ");
+    scanf("%d %d", &number, &k);
+
+    if(digit(number, k) != -1)
+        printf("The digit at position %d from the right is: %d\n", k, digit(number, k));
+    else 
+        printf("The number doesn't have %d digits.\n", k);
+
+    return 0;
+}
+
+int digit(int number, int k)
+{
+    if(number == 0)
+        return (k == 1) ? 0 : -1;
+    
+    if(number < 0)
+        number = -number;
+
+    for(int i = 1;i < k;i ++)
+        number /= 10;
+    if(number == 0)
+        return -1;
+    
+    return number % 10;
+}
+```
+
+```
+alancong@AlanCongdeMacBook-Air chapter_9 % ./a.out 
+Enter a number : 829 1
+The digit at position 1 from the right is: 9
+alancong@AlanCongdeMacBook-Air chapter_9 % ./a.out
+Enter a number : 829 2
+The digit at position 2 from the right is: 2
+alancong@AlanCongdeMacBook-Air chapter_9 % ./a.out
+Enter a number : 829 3
+The digit at position 3 from the right is: 8
+```
+
 7. 假设函数 `f` 有如下定义：
 
-   ```c
-   int f(int a, int b) { ... }
-   ```
+```c
+int f(int a, int b) { ... }
+```
 
-   那么下面哪些语句是合法的？（假设 `i` 的类型为 `int` 而 `x` 的类型为 `double`。）
+那么下面哪些语句是合法的？（假设 `i` 的类型为 `int` 而 `x` 的类型为 `double`。）
 
-   ```
-   (a) i = f(83, 12);
-   (b) x = f(83, 12);
-   (c) i = f(3.15, 9.28);
-   (d) x = f(3.15, 9.28);
-   (e) f(83, 12);
-   ```
+```C
+(a) i = f(83, 12);
+(b) x = f(83, 12);
+(c) i = f(3.15, 9.28);
+(d) x = f(3.15, 9.28);
+(e) f(83, 12);
+```
+
+```
+(a) i = f(83, 12); 合法，完全匹配
+(b) x = f(83, 12); 合法，但是存在返回值的隐式类型转换 int→double
+(c) i = f(3.15, 9.28); 合法，但是存在形式参数的隐式类型转换 double→int，因此存在精度损失
+(d) x = f(3.15, 9.28); 合法，但是存在返回值和形式参数的隐式类型转换 double→int，因此存在精度损失
+(e) f(83, 12); 合法，虽然没有使用函数的返回值，但这是合法的
+```
+```
+#include <stdio.h>
+
+int f(int a, int b);
+
+int main(void)
+{
+    int i;
+    double x;
+
+    i = f(83, 12);
+    x = f(83, 12);
+    i = f(3.15, 9.28);
+    x = f(3.15, 9.28);
+    f(83, 12);
+    
+    return 0;
+}
+
+int f(int a, int b)
+{
+    return a + b;
+}
+```
+```
+alancong@AlanCongdeMacBook-Air chapter_9 % cc 9_7.c 
+9_7.c:12:17: warning: implicit conversion from 'double' to 'int' changes value from 9.279999999999999 to 9 [-Wliteral-conversion]
+   12 |     i = f(3.15, 9.28);
+      |         ~       ^~~~
+9_7.c:12:11: warning: implicit conversion from 'double' to 'int' changes value from 3.15 to 3 [-Wliteral-conversion]
+   12 |     i = f(3.15, 9.28);
+      |         ~ ^~~~
+9_7.c:13:17: warning: implicit conversion from 'double' to 'int' changes value from 9.279999999999999 to 9 [-Wliteral-conversion]
+   13 |     x = f(3.15, 9.28);
+      |         ~       ^~~~
+9_7.c:13:11: warning: implicit conversion from 'double' to 'int' changes value from 3.15 to 3 [-Wliteral-conversion]
+   13 |     x = f(3.15, 9.28);
+      |         ~ ^~~~
+4 warnings generated.
+```
 
 9.2 节
 
-1. 对于不返回值且有一个 `double` 类型形式参数的函数，下列哪些函数原型是有效的？
+8. 对于不返回值且有一个 `double` 类型形式参数的函数，下列哪些函数原型是有效的？
 
-   ```
+```
 (a) void f(double x);
-   (b) void f(double);
+(b) void f(double);
 (c) void f(x);
-   (d) f(double x);
+(d) f(double x);
+```
+
+```
+(a) void f(double x); 合法，这个就是标准的函数声明
+(b) void f(double); 合法，函数声明的时候可以省略掉形式参数的名字
+(c) void f(x); 不合法，可以省略形式参数的名字但是无法省略类型名
+(d) f(double x); 不合法，没有返回值
+```
+
+```C
+#include<stdio.h>
+
+void f(double x);
+void f(double);
+void f(x);
+f(double x);
+
+int main(void)
+{
+    return 0;
+}
+
+void f(double x)
+{
+    
+}
+```
+
+```
+alancong@AlanCongdeMacBook-Air chapter_9 % cc 9_8.c
+9_8.c:5:8: error: a parameter list without types is only allowed in a function definition
+    5 | void f(x);
+      |        ^
+9_8.c:6:1: error: type specifier missing, defaults to 'int'; ISO C99 and later do not support implicit int [-Wimplicit-int]
+    6 | f(double x);
+      | ^
+      | int
+9_8.c:6:1: error: conflicting types for 'f'
+9_8.c:4:6: note: previous declaration is here
+    4 | void f(double);
+      |      ^
+3 errors generated.
 ```
 
 9.3 节
 
-1. 下列程序的输出是什么？
+9. 下列程序的输出是什么？
 
-   ```c
-   #include 
-   void swap(int a, int b);
-   int main(void) {
-       int i = 1, j = 2;
-       swap(i, j);
-       printf("i = %d, j = %d\n", i, j);
-       return 0;
-   }
-   void swap(int a, int b) {
-       int temp = a;
-       a = b;
-       b = temp;
-   }
-   ```
+```c
+#include 
+void swap(int a, int b);
+int main(void) {
+    int i = 1, j = 2;
+    swap(i, j);
+    printf("i = %d, j = %d\n", i, j);
+    return 0;
+}
+void swap(int a, int b) {
+    int temp = a;
+    a = b;
+    b = temp;
+}
+```
 
-2. 编写函数，使得函数返回下列值。（假设 `a` 和 `n` 是形式参数，其中 `a` 是 `int` 类型数组，`n` 是数组的长度。）
+```
+alancong@AlanCongdeMacBook-Air chapter_9 % ./a.out 
+i = 1, j = 2
+```
+
+```
+这个程序是用来交换输入参数的值，但是最终的输出并没有任何的副作用，这是因为形式参数相当于实际参数的备份，对形式参数的修改并不会导致实际参数的变化，很容易想到的思路就是”直接传入“需要交换的变量本身，这个就是指针。
+```
+
+10. 编写函数，使得函数返回下列值。（假设 `a` 和 `n` 是形式参数，其中 `a` 是 `int` 类型数组，`n` 是数组的长度。）
 
 ```
 (a) 数组 a 中最大的元素。
@@ -6269,7 +6750,59 @@ Enter size of magic square: 9
 (c) 数组 a 中正数元素的数量。
 ```
 
-1. 编写下面的函数：
+```C
+#include<stdio.h>
+
+int max(int a[], int n);
+double ave(int a[], int n);
+int count(int a[], int n);
+
+int main(void)
+{
+    int test[10] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+    printf("The max of array Test is : %d\n", max(test, 10));
+    printf("The ave of array Test is : %.1lf\n", ave(test, 10));
+    printf("The count of array Test is : %d\n", count(test, 10));
+    return 0;
+}
+
+int max(int a[], int n)
+{
+    int max = a[0];
+    for(int i = 1;i < n;i ++)
+        if(max < a[i])
+            max = a[i];
+
+    return 0;
+}
+
+double ave(int a[], int n)
+{
+    double sum = 0;
+    for(int i = 0;i < n;i ++)
+        sum += a[i];
+
+    return sum / n;
+}
+
+int count(int a[], int n)
+{
+    int count = 0;
+    for(int i = 0;i < n;i ++)
+        if(a[i] > 0)
+            count ++;
+
+    return count;
+}
+```
+
+```
+The max of array Test is : 0
+The ave of array Test is : 4.5
+The count of array Test is : 9
+```
+
+11. 编写下面的函数：
 
 ```c
 float compute_GPA(char grades[], int n);
@@ -6277,7 +6810,40 @@ float compute_GPA(char grades[], int n);
 
 其中 `grades` 数组包含字母等级（A、B、C、D 或 F，大小写皆可），`n` 是数组的长度。函数应返回等级的平均值（假定 A=4，B=3，C=2，D=1，F=0）。
 
-1. 编写下面的函数：
+```C
+#include <stdio.h>
+#include <ctype.h>
+
+float compute_GPA(char grades[], int n);
+
+int main(void)
+{
+    char grade[] = {'A', 'B', 'C', 'D', 'F'};
+
+    printf("The GPA is : %.1lf\n", compute_GPA(grade, 5));
+
+    return 0;
+}
+
+float compute_GPA(char grades[], int n)
+{
+    float ave = 0;
+    for(int i = 0;i < n;i ++)
+    {
+        if('A' <= toupper(grades[i]) && toupper(grades[i]) <= 'D')
+            ave += 1 - (toupper(grades[i]) - 'D');
+    }
+
+    return ave / n;
+}
+```
+
+```
+alancong@AlanCongdeMacBook-Air chapter_9 % ./a.out 
+The GPA is : 2.0
+```
+
+12. 编写下面的函数：
 
 ```c
 double inner_product(double a[], double b[], int n);
@@ -6285,7 +6851,36 @@ double inner_product(double a[], double b[], int n);
 
 函数应返回 `a[0] * b[0] + a[1] * b[1] + ... + a[n-1] * b[n-1]`。
 
-1. 编写下面的函数，对棋盘位置求值：
+```C
+#include <stdio.h>
+
+double inner_product(double a[], double b[], int n);
+
+int main(void)
+{
+    double a[] = {-1.5, 0.0, 2.5, 3.0};
+    double b[] = {4.0, -2.0, 1.0, 0.5};
+
+    printf("The inner product is : %.1lf\n", inner_product(a, b, 4));
+    return 0;
+}
+
+double inner_product(double a[], double b[], int n)
+{
+    double sum = 0;
+    for (int i = 0; i < n; i++)
+        sum += a[i] * b[i];
+
+    return sum;
+}
+```
+
+```
+alancong@AlanCongdeMacBook-Air chapter_9 % ./a.out 
+The inner product is : -2.0
+```
+
+13. 编写下面的函数，对棋盘位置求值：
 
 ```c
 int evaluate_position(char board[8][8]);
@@ -6293,9 +6888,109 @@ int evaluate_position(char board[8][8]);
 
 `board` 表示棋盘上方格的配置，其中字母 K、Q、R、B、N、P 表示白色的方格，字母 k、q、r、b、n、p 表示黑色的方格。`evaluate_position` 应计算出白色方格的和（Q=9，R=5，B=3，N=3，P=1），并按类似的方法计算出黑色方格的和，然后返回这两个数的差。如果白子占优则返回值为正数，如果黑子占优则返回值为负数。
 
+```C
+#include <stdio.h>
+#include <ctype.h>
+int evaluate_position(char board[8][8]);
+
+// （Q=9，R=5，B=3，N=3，P=1）
+
+char midgame_board[8][8] = {
+    {'r', '.', '.', '.', 'k', '.', '.', 'r'},
+    {'p', 'p', 'p', 'q', '.', 'p', 'p', 'p'},
+    {'.', '.', 'n', '.', '.', '.', '.', '.'},
+    {'.', 'b', '.', 'p', 'P', '.', '.', '.'},
+    {'.', '.', 'P', '.', 'N', 'B', '.', '.'},
+    {'.', '.', '.', '.', '.', '.', '.', '.'},
+    {'P', 'P', '.', 'Q', '.', 'P', 'P', 'P'},
+    {'R', 'N', 'B', '.', 'K', '.', '.', 'R'}};
+
+char endgame_board[8][8] = {
+    {'.', '.', '.', '.', 'k', '.', '.', '.'},
+    {'.', '.', '.', '.', '.', '.', '.', '.'},
+    {'.', '.', '.', '.', '.', '.', '.', '.'},
+    {'.', '.', '.', '.', 'p', '.', '.', '.'},
+    {'.', '.', '.', '.', 'P', '.', '.', '.'},
+    {'.', '.', '.', '.', '.', '.', '.', '.'},
+    {'.', '.', '.', '.', '.', '.', '.', '.'},
+    {'.', '.', '.', '.', 'K', '.', '.', 'R'}};
+
+int main(void)
+{
+    if (evaluate_position(midgame_board) > 0)
+        printf("White advanced!\n");
+    else if (evaluate_position(midgame_board) < 0)
+        printf("Black advanced!\n");
+    else
+        printf("Even position.\n");
+
+    if (evaluate_position(endgame_board) > 0)
+        printf("White advanced!\n");
+    else if (evaluate_position(endgame_board) < 0)
+        printf("Black advanced!\n");
+    else
+        printf("Even position.\n");
+
+    return 0;
+}
+
+int evaluate_position(char board[8][8])
+{
+    int black = 0, white = 0;
+    for (int i = 0; i < 8; i++)
+        for (int j = 0; j < 8; j++)
+        {
+            switch (board[i][j])
+            {
+            case 'q':
+                black += 9;
+                break;
+            case 'r':
+                black += 5;
+                break;
+            case 'b':
+                black += 3;
+                break;
+            case 'n':
+                black += 3;
+                break;
+            case 'p':
+                black += 1;
+                break;
+            case 'Q':
+                white += 9;
+                break;
+            case 'R':
+                white += 5;
+                break;
+            case 'B':
+                white += 3;
+                break;
+            case 'N':
+                white += 3;
+                break;
+            case 'P':
+                white += 1;
+                break;
+            default:
+                break;
+            }
+        }
+
+    return white - black;
+}
+
+```
+
+```
+alancong@AlanCongdeMacBook-Air chapter_9 % ./a.out 
+White advanced!
+White advanced!
+```
+
 9.4 节
 
-1. 如果数组 `a` 中有任一元素的值为 0，那么下列函数返回 `true`；如果数组 `a` 的所有元素都是非零的，则函数返回 `false`。可惜的是，此函数有错误。请找出错误并且说明修改它的方法。
+14. 如果数组 `a` 中有任一元素的值为 0，那么下列函数返回 `true`；如果数组 `a` 的所有元素都是非零的，则函数返回 `false`。可惜的是，此函数有错误。请找出错误并且说明修改它的方法。
 
 ```c
 bool has_zero(int a[], int n) {
@@ -6308,7 +7003,44 @@ bool has_zero(int a[], int n) {
 }
 ```
 
-1. 下面这个（相当混乱的）函数找出三个数的中间数。重新编写函数，使得它只有一条 `return` 语句。
+```C
+// 假设数组第一个元素为非零值，第二个元素为零，那么在运行这个函数的时候，因为第一个元素非零就会提前返回
+// 但这并非程序的预期运行结果，预期下程序应当运行到第二个元素的时候才返回。
+#include <stdio.h>
+#include <stdbool.h>
+
+bool has_zero(int a[], int n);
+
+int main(void)
+{
+    int a[10] = {1, 2, 3, 4, 5, 0, 6, 7, 8, 9};
+    if(has_zero(a, 10))
+        printf("Contains zero.\n");
+    else 
+        printf("Does not contain zero.\n");
+
+    return 0;
+}
+
+bool has_zero(int a[], int n)
+{
+    int i;
+    for (i = 0; i < n; i++)
+        if (a[i] == 0)
+            return true;
+
+    return false;
+}
+```
+
+```
+alancong@AlanCongdeMacBook-Air chapter_9 % ./a.out 
+Contains zero.
+```
+
+
+
+15. 下面这个（相当混乱的）函数找出三个数的中间数。重新编写函数，使得它只有一条 `return` 语句。
 
 ```c
 double median(double x, double y, double z) {
@@ -6322,12 +7054,146 @@ double median(double x, double y, double z) {
 }
 ```
 
+```C
+#include <stdio.h>
+
+double median(double x, double y, double z);
+
+int main(void)
+{
+    double a[3];
+    printf("Enter three number : ");
+    for(int i = 0;i < 3;i ++)
+        scanf("%lf", &a[i]);
+
+    printf("The middle of %.lf %.lf %.lf is : %.lf\n", a[0], a[1], a[2], median(a[0], a[1], a[2]));
+
+    return 0;
+}
+
+double median(double x, double y, double z)
+{
+    double middle;
+    if((x <= y && y <= z) || (z <= y && y <= x))
+        middle = y;
+    else if((x <= z && z <= y) || (y <= z && z <= x))
+        middle = z;
+    else 
+        middle = x;
+
+    return middle;
+}
+```
+
+```
+alancong@AlanCongdeMacBook-Air chapter_9 % ./a.out 
+Enter three number : 1 2 3
+The middle of 1 2 3 is : 2
+alancong@AlanCongdeMacBook-Air chapter_9 % ./a.out
+Enter three number : 1 6 9
+The middle of 1 6 9 is : 6
+```
+
 9.6 节
 
-1. 请采用精简 `power` 函数的方法来简化 `fact` 函数。
-2. 请重新编写 `fact` 函数，使得编写后的函数不再有递归。
-3. 编写递归版本的 `gcd` 函数（见练习题3）。下面是用于计算 `gcd(m, n)` 的策略：如果 `n` 为 0，那么返回 `m`；否则，递归地调用 `gcd` 函数，把 `n` 作为第一个实际参数进行传递，而把 `m % n` 作为第二个实际参数进行传递。
-4. 思考下面这个“神秘”的函数：
+16. 请采用精简 `power` 函数的方法来简化 `fact` 函数。
+
+
+```C
+#include <stdio.h>
+int fact(int n);
+
+int main(void)
+{
+    int n;
+    printf("Enter a number : ");
+    scanf("%d", &n);
+
+    printf("The fact of %d is : %d\n", n, fact(n));
+
+    return 0;
+}
+int fact(int n)
+{
+    return n <= 1 ? 1 : n * fact(n - 1);
+}
+```
+
+```
+alancong@AlanCongdeMacBook-Air chapter_9 % ./a.out 
+Enter a number : 5
+The fact of 5 is : 120
+```
+
+17. 请重新编写 `fact` 函数，使得编写后的函数不再有递归。
+
+```C
+#include <stdio.h>
+
+int fact(int n);
+
+int main(void)
+{
+    int n;
+    printf("Enter a number : ");
+    scanf("%d", &n);
+
+    printf("The fact of %d is : %d\n", n, fact(n));
+
+    return 0;
+}
+int fact(int n)
+{
+    int res = 1;
+    while(n > 0)
+    {
+        res *= n;
+        n --;
+    }
+
+    return res;
+}
+```
+
+```
+alancong@AlanCongdeMacBook-Air chapter_9 % ./a.out 
+Enter a number : 5
+The fact of 5 is : 120
+```
+
+18. 编写递归版本的 `gcd` 函数（见练习题3）。下面是用于计算 `gcd(m, n)` 的策略：如果 `n` 为 0，那么返回 `m`；否则，递归地调用 `gcd` 函数，把 `n` 作为第一个实际参数进行传递，而把 `m % n` 作为第二个实际参数进行传递。
+
+```c
+#include<stdio.h>
+
+int gcd(int m, int n);
+
+int main(void)
+{
+    int m, n, temp;
+    printf("Enter two integers: ");
+    scanf("%d %d", &m, &n);
+
+    printf("Greatest common divisor: %d\n", gcd(m, n));
+    return 0;
+}
+
+int gcd(int m, int n)
+{
+    return n == 0 ? m : gcd(n ,m % n);
+}
+```
+
+```
+alancong@AlanCongdeMacBook-Air chapter_9 % ./a.out 
+Enter two integers: 6 3
+Greatest common divisor: 3
+alancong@AlanCongdeMacBook-Air chapter_9 % ./a.out
+Enter two integers: 35 37
+Greatest common divisor: 1
+```
+
+19. 思考下面这个“神秘”的函数：
 
 ```c
 void pb(int n) {
@@ -6340,98 +7206,766 @@ void pb(int n) {
 
 手动跟踪函数的执行。然后编写程序调用此函数，把用户输入的数传递给此函数。函数做了什么？
 
+```C
+#include <stdio.h>
+
+void pb(int n);
+
+int main(void)
+{
+    int n;
+    printf("Enter a number : ");
+    scanf("%d", &n);
+
+    pb(n);
+
+    printf("\n");
+
+    return 0;
+}
+
+void pb(int n)
+{
+    if (n != 0)
+    {
+        pb(n / 2);
+        putchar('0' + n % 2);
+    }
+}
+```
+
+```
+alancong@AlanCongdeMacBook-Air chapter_9 % ./a.out
+Enter a number : 1
+1
+alancong@AlanCongdeMacBook-Air chapter_9 % ./a.out
+Enter a number : 2
+10
+alancong@AlanCongdeMacBook-Air chapter_9 % ./a.out
+Enter a number : 15
+1111
+alancong@AlanCongdeMacBook-Air chapter_9 % ./a.out
+Enter a number : 255
+11111111
+alancong@AlanCongdeMacBook-Air chapter_9 % ./a.out
+Enter a number : 65535
+1111111111111111
+```
+
+```
+很显然这是一个将十进制数转化为二进制数的程序。
+```
+
 ### 编程题
 
 1. 编写程序，要求用户输入一串整数（把这串整数存储在数组中），然后通过调用 `selection_sort` 函数来排序这些整数。在给定 n 个元素的数组后，`selection_sort` 函数必须做下列工作：
     (a) 搜索数组找出最大的元素，然后把它移到数组的最后；
     (b) 递归地调用函数本身来对前 n-1 个数组元素进行排序。
 
+
+```C
+#include <stdio.h>
+#include <stdbool.h>
+
+int selection_sort(int arr[], int n);
+
+int arr[100] = {
+    37, 12, 65, 90, 21, 78, 3, 44, 29, 8,
+    70, 18, 61, 49, 6, 95, 85, 1, 32, 25,
+    72, 31, 87, 11, 66, 22, 76, 91, 38, 26,
+    84, 59, 53, 23, 34, 4, 96, 10, 17, 92,
+    40, 36, 7, 14, 73, 9, 58, 35, 41, 50,
+    45, 28, 39, 79, 63, 64, 2, 55, 19, 20,
+    71, 80, 86, 60, 62, 24, 16, 33, 47, 88,
+    15, 30, 13, 74, 81, 48, 5, 67, 52, 97,
+    68, 75, 43, 56, 46, 89, 42, 82, 27, 93,
+    83, 57, 98, 94, 69, 99, 77, 51, 54, 0};
+
+int main(void)
+{
+    for (int i = 0; i < 100; i++)
+        printf("%2d ", arr[i]);
+    printf("\n");
+
+    selection_sort(arr, 100);
+
+    for (int i = 0; i < 100; i++)
+        printf("%2d ", arr[i]);
+    printf("\n");
+
+    return 0;
+}
+
+int selection_sort(int arr[], int n)
+{
+    int temp, max, index = 0;
+
+    if (n == 1)
+        return 0;
+    else
+    {
+        max = arr[0];
+
+        for (int i = 1; i < n; i++)
+            if (max < arr[i])
+            {
+                max = arr[i];
+                index = i;
+            }
+
+        temp = arr[n - 1];
+        arr[n - 1] = max;
+        arr[index] = temp;
+
+        selection_sort(arr, n - 1);
+    }
+
+    return 0;
+}
+```
+
+```
+alancong@AlanCongdeMacBook-Air chapter_9 % ./a.out 
+37 12 65 90 21 78  3 44 29  8 70 18 61 49  6 95 85  1 32 25 72 31 87 11 66 22 76 91 38 26 84 59 53 23 34  4 96 10 17 92 40 36  7 14 73  9 58 35 41 50 45 28 39 79 63 64  2 55 19 20 71 80 86 60 62 24 16 33 47 88 15 30 13 74 81 48  5 67 52 97 68 75 43 56 46 89 42 82 27 93 83 57 98 94 69 99 77 51 54  0 
+ 0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63 64 65 66 67 68 69 70 71 72 73 74 75 76 77 78 79 80 81 82 83 84 85 86 87 88 89 90 91 92 93 94 95 96 97 98 99 
+```
+
+```
+这道题在写的时候在两个地方，一是递归函数的调用有点不太熟练。二是index的初始值我没有搞清楚，其实很容易理解，一共就是两种情况，当a[0]不是最大值的时候index就会是循环中的i，如果a[0]本身就是最大值，那么交换的a[index]就应该是a[0]，但是我一开始写成了index = n - 1，这个就交换错了，所以最终的结果不对，部分有序的结果我认为是和a[0]的值为37有关，从38开始是有序的，但是当37本身是最大的数字的时候，bug就暴露出来了。
+```
+
+```
+alancong@AlanCongdeMacBook-Air chapter_9 % ./a.out 
+37 12 65 90 21 78  3 44 29  8 70 18 61 49  6 95 85  1 32 25 72 31 87 11 66 22 76 91 38 26 84 59 53 23 34  4 96 10 17 92 40 36  7 14 73  9 58 35 41 50 45 28 39 79 63 64  2 55 19 20 71 80 86 60 62 24 16 33 47 88 15 30 13 74 81 48  5 67 52 97 68 75 43 56 46 89 42 82 27 93 83 57 98 94 69 99 77 51 54  0 
+ 0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63 64 65 66 67 68 69 70 71 72 73 74 75 76 77 78 79 80 81 82 83 84 85 86 87 88 89 90 91 92 93 94 95 96 97 98 99 
+```
+
 2. 修改第5章的编程题5，用函数计算所得税的金额。在输入应纳税所得额后，函数返回税金。
+
+```C
+#include<stdio.h>
+
+float calculate_tax(int income);
+
+int main(void)
+{
+    int income;
+    float tax;
+    printf("Enter your income:");
+    scanf("%d", &income);
+
+    printf("The tax is:%.2f\n", calculate_tax(income));
+
+    return 0;
+}
+
+float calculate_tax(int income)
+{
+    float tax;
+    if(income < 750)
+        tax = income * 0.01f;
+    else if(750 <= income && income <= 2250)
+        tax = (income - 750) * 0.02 + 7.5f;
+    else if(2250 <= income && income <= 3750)
+        tax = (income - 2250) * 0.03 + 37.5f;
+    else if(3750 <= income && income <= 5250)
+        tax = (income - 3750) * 0.04 + 82.5f;
+    else if(5250 <= income && income <= 7000)
+        tax = (income - 5250) * 0.05 + 142.5f;
+    else if(income > 7000)
+        tax = (income - 7000) * 0.06 + 230.0f;
+
+    return tax;
+}
+```
+
+```
+alancong@AlanCongdeMacBook-Air chapter_9 % ./a.out 
+Enter your income:256
+The tax is:2.56
+```
 
 3. 修改第8章的编程题9，使其包含下列函数：
 
-   ```c
-   void generate_random_walk(char walk[10][10]);
-   void print_array(char walk[10][10]);
-   ```
+```c
+void generate_random_walk(char walk[10][10]);
+void print_array(char walk[10][10]);
+```
 
-   main 函数首先调用 `generate_random_walk`，该函数把所有数组元素都初始化为字符 `.`，然后将其中一些字符替换为 A~Z 的字母，详见原题的描述。接着，main 函数调用 `print_array` 函数来显示数组。
+main 函数首先调用 `generate_random_walk`，该函数把所有数组元素都初始化为字符 `.`，然后将其中一些字符替换为 A~Z 的字母，详见原题的描述。接着，main 函数调用 `print_array` 函数来显示数组。
+
+```
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdbool.h>
+#include <time.h>
+
+// the index to find if the direction is reachable
+#define UP 0
+#define RIGHT 1
+#define LEFT 2
+#define DOWN 3
+#define ROW 10
+#define COLUMN 10
+
+void generate_random_walk(char walk[10][10]);
+void print_array(char walk[10][10]);
+
+int main(void)
+{
+    char board[ROW][COLUMN];
+
+    generate_random_walk(board);
+    print_array(board);
+
+    return 0;
+}
+
+void generate_random_walk(char walk[10][10])
+{
+    int row = 0, col = 0, direction_num = 0, dir;
+    bool direction[4] = {false};
+    char snake = 'A';
+    // initiate char array
+    for (int i = 0; i < 10; i++)
+        for (int j = 0; j < 10; j++)
+            walk[i][j] = '.';
+
+    walk[row][col] = snake;
+    // set the random seed
+    srand(time(NULL));
+
+    // until the string is finished
+    while (snake < 'Z')
+    {
+        // check if the direction is reachable
+        // the coordinate of the snake is (row, col)
+        // so the up direction is (row - 1, col)
+
+        // initiate the number of reachable number
+        direction_num = 0;
+
+        // check UP
+        if (((row - 1) >= 0) && (walk[row - 1][col] == '.'))
+        {
+            direction[UP] = true;
+            direction_num++;
+        }
+        // check DOWN
+        if (((row + 1) < 10) && (walk[row + 1][col] == '.'))
+        {
+            direction[DOWN] = true;
+            direction_num++;
+        }
+        // check LEFT
+        if (((col - 1) >= 0) && (walk[row][col - 1] == '.'))
+        {
+            direction[LEFT] = true;
+            direction_num++;
+        }
+        // check RIGHT
+        if (((col + 1) < 10) && (walk[row][col + 1] == '.'))
+        {
+            direction[RIGHT] = true;
+            direction_num++;
+        }
+
+        // if there is still space remain
+        if (direction_num > 0)
+        {
+            // if the direction is unreachable, just try again.
+            while (direction[(dir = rand() % 4)] != true)
+                ;
+            if (dir == UP)
+            {
+                row--;
+            }
+            if (dir == DOWN)
+            {
+                row++;
+            }
+            if (dir == RIGHT)
+            {
+                col++;
+            }
+            if (dir == LEFT)
+            {
+                col--;
+            }
+
+            walk[row][col] = ++snake;
+
+            // reset the director of the direction
+            for (int i = 0; i < 4; i++)
+                direction[i] = false;
+        }
+        else
+            break;
+    }
+}
+
+void print_array(char walk[10][10])
+{
+    for (int i = 0; i < 10; i++)
+    {
+        for (int j = 0; j < 10; j++)
+            printf("%c ", walk[i][j]);
+        printf("\n");
+    }
+}
+```
+
+```
+alancong@AlanCongdeMacBook-Air chapter_9 % ./a.out 
+A B . . Q R S T U V 
+. C . O P . . . X W 
+. D . N . . . . Y . 
+. E F M L . . . Z . 
+. . G J K . . . . . 
+. . H I . . . . . . 
+. . . . . . . . . . 
+. . . . . . . . . . 
+. . . . . . . . . . 
+. . . . . . . . . . 
+```
 
 4. 修改第8章的编程题16，使其包含下列函数：
 
-   ```c
-   void read_word(int counts[26]);
-   bool equal_array(int counts1[26], int counts2[26]);
-   ```
+```c
+void read_word(int counts[26]);
+bool equal_array(int counts1[26], int counts2[26]);
+```
 
-   main 函数将调用 `read_word` 两次，每次用于读取用户输入的一个单词。读取单词时，`read_word` 用单词中的字母更新 `counts` 数组，详见原题的描述。`main` 将声明两个数组，每个数组用于一个单词。这些数组用于跟踪单词中每个字母出现的次数。接下来，main 函数调用 `equal_array` 函数， 以前面提到的两个数组作为参数。如果两个数组中的元素相同（表明这两个单词是变位词），`equal_array` 返回 `true`，否则返回 `false`。
+main 函数将调用 `read_word` 两次，每次用于读取用户输入的一个单词。读取单词时，`read_word` 用单词中的字母更新 `counts` 数组，详见原题的描述。`main` 将声明两个数组，每个数组用于一个单词。这些数组用于跟踪单词中每个字母出现的次数。接下来，main 函数调用 `equal_array` 函数， 以前面提到的两个数组作为参数。如果两个数组中的元素相同（表明这两个单词是变位词），`equal_array` 返回 `true`，否则返回 `false`。
+
+```C
+#include <stdio.h>
+#include <stdbool.h>
+#include <ctype.h>
+
+void read_word(int counts[26]);
+bool equal_array(int counts1[26], int counts2[26]);
+
+int main(void)
+{
+    int counts1[26] = {0}, counts2[26] = {0};
+
+    read_word(counts1);
+    read_word(counts2);
+
+    if (equal_array(counts1, counts2))
+        printf("The words are anagrams.\n");
+    else
+        printf("The words are not anagrams.\n");
+
+    return 0;
+}
+
+void read_word(int counts[26])
+{
+    char ch;
+
+    printf("Enter a word: ");
+    while ((ch = getchar()) != '\n')
+    {
+        counts[tolower(ch) - 'a']++;
+    }
+}
+
+bool equal_array(int counts1[26], int counts2[26])
+{
+    for (int i = 0; i < 26; i++)
+        if (counts1[i] != counts2[i])
+            return false;
+
+    return true;
+}
+```
+
+```
+alancong@AlanCongdeMacBook-Air chapter_9 % ./a.out 
+Enter a word: smartlight
+Enter a word: lightsmart
+The words are anagrams.
+```
+
+```
+这个函数是存在隐患的，没有判断输入的字符是不是英文字母，虽然已经完成了题目的要求，但是针对输入一定时刻都要注入合法性的判断，这是非常非常重要的。
+```
 
 5. 修改第8章的编程题17，使其包含下列函数：
 
-   ```c
-   void create_magic_square(int n, int magic_square[n][n]);
-   void print_magic_square(int n, int magic_square[n][n]);
-   ```
+```c
+void create_magic_square(int n, int magic_square[n][n]);
+void print_magic_square(int n, int magic_square[n][n]);
+```
 
-   获得用户输入的数 `n` 之后，main 函数调用 `create_magic_square` 函数，另一个调用参数是在 `main` 内部声明的 `n×n` 的数组。`create_magic_square` 函数用 1, 2, …, n² 填充数组，如原题所述。接下来，main 函数调用 `print_magic_square`，按原题描述的格式显示数组。注意：如果你的编译器不支持变长数组，请把 `main` 中的数组声明为 99×99 而不是 n×n，并使用下面的原型：
+获得用户输入的数 `n` 之后，main 函数调用 `create_magic_square` 函数，另一个调用参数是在 `main` 内部声明的 `n×n` 的数组。`create_magic_square` 函数用 $1, 2, …, n^2$ 填充数组，如原题所述。接下来，main 函数调用 `print_magic_square`，按原题描述的格式显示数组。注意：如果你的编译器不支持变长数组，请把 `main` 中的数组声明为 99×99 而不是 n×n，并使用下面的原型：
 
-   ```c
-   void create_magic_square(int n, int magic_square[99][99]);
-   void print_magic_square(int n, int magic_square[99][99]);
-   ```
+```c
+void create_magic_square(int n, int magic_square[99][99]);
+void print_magic_square(int n, int magic_square[99][99]);
+```
 
-6. 编写函数计算下面多项式的值：
+```C
+#include <stdio.h>
 
-   $5x4−3x3+2x2−7x+65x^4 - 3x^3 + 2x^2 - 7x + 6$
+void create_magic_square(int n, int magic_square[n][n]);
+void print_magic_square(int n, int magic_square[n][n]);
 
-   编写程序要求用户输入 x 的值，调用该函数计算多项式的值并显示函数返回的值。
+int main(void)
+{
+    int dimension;
+    printf("This program creates a magic square of a specified size.\n");
+    printf("The size must be an odd number between 1 and 99.\n");
+    printf("Enter size of magic square: ");
 
-7. 如果换一种方法计算 $x^n$，9.6节的 `power` 函数速度可以更快。我们注意到，如果 n 是 2 的幂，则可以通过自乘的方法计算 $x^n$。例如， $4^x$ 是 $2^x$ 的平方，所以 $4^x$ 可以用两次乘法计算，而不需要三次乘法。这种方法甚至可以用于 n 不是 2 的幂的情况。如果 n 是偶数，则
+    scanf("%d", &dimension);
+    if (dimension % 2 == 0)
+    {
+        printf("Negative input!");
+        return 0;
+    }
 
-   $xn=(xn/2)2x^n = (x^{n/2})^2$
+    int magic_square[dimension][dimension];
 
-   如果 n 是奇数，则
+    create_magic_square(dimension, magic_square);
+    print_magic_square(dimension, magic_square);
 
-   $xn=x×xn−1x^n = x \times x^{n-1}$
+    return 0;
+}
 
-   编写计算 $x^n$ 的递归函数（递归在 n=0 时结束，此时函数返回 1）。为了测试该函数，写一个程序要求用户输入 x 和 n 的值，调用 `power` 计算 $x^n$，然后显示函数的返回值。
+void create_magic_square(int n, int magic_square[n][n])
+{
+    int next_x, next_y, before_x, before_y, count = 0;;
+
+    for (int i = 0; i < n; i++)
+    {
+        for (int j = 0; j < n; j++)
+            magic_square[i][j] = 0;
+    }
+
+    for (int i = 0; i < n * n; i++)
+    {
+        if (i == 0)
+        {
+            next_x = ((n + 1) / 2) - 1;
+            next_y = 0;
+            magic_square[next_y][next_x] = ++count;
+        }
+        else
+        {
+            if (next_x + 1 >= n)
+            {
+                before_x = next_x;
+                next_x = 0;
+            }
+            else
+            {
+                before_x = next_x;
+                next_x += 1;
+            }
+
+            if (next_y - 1 < 0)
+            {
+                before_y = next_y;
+                next_y = n - 1;
+            }
+            else
+            {
+                before_y = next_y;
+                next_y -= 1;
+            }
+
+            // check if there is already has a number
+            if (magic_square[next_y][next_x] == 0)
+                magic_square[next_y][next_x] = ++count;
+            else
+            {
+                next_x = before_x;
+                next_y = before_y + 1;
+                magic_square[next_y][next_x] = ++count;
+            }
+        }
+    }
+}
+void print_magic_square(int n, int magic_square[n][n])
+{
+    for (int i = 0; i < n; i++)
+    {
+        for (int j = 0; j < n; j++)
+            printf("%2d ", magic_square[i][j]);
+        printf("\n");
+    }
+}
+```
+
+```
+alancong@AlanCongdeMacBook-Air chapter_9 % ./a.out 
+This program creates a magic square of a specified size.
+The size must be an odd number between 1 and 99.
+Enter size of magic square: 5
+17 24  1  8 15 
+23  5  7 14 16 
+ 4  6 13 20 22 
+10 12 19 21  3 
+11 18 25  2  9 
+```
+
+6. 编写函数计算下面多项式的值：$3x^5 + 2x^4 − 5x^3 - x^2 + 7x - 6$编写程序要求用户输入 x 的值，调用该函数计算多项式的值并显示函数返回的值。
+
+```C
+#include<stdio.h>
+
+int calculate_polynomial(int x);
+int power(int x, int n);
+
+int main(void)
+{
+    int x;
+    printf("Enter a number : ");
+    scanf("%d", &x);
+
+    printf("The result of the polynomial is : %d\n", calculate_polynomial(x));
+
+    return 0;
+}
+
+int calculate_polynomial(int x)
+{
+    int res;
+    res = 3 * power(x, 5) + 2 * power(x, 4) - 5 * power(x, 3) - power(x, 2) + 7 * x - 6;
+
+    return res;
+}
+
+int power(int x, int n)
+{
+    if (n == 0)
+        return 1;
+    else
+        return x * power(x, n - 1);
+}
+```
+
+```
+alancong@AlanCongdeMacBook-Air chapter_9 % ./a.out
+Enter a number : 0
+The result of the polynomial is : -6
+alancong@AlanCongdeMacBook-Air chapter_9 % ./a.out
+Enter a number : 3
+The result of the polynomial is : 762
+```
+
+7. 如果换一种方法计算 $x^n$，9.6节的 `power` 函数速度可以更快。我们注意到，如果 n 是 2 的幂，则可以通过自乘的方法计算 $x^n$。例如， $x^4$ 是 $x^2$ 的平方，所以 $4^x$ 可以用两次乘法计算，而不需要三次乘法。这种方法甚至可以用于 n 不是 2 的幂的情况。如果 n 是偶数，则$x^n=(x^{n/2})^2$；如果 n 是奇数，则$x^n=x×x^{n−1}$。编写计算 $x^n$ 的递归函数（递归在 n=0 时结束，此时函数返回 1）。为了测试该函数，写一个程序要求用户输入 x 和 n 的值，调用 `power` 计算 $x^n$，然后显示函数的返回值。
+
+```C
+#include<stdio.h>
+
+int calculate_polynomial(int x);
+int power(int x, int n);
+int main(void)
+{
+    int x;
+    printf("Enter a number : ");
+    scanf("%d", &x);
+
+    printf("The result of the polynomial is : %d\n", calculate_polynomial(x));
+
+    return 0;
+}
+
+int calculate_polynomial(int x)
+{
+    int res;
+    res = 3 * power(x, 5) + 2 * power(x, 4) - 5 * power(x, 3) - power(x, 2) + 7 * x - 6;
+
+    return res;
+}
+
+int power(int x, int n)
+{
+    if (n == 0)
+        return 1;
+    else if( n % 2 == 0)
+    {
+        int res = power(x, n / 2);
+        return res * res;
+    }
+    else 
+        return x * power(x, n -1);
+}
+```
+
+```
+alancong@AlanCongdeMacBook-Air chapter_9 % ./a.out 
+Enter a number : 0
+The result of the polynomial is : -6
+alancong@AlanCongdeMacBook-Air chapter_9 % 3
+zsh: command not found: 3
+alancong@AlanCongdeMacBook-Air chapter_9 % ./a.out
+Enter a number : 3
+The result of the polynomial is : 762
+```
 
 8. 编写函数模拟掷骰子的游戏（两个骰子）。第一次掷的时候，如果点数之和为 7 或 11 则获胜；如果点数之和为 2、3 或 12 则落败；其他情况下的点数之和称为“目标”，游戏继续。在后续的投掷中，如果玩家再次掷出“目标”点数则获胜，掷出 7 则落败，其他情况都忽略，游戏继续进行。每局游戏结束时，程序询问用户是否再玩一次，如果用户输入的回答不是 y 或 Y，程序会显示胜败的次数然后终止。
 
-   ```
-   You rolled: 8
-   Your point is 8
-   You rolled: 3
-   You rolled: 10
-   You rolled: 8
-   You win!
-   Play again? y
-   
-   You rolled: 6
-   Your point is 6
-   You rolled: 5
-   You rolled: 12
-   You rolled: 3
-   You rolled: 7
-   You lose!
-   Play again? y
-   
-   You rolled: 11
-   You win!
-   Play again? n
-   
-   Wins: 2
-   Losses: 1
-   ```
+```
+You rolled: 8
+Your point is 8
+You rolled: 3
+You rolled: 10
+You rolled: 8
+You win!
+Play again? y
 
-   编写三个函数：`main`、`roll_dice` 和 `play_game`。下面给出了后两个函数的原型：
+You rolled: 6
+Your point is 6
+You rolled: 5
+You rolled: 12
+You rolled: 3
+You rolled: 7
+You lose!
+Play again? y
 
-   ```c
-   int roll_dice(void);
-   bool play_game(void);
-   ```
+You rolled: 11
+You win!
+Play again? n
 
-   `roll_dice` 应生成两个随机数（每个都在 1~6 范围内），并返回它们的和。`play_game` 应进行一次掷骰子游戏（调用 `roll_dice` 确定每次掷的点数），如果玩家获胜则返回 `true`，如果玩家落败则返回 `false`。`play_game` 函数还要显示玩家每次掷骰子的结果。`main` 函数反复调用 `play_game` 函数，记录获胜和落败的次数，并显示“you win”和“you lose”消息。提示：使用 `rand` 函数生成随机数。关于如何调用 `rand` 和相关的 `srand` 函数，见 8.2 节 `deal.c` 程序中的例子。
+Wins: 2 Losses: 1
+```
+
+编写三个函数：`main`、`roll_dice` 和 `play_game`。下面给出了后两个函数的原型：
+
+```c
+int roll_dice(void);
+bool play_game(void);
+```
+
+`roll_dice` 应生成两个随机数（每个都在 1~6 范围内），并返回它们的和。`play_game` 应进行一次掷骰子游戏（调用 `roll_dice` 确定每次掷的点数），如果玩家获胜则返回 `true`，如果玩家落败则返回 `false`。`play_game` 函数还要显示玩家每次掷骰子的结果。`main` 函数反复调用 `play_game` 函数，记录获胜和落败的次数，并显示“you win”和“you lose”消息。提示：使用 `rand` 函数生成随机数。关于如何调用 `rand` 和相关的 `srand` 函数，见 8.2 节 `deal.c` 程序中的例子。
+
+```C
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdbool.h>
+#include <time.h>
+
+int roll_dice(void);
+bool play_game(void);
+
+int main(void)
+{
+    char ch;
+    int win = 0, lose = 0;
+
+    srand(time(NULL));
+
+    while (1)
+    {
+        if (play_game())
+        {
+            printf("\nYou win! ");
+            win++;
+        }
+        else
+        {
+            printf("\nYou lose! ");
+            lose++;
+        }
+
+        printf("\nPlay again? ");
+        if ((ch = getchar()) == 'N' || ch == 'n')
+        {
+            printf("Wins: %d Losses: %d\n", win, lose);
+            return 0;
+        }
+        else if (ch == 'Y' || ch == 'y')
+        {   
+            // capture the extra \n character
+            while((ch = getchar()) != '\n' && ch != EOF);
+            printf("\n");
+            continue;
+        }
+        else
+            return 0;
+    }
+}
+
+int roll_dice(void)
+{
+    int dice_1, dice_2;
+    dice_1 = rand() % 6 + 1;
+    dice_2 = rand() % 6 + 1;
+
+    return dice_1 + dice_2;
+}
+
+bool play_game(void)
+{
+    char ch;
+    bool isFirst = true;
+    int res, goal;
+    while (1)
+    {
+        if (isFirst == true || (ch = getchar()) == '\n')
+        {
+            res = roll_dice();
+            printf("You rolled: %d", res);
+
+            if(!isFirst)
+            {
+                if (res == goal)
+                    return true;
+                else if(res == 7)
+                    return false;
+            }
+        }
+
+        if (isFirst)
+        {
+            if (res == 7 || res == 11)
+                return true;
+            else if (res == 2 || res == 3 || res == 12)
+                return false;
+            else
+            {
+                goal = res;
+                isFirst = false;
+                printf("\nYou point is %d", res);
+            }
+        }
+    }
+}
+```
+
+```
+alancong@AlanCongdeMacBook-Air chapter_9 % ./a.out
+You rolled: 9
+You point is 9
+You rolled: 7
+You lose! 
+Play again? y
+
+You rolled: 7
+You win! 
+Play again? y
+
+You rolled: 7
+You win! 
+Play again? y
+
+You rolled: 7
+You win! 
+Play again? y
+
+You rolled: 10
+You point is 10
+You rolled: 9
+You rolled: 7
+You lose! 
+Play again? n
+Wins: 3 Losses: 2
+```
 
 ## 第十章 程序结构
 
@@ -6441,107 +7975,1412 @@ void pb(int n) {
 
 1. 下面的程序框架只显示了函数定义和变量声明。
 
-   ```C
-   int a;
-   void f(int b) {
-       int c;
-   }
-   void g(void) {
-       int d;
-       {
-           int e;
-       }
-   }
-   int main(void) {
-       int f;
-   }
-   ```
 
-   列出下面每种作用域内所有变量的名字和形式参数的名字。
+```C
+int a;
+void f(int b) {
+    int c;
+}
+void g(void) {
+    int d;
+    {
+        int e;
+    }
+}
+int main(void) {
+    int f;
+}
+```
 
-   (a) f 函数。
-   (b) g 函数。
-   (c) 声明 e 的程序块。
-   (d) main 函数。
+列出下面每种作用域内所有变量的名字和形式参数的名字。
+
+```
+(a) f 函数。
+(b) g 函数。
+(c) 声明 e 的程序块。
+(d) main 函数。
+```
+
+```
+(a) f 函数。 在f函数的作用域内有全局变量int a，形式参数int b，局部变量int c。
+(b) g 函数。 在g函数的作用域内有全局变量int a，局部变量int d，更小的花括号作用域中有int e。
+(c) 声明 e 的程序块。 程序块作用域中的变量有全局变量int a，局部变量int e。
+(d) main 函数。 在main函数中有全局变量int a，局部变量int f。
+```
 
 2. 下面的程序框架只显示了函数定义和变量声明。
 
-   ```
-   int b, c;
-   void f(void) {
-       int b, d;
-   }
-   void g(int a) {
-       int c;
-       {
-           int a, d;
-       }
-   }
-   int main(void) {
-       int c, d;
-   }
-   ```
+```C
+int b, c;
+void f(void) {
+    int b, d;
+}
+void g(int a) {
+    int c;
+    {
+        int a, d;
+    }
+}
+int main(void) {
+    int c, d;
+}
+```
 
-   列出下面每种作用域内所有变量的名字和形式参数的名字。如果有多个同名的变量或形式参数，指明具体是哪一个。
+列出下面每种作用域内所有变量的名字和形式参数的名字。如果有多个同名的变量或形式参数，指明具体是哪一个。
 
-   (a) f 函数。
-    (b) g 函数。
-    (c) 声明 a 和 d 的程序块。
-    (d) main 函数。
+```
+(a) f 函数。
+(b) g 函数。
+(c) 声明 a 和 d 的程序块。
+(d) main 函数。
+```
 
-3. 如果程序只有一个函数（main），那么它最多可以包含多少个名为 i 的不同变量？
+```
+(a) f 函数。 f函数的作用域中有全局变量int c，局部变量int b和int d，全局变量int b被局部变量int b隐藏。
+(b) g 函数。 g函数的作用域中有全局变量int b，局部变量int c，最内层的程序块中有局部变量int a和int d，全局变量int c被局部变量int c隐藏。
+(c) 声明 a 和 d 的程序块。 最内层的程序块中有局部变量int a和int d以及前面声明的局部变量int c，全局变量int c被局部变量int c隐藏。
+(d) main 函数。 main函数的作用域中有全局变量int b，局部变量int c，int d，全局变量int c被局部变量int c隐藏。
+```
+
+
+
+*3. 如果程序只有一个函数（main），那么它最多可以包含多少个名为 i 的不同变量？
+
+```
+程序虽然只有一个main函数，但是经过不同的程序块的嵌套就可以有无穷多名为i的不同变量。
+```
+
+
 
 ### 编程题
 
 1. 改10.2节的栈示例使它存储字符而不是整数。接下来，增加main函数，用来要求用户输入一串圆括号或花括号，然后指出它们之间的嵌套是否正确：
 
-   ```
-   Enter parenteses and/or braces: ((){}{()})
-   Parenteses/braces are nested properly
-   ```
 
-   提示：读入左圆括号或左花括号时，把它们像字符一样压入栈中。当读入右圆括号或右花括号时，把栈顶的项弹出，并且检查弹出项是否是匹配的圆括号或花括号。（如果不是，那么圆括号或花括号嵌套不正确。）当程序读入换行符时，检查栈是否为空。如果为空，那么圆括号或花括号匹配；如果栈不为空（或者如果曾经调用过stack_underflow函数），那么圆括号或花括号不匹配。如果调用stack_overflow函数，程序显示信息Stack overflow，并且立刻终止。
+```
+Enter parenteses and/or braces: ((){}{()})
+Parenteses/braces are nested properly
+```
+
+提示：读入左圆括号或左花括号时，把它们像字符一样压入栈中。当读入右圆括号或右花括号时，把栈顶的项弹出，并且检查弹出项是否是匹配的圆括号或花括号。（如果不是，那么圆括号或花括号嵌套不正确。）当程序读入换行符时，检查栈是否为空。如果为空，那么圆括号或花括号匹配；如果栈不为空（或者如果曾经调用过stack_underflow函数），那么圆括号或花括号不匹配。如果调用stack_overflow函数，程序显示信息Stack overflow，并且立刻终止。
+
+```C
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdbool.h> /* C99 only */
+
+#define STACK_SIZE 100
+/* external variables */
+
+char contents[STACK_SIZE];
+int top = 0;
+
+void stack_overflow()
+{
+    printf("The stack is overflowed!\n");
+    printf("Parenteses/braces are not nested properly\n");
+
+    exit(1);
+}
+
+void stack_underflow()
+{
+    printf("The stack is underflowed!\n");
+    exit(1);
+}
+
+void make_empty(void)
+{
+    top = 0;
+}
+
+bool is_empty(void)
+{
+    return top == 0;
+}
+
+bool is_full(void)
+{
+    return top == STACK_SIZE;
+}
+
+void push(int i)
+{
+    if (is_full())
+        stack_overflow();
+    else
+        contents[top++] = i;
+}
+
+char pop(void)
+{
+    if (is_empty())
+    {
+        stack_underflow();
+        return '\0';
+    }
+    else
+        return contents[--top];
+}
+
+int main(void)
+{
+    char ch;
+    printf("Enter parenteses and/or braces: ");
+    while ((ch = getchar()) != '\n')
+    {
+        if (ch == '(' || ch == '{')
+            if (!is_full())
+                push(ch);
+            else
+                stack_overflow();
+        else if (ch == ')' || ch == '}')
+        {
+            char stack_top;
+            stack_top = pop();
+            if ((stack_top == '(' && ch == ')') || (stack_top == '{' && ch == '}'))
+                ;
+            else
+                push(stack_top);
+        }
+        else
+            printf("False input, ingored.\n");
+    }
+
+    if (is_empty())
+        printf("Parenteses/braces are nested properly\n");
+    else
+        printf("Parenteses/braces are not nested properly\n");
+
+    return 0;
+}
+```
+
+```
+alancong@AlanCongdeMacBook-Air chapter_10 % ./a.out 
+Enter parenteses and/or braces: ((){}{()})
+Parenteses/braces are nested properly
+```
 
 2. 修改10.5节的poker.c程序，把数组num_in_rank和数组num_in_suit移到main函数中。main函数将把这两个数组作为实际参数传递给read_cards函数和analyze_hand函数。
 
-3. 把数组num_in_rank、num_in_suit和card_exists从10.5节的poker.c程序中去掉。程序改用5×2的数组来存储牌。数组的每一行表示一张牌。例如，如果数组名为hand，则hand[0][0]存储第一张牌的点数，hand[0][1]存储第一张牌的花色。
+```C
+/*********************************************************
+ * From C PROGRAMMING: A MODERN APPROACH, Second Edition *
+ * By K. N. King                                         *
+ * Copyright (c) 2008, 1996 W. W. Norton & Company, Inc. *
+ * All rights reserved.                                  *
+ * This program may be freely distributed for class use, *
+ * provided that this copyright notice is retained.      *
+ *********************************************************/
+
+/* poker.c (Chapter 10, page 233) */
+/* Classifies a poker hand */
+
+#include <stdbool.h> /* C99 only */
+#include <stdio.h>
+#include <stdlib.h>
+
+#define NUM_RANKS 13
+#define NUM_SUITS 4
+#define NUM_CARDS 5
+
+/* external variables */
+bool straight, flush, four, three;
+int pairs; /* can be 0, 1, or 2 */
+
+/* prototypes */
+void read_cards(int num_in_rank[], int num_in_suit[]);
+void analyze_hand(int num_in_rank[], int num_in_suit[]);
+void print_result(void);
+
+/**********************************************************
+ * main: Calls read_cards, analyze_hand, and print_result *
+ *       repeatedly.                                      *
+ **********************************************************/
+int main(void)
+{
+    int num_in_rank[NUM_RANKS];
+    int num_in_suit[NUM_SUITS];
+
+    for (;;)
+    {
+        read_cards(num_in_rank, num_in_suit);
+        analyze_hand(num_in_rank, num_in_suit);
+        print_result();
+    }
+}
+
+/**********************************************************
+ * read_cards: Reads the cards into the external          *
+ *             variables num_in_rank and num_in_suit;     *
+ *             checks for bad cards and duplicate cards.  *
+ **********************************************************/
+void read_cards(int num_in_rank[], int num_in_suit[])
+{
+    bool card_exists[NUM_RANKS][NUM_SUITS];
+    char ch, rank_ch, suit_ch;
+    int rank, suit;
+    bool bad_card;
+    int cards_read = 0;
+
+    for (rank = 0; rank < NUM_RANKS; rank++)
+    {
+        num_in_rank[rank] = 0;
+        for (suit = 0; suit < NUM_SUITS; suit++)
+            card_exists[rank][suit] = false;
+    }
+
+    for (suit = 0; suit < NUM_SUITS; suit++)
+        num_in_suit[suit] = 0;
+
+    while (cards_read < NUM_CARDS)
+    {
+        bad_card = false;
+
+        printf("Enter a card: ");
+
+        rank_ch = getchar();
+        switch (rank_ch) {
+        case '0':           exit(EXIT_SUCCESS);
+        case '2':           hand[cards_read][0] = 0; break;
+        case '3':           hand[cards_read][0] = 1; break;
+        case '4':           hand[cards_read][0] = 2; break;
+        case '5':           hand[cards_read][0] = 3; break;
+        case '6':           hand[cards_read][0] = 4; break;
+        case '7':           hand[cards_read][0] = 5; break;
+        case '8':           hand[cards_read][0] = 6; break;
+        case '9':           hand[cards_read][0] = 7; break;
+        case 't': case 'T': hand[cards_read][0] = 8; break;
+        case 'j': case 'J': hand[cards_read][0] = 9; break;
+        case 'q': case 'Q': hand[cards_read][0] = 10; break;
+        case 'k': case 'K': hand[cards_read][0] = 11; break;
+        case 'a': case 'A': hand[cards_read][0] = 12; break;
+        default:            bad_card = true;
+        }
+
+        suit_ch = getchar();
+        switch (suit_ch) {
+        case 'c': case 'C': hand[cards_read][1] = 0; break;
+        case 'd': case 'D': hand[cards_read][1] = 1; break;
+        case 'h': case 'H': hand[cards_read][1] = 2; break;
+        case 's': case 'S': hand[cards_read][1] = 3; break;
+        default:            bad_card = true;
+        }
+
+        while ((ch = getchar()) != '\n')
+            if (ch != ' ')
+                bad_card = true;
+
+        if (bad_card)
+            printf("Bad card; ignored.\n");
+        else if (card_exists[rank][suit])
+            printf("Duplicate card; ignored.\n");
+        else
+        {
+            num_in_rank[rank]++;
+            num_in_suit[suit]++;
+            card_exists[rank][suit] = true;
+            cards_read++;
+        }
+    }
+}
+
+/**********************************************************
+ * analyze_hand: Determines whether the hand contains a   *
+ *               straight, a flush, four-of-a-kind,       *
+ *               and/or three-of-a-kind; determines the   *
+ *               number of pairs; stores the results into *
+ *               the external variables straight, flush,  *
+ *               four, three, and pairs.                  *
+ **********************************************************/
+void analyze_hand(int num_in_rank[], int num_in_suit[])
+{
+    int num_consec = 0;
+    int rank, suit;
+
+    straight = false;
+    flush = false;
+    four = false;
+    three = false;
+    pairs = 0;
+
+    /* check for flush */
+    for (suit = 0; suit < NUM_SUITS; suit++)
+        if (num_in_suit[suit] == NUM_CARDS)
+            flush = true;
+
+    /* check for straight */
+    rank = 0;
+    while (num_in_rank[rank] == 0)
+        rank++;
+    for (; rank < NUM_RANKS && num_in_rank[rank] > 0; rank++)
+        num_consec++;
+    if (num_consec == NUM_CARDS)
+    {
+        straight = true;
+        return;
+    }
+
+    /* check for 4-of-a-kind, 3-of-a-kind, and pairs */
+    for (rank = 0; rank < NUM_RANKS; rank++)
+    {
+        if (num_in_rank[rank] == 4)
+            four = true;
+        if (num_in_rank[rank] == 3)
+            three = true;
+        if (num_in_rank[rank] == 2)
+            pairs++;
+    }
+}
+
+/**********************************************************
+ * print_result: Prints the classification of the hand,   *
+ *               based on the values of the external      *
+ *               variables straight, flush, four, three,  *
+ *               and pairs.                               *
+ **********************************************************/
+void print_result(void)
+{
+    if (straight && flush)
+        printf("Straight flush");
+    else if (four)
+        printf("Four of a kind");
+    else if (three &&
+             pairs == 1)
+        printf("Full house");
+    else if (flush)
+        printf("Flush");
+    else if (straight)
+        printf("Straight");
+    else if (three)
+        printf("Three of a kind");
+    else if (pairs == 2)
+        printf("Two pairs");
+    else if (pairs == 1)
+        printf("Pair");
+    else
+        printf("High card");
+
+    printf("\n\n");
+}
+
+```
+
+```
+alancong@AlanCongdeMacBook-Air chapter_10 % ./a.out
+Enter a card: 2c
+Enter a card: 3c
+Enter a card: 4c
+Enter a card: 5c
+Enter a card: 6c
+Straight flush
+
+Enter a card: 0
+```
+
+3. 把数组`num_in_rank`、`num_in_suit`和`card_exists`从10.5节的poker.c程序中去掉。程序改用5×2的数组来存储牌。数组的每一行表示一张牌。例如，如果数组名为hand，则`hand[0][0]`存储第一张牌的点数，`hand[0][1]`存储第一张牌的花色。
+
+```C
+#include <stdbool.h> /* C99 only */
+#include <stdio.h>
+#include <stdlib.h>
+
+#define NUM_CARDS 5
+#define RANK 0
+#define SUIT 1
+
+/* external variables */
+int hand[NUM_CARDS][2];
+/*    0    1
+    ____ ____
+ 0 |____|____|
+ 1 |____|____|
+ 2 |____|____|
+ 3 |____|____|
+ 4 |____|____|
+    rank suit
+*/
+
+bool straight, flush, four, three;
+int pairs; /* can be 0, 1, or 2 */
+
+/* prototypes */
+void read_cards(void);
+void analyze_hand(void);
+void print_result(void);
+
+/**********************************************************
+ * main: Calls read_cards, analyze_hand, and print_result *
+ *       repeatedly.                                      *
+ **********************************************************/
+int main(void)
+{
+    for (;;)
+    {
+        read_cards();
+        analyze_hand();
+        print_result();
+    }
+}
+
+/**********************************************************
+ * read_cards: Reads the cards into the external variable *
+ *             hand; checks for bad cards and duplicate   *
+ *             cards.                                     *
+ **********************************************************/
+void read_cards(void)
+{
+    char ch, rank_ch, suit_ch;
+    int i, rank, suit;
+    bool bad_card, duplicate_card;
+    int cards_read = 0;
+
+    while (cards_read < NUM_CARDS)
+    {
+        bad_card = false;
+
+        printf("Enter a card: ");
+
+        rank_ch = getchar();
+        switch (rank_ch) {
+        case '0':           exit(EXIT_SUCCESS);
+        case '2':           rank = 0; break;
+        case '3':           rank = 1; break;
+        case '4':           rank = 2; break;
+        case '5':           rank = 3; break;
+        case '6':           rank = 4; break;
+        case '7':           rank = 5; break;
+        case '8':           rank = 6; break;
+        case '9':           rank = 7; break;
+        case 't': case 'T': rank = 8; break;
+        case 'j': case 'J': rank = 9; break;
+        case 'q': case 'Q': rank = 10; break;
+        case 'k': case 'K': rank = 11; break;
+        case 'a': case 'A': rank = 12; break;
+        default:            bad_card = true;
+        }
+
+        suit_ch = getchar();
+        switch (suit_ch) {
+        case 'c': case 'C': suit = 0; break;
+        case 'd': case 'D': suit = 1; break;
+        case 'h': case 'H': suit = 2; break;
+        case 's': case 'S': suit = 3; break;
+        default:            bad_card = true;
+        }
+
+        while ((ch = getchar()) != '\n')
+            if (ch != ' ')
+                bad_card = true;
+
+        if (bad_card)
+        {
+            printf("Bad card; ignored.\n");
+            continue;
+        }
+
+        duplicate_card = false;
+        for (i = 0; i < cards_read; i++)
+            if (hand[i][RANK] == rank && hand[i][SUIT] == suit)
+            {
+                printf("Duplicate card; ignored.\n");
+                duplicate_card = true;
+                break;
+            }
+
+        if (!duplicate_card)
+        {
+            hand[cards_read][RANK] = rank;
+            hand[cards_read][SUIT] = suit;
+            cards_read++;
+        }
+    }
+}
+
+/**********************************************************
+ * analyze_hand: Determines whether the hand contains a   *
+ *               straight, a flush, four-of-a-kind,       *
+ *               and/or three-of-a-kind; determines the   *
+ *               number of pairs; stores the results into *
+ *               the external variables straight, flush,  *
+ *               four, three, and pairs.                  *
+ **********************************************************/
+void analyze_hand(void)
+{
+    int rank, suit, card, pass, run;
+
+    straight = true;
+    flush = true;
+    four = false;
+    three = false;
+    pairs = 0;
+
+    /* sort cards by rank */
+    for (pass = 1; pass < NUM_CARDS; pass++)
+        for (card = 0; card < NUM_CARDS - pass; card++)
+        {
+            rank = hand[card][RANK];
+            suit = hand[card][SUIT];
+            if (hand[card + 1][RANK] < rank)
+            {
+                hand[card][RANK] = hand[card + 1][RANK];
+                hand[card][SUIT] = hand[card + 1][SUIT];
+                hand[card + 1][RANK] = rank;
+                hand[card + 1][SUIT] = suit;
+            }
+        }
+
+    /* check for flush */
+    suit = hand[0][SUIT];
+    for (card = 1; card < NUM_CARDS; card++)
+        if (hand[card][SUIT] != suit)
+            flush = false;
+
+    /* check for straight */
+    for (card = 0; card < NUM_CARDS - 1; card++)
+        if (hand[card][RANK] + 1 != hand[card + 1][RANK])
+            straight = false;
+
+    /* check for 4-of-a-kind, 3-of-a-kind, and pairs by
+       looking for "runs" of cards with identical ranks */
+    card = 0;
+    while (card < NUM_CARDS)
+    {
+        rank = hand[card][RANK];
+        run = 0;
+        do
+        {
+            run++;
+            card++;
+        } while (card < NUM_CARDS && hand[card][RANK] == rank);
+        switch (run)
+        {
+        case 2: pairs++; break;
+        case 3: three = true; break;
+        case 4: four = true; break;
+        }
+    }
+}
+
+/**********************************************************
+ * print_result: Prints the classification of the hand,   *
+ *               based on the values of the external      *
+ *               variables straight, flush, four, three,  *
+ *               and pairs.                               *
+ **********************************************************/
+void print_result(void)
+{
+    if (straight && flush)
+        printf("Straight flush");
+    else if (four)
+        printf("Four of a kind");
+    else if (three &&
+             pairs == 1)
+        printf("Full house");
+    else if (flush)
+        printf("Flush");
+    else if (straight)
+        printf("Straight");
+    else if (three)
+        printf("Three of a kind");
+    else if (pairs == 2)
+        printf("Two pairs");
+    else if (pairs == 1)
+        printf("Pair");
+    else
+        printf("High card");
+
+    printf("\n\n");
+}
+```
+
+```
+alancong@AlanCongdeMacBook-Air chapter_10 % ./a.out 
+Enter a card: 2c
+Enter a card: 3c
+Enter a card: 4c
+Enter a card: 5c
+Enter a card: 6c
+Straight flush
+
+Enter a card: 0
+```
+
+```
+这个是书本的标准答案，自己写的程序数组越界的问题很大
+```
+
+
 
 4. 修改10.5节的poker.c程序，使其能识别牌的另一种类别——“同花大顺”（同花色的A、K、Q、J和10）。同花大顺的级别高于其他所有的类别。
 
+```C
+/*********************************************************
+ * From C PROGRAMMING: A MODERN APPROACH, Second Edition *
+ * By K. N. King                                         *
+ * Copyright (c) 2008, 1996 W. W. Norton & Company, Inc. *
+ * All rights reserved.                                  *
+ * This program may be freely distributed for class use, *
+ * provided that this copyright notice is retained.      *
+ *********************************************************/
+
+/* poker.c (Chapter 10, page 233) */
+/* Classifies a poker hand */
+
+#include <stdbool.h> /* C99 only */
+#include <stdio.h>
+#include <stdlib.h>
+
+#define NUM_RANKS 13
+#define NUM_SUITS 4
+#define NUM_CARDS 5
+
+/* external variables */
+int num_in_rank[NUM_RANKS];
+int num_in_suit[NUM_SUITS];
+bool royal, straight, flush, four, three;
+int pairs; /* can be 0, 1, or 2 */
+
+/* prototypes */
+void read_cards(void);
+void analyze_hand(void);
+void print_result(void);
+
+/**********************************************************
+ * main: Calls read_cards, analyze_hand, and print_result *
+ *       repeatedly.                                      *
+ **********************************************************/
+int main(void)
+{
+    for (;;)
+    {
+        read_cards();
+        analyze_hand();
+        print_result();
+    }
+}
+
+/**********************************************************
+ * read_cards: Reads the cards into the external          *
+ *             variables num_in_rank and num_in_suit;     *
+ *             checks for bad cards and duplicate cards.  *
+ **********************************************************/
+void read_cards(void)
+{
+    bool card_exists[NUM_RANKS][NUM_SUITS];
+    char ch, rank_ch, suit_ch;
+    int rank, suit;
+    bool bad_card;
+    int cards_read = 0;
+
+    for (rank = 0; rank < NUM_RANKS; rank++)
+    {
+        num_in_rank[rank] = 0;
+        for (suit = 0; suit < NUM_SUITS; suit++)
+            card_exists[rank][suit] = false;
+    }
+
+    for (suit = 0; suit < NUM_SUITS; suit++)
+        num_in_suit[suit] = 0;
+
+    while (cards_read < NUM_CARDS)
+    {
+        bad_card = false;
+
+        printf("Enter a card: ");
+
+        rank_ch = getchar();
+        switch (rank_ch) {
+        case '0':           exit(EXIT_SUCCESS);
+        case '2':           rank = 0; break;
+        case '3':           rank = 1; break;
+        case '4':           rank = 2; break;
+        case '5':           rank = 3; break;
+        case '6':           rank = 4; break;
+        case '7':           rank = 5; break;
+        case '8':           rank = 6; break;
+        case '9':           rank = 7; break;
+        case 't': case 'T': rank = 8; break;
+        case 'j': case 'J': rank = 9; break;
+        case 'q': case 'Q': rank = 10; break;
+        case 'k': case 'K': rank = 11; break;
+        case 'a': case 'A': rank = 12; break;
+        default:            bad_card = true;
+        }
+
+        suit_ch = getchar();
+        switch (suit_ch) {
+        case 'c': case 'C': suit = 0; break;
+        case 'd': case 'D': suit = 1; break;
+        case 'h': case 'H': suit = 2; break;
+        case 's': case 'S': suit = 3; break;
+        default:            bad_card = true;
+        }
+
+        while ((ch = getchar()) != '\n')
+            if (ch != ' ')
+                bad_card = true;
+
+        if (bad_card)
+            printf("Bad card; ignored.\n");
+        else if (card_exists[rank][suit])
+            printf("Duplicate card; ignored.\n");
+        else
+        {
+            num_in_rank[rank]++;
+            num_in_suit[suit]++;
+            card_exists[rank][suit] = true;
+            cards_read++;
+        }
+    }
+}
+
+/**********************************************************
+ * analyze_hand: Determines whether the hand contains a   *
+ *               straight, a flush, four-of-a-kind,       *
+ *               and/or three-of-a-kind; determines the   *
+ *               number of pairs; stores the results into *
+ *               the external variables straight, flush,  *
+ *               four, three, and pairs.                  *
+ **********************************************************/
+void analyze_hand(void)
+{
+    int num_consec = 0;
+    int rank, suit;
+
+    royal = false;
+    straight = false;
+    flush = false;
+    four = false;
+    three = false;
+    pairs = 0;
+
+    /* check for flush */
+    for (suit = 0; suit < NUM_SUITS; suit++)
+        if (num_in_suit[suit] == NUM_CARDS)
+            flush = true;
+
+    /* check for straight */
+    rank = 0;
+    while (num_in_rank[rank] == 0)
+        rank++;
+    for (; rank < NUM_RANKS && num_in_rank[rank] > 0; rank++)
+        num_consec++;
+    if (num_consec == NUM_CARDS)
+    {
+        straight = true;
+        // return;
+    }
+
+    /* check for royal flush */
+    if(flush && straight)
+    {
+        int max_rank = 0, min_rank = 13;
+        for(int rank = 0;rank < NUM_RANKS;rank ++)
+        {
+            if((max_rank < rank) && (num_in_rank[rank] == 1))
+                max_rank = rank;
+            if((min_rank > rank) && (num_in_rank[rank] == 1))
+                min_rank = rank;
+        }
+        // printf("max : %d min: %d\n", max_rank, min_rank);
+        if(max_rank == 12 && min_rank == 8)
+            royal = true;
+    }
+
+    /* check for 4-of-a-kind, 3-of-a-kind, and pairs */
+    for (rank = 0; rank < NUM_RANKS; rank++)
+    {
+        if (num_in_rank[rank] == 4)
+            four = true;
+        if (num_in_rank[rank] == 3)
+            three = true;
+        if (num_in_rank[rank] == 2)
+            pairs++;
+    }
+}
+
+/**********************************************************
+ * print_result: Prints the classification of the hand,   *
+ *               based on the values of the external      *
+ *               variables straight, flush, four, three,  *
+ *               and pairs.                               *
+ **********************************************************/
+void print_result(void)
+{
+    if (royal)
+        printf("Royal flush");
+    else if (straight && flush)
+        printf("Straight flush");
+    else if (four)
+        printf("Four of a kind");
+    else if (three &&
+             pairs == 1)
+        printf("Full house");
+    else if (flush)
+        printf("Flush");
+    else if (straight)
+        printf("Straight");
+    else if (three)
+        printf("Three of a kind");
+    else if (pairs == 2)
+        printf("Two pairs");
+    else if (pairs == 1)
+        printf("Pair");
+    else
+        printf("High card");
+
+    printf("\n\n");
+}
+```
+
+```
+alancong@AlanCongdeMacBook-Air chapter_10 % ./a.out 
+Enter a card: ac
+Enter a card: kc
+Enter a card: qc
+Enter a card: tc
+Enter a card: jc
+max : 12 min: 8
+Royal flush
+
+Enter a card: 0
+```
+
 5. 修改10.5节的poker.c程序，使其能识别“小A顺”（即A、2、3、4和5）。
+
+```C
+/*********************************************************
+ * From C PROGRAMMING: A MODERN APPROACH, Second Edition *
+ * By K. N. King                                         *
+ * Copyright (c) 2008, 1996 W. W. Norton & Company, Inc. *
+ * All rights reserved.                                  *
+ * This program may be freely distributed for class use, *
+ * provided that this copyright notice is retained.      *
+ *********************************************************/
+
+/* poker.c (Chapter 10, page 233) */
+/* Classifies a poker hand */
+
+#include <stdbool.h> /* C99 only */
+#include <stdio.h>
+#include <stdlib.h>
+
+#define NUM_RANKS 13
+#define NUM_SUITS 4
+#define NUM_CARDS 5
+
+/* external variables */
+int num_in_rank[NUM_RANKS];
+int num_in_suit[NUM_SUITS];
+bool royal, straight, flush, four, three;
+int pairs; /* can be 0, 1, or 2 */
+
+/* prototypes */
+void read_cards(void);
+void analyze_hand(void);
+void print_result(void);
+
+/**********************************************************
+ * main: Calls read_cards, analyze_hand, and print_result *
+ *       repeatedly.                                      *
+ **********************************************************/
+int main(void)
+{
+    for (;;)
+    {
+        read_cards();
+        analyze_hand();
+        print_result();
+    }
+}
+
+/**********************************************************
+ * read_cards: Reads the cards into the external          *
+ *             variables num_in_rank and num_in_suit;     *
+ *             checks for bad cards and duplicate cards.  *
+ **********************************************************/
+void read_cards(void)
+{
+    bool card_exists[NUM_RANKS][NUM_SUITS];
+    char ch, rank_ch, suit_ch;
+    int rank, suit;
+    bool bad_card;
+    int cards_read = 0;
+
+    for (rank = 0; rank < NUM_RANKS; rank++)
+    {
+        num_in_rank[rank] = 0;
+        for (suit = 0; suit < NUM_SUITS; suit++)
+            card_exists[rank][suit] = false;
+    }
+
+    for (suit = 0; suit < NUM_SUITS; suit++)
+        num_in_suit[suit] = 0;
+
+    while (cards_read < NUM_CARDS)
+    {
+        bad_card = false;
+
+        printf("Enter a card: ");
+
+        rank_ch = getchar();
+        switch (rank_ch) {
+        case '0':           exit(EXIT_SUCCESS);
+        case '2':           rank = 0; break;
+        case '3':           rank = 1; break;
+        case '4':           rank = 2; break;
+        case '5':           rank = 3; break;
+        case '6':           rank = 4; break;
+        case '7':           rank = 5; break;
+        case '8':           rank = 6; break;
+        case '9':           rank = 7; break;
+        case 't': case 'T': rank = 8; break;
+        case 'j': case 'J': rank = 9; break;
+        case 'q': case 'Q': rank = 10; break;
+        case 'k': case 'K': rank = 11; break;
+        case 'a': case 'A': rank = 12; break;
+        default:            bad_card = true;
+        }
+
+        suit_ch = getchar();
+        switch (suit_ch) {
+        case 'c': case 'C': suit = 0; break;
+        case 'd': case 'D': suit = 1; break;
+        case 'h': case 'H': suit = 2; break;
+        case 's': case 'S': suit = 3; break;
+        default:            bad_card = true;
+        }
+
+        while ((ch = getchar()) != '\n')
+            if (ch != ' ')
+                bad_card = true;
+
+        if (bad_card)
+            printf("Bad card; ignored.\n");
+        else if (card_exists[rank][suit])
+            printf("Duplicate card; ignored.\n");
+        else
+        {
+            num_in_rank[rank]++;
+            num_in_suit[suit]++;
+            card_exists[rank][suit] = true;
+            cards_read++;
+        }
+    }
+}
+
+/**********************************************************
+ * analyze_hand: Determines whether the hand contains a   *
+ *               straight, a flush, four-of-a-kind,       *
+ *               and/or three-of-a-kind; determines the   *
+ *               number of pairs; stores the results into *
+ *               the external variables straight, flush,  *
+ *               four, three, and pairs.                  *
+ **********************************************************/
+void analyze_hand(void)
+{
+    int num_consec = 0;
+    int rank, suit;
+
+    royal = false;
+    straight = false;
+    flush = false;
+    four = false;
+    three = false;
+    pairs = 0;
+
+    /* check for flush */
+    for (suit = 0; suit < NUM_SUITS; suit++)
+        if (num_in_suit[suit] == NUM_CARDS)
+            flush = true;
+
+    /* check for straight */
+    rank = 0;
+    while (num_in_rank[rank] == 0)
+        rank++;
+    for (; rank < NUM_RANKS && num_in_rank[rank] > 0; rank++)
+        num_consec++;
+    if (num_consec == NUM_CARDS)
+    {
+        straight = true;
+        // return;
+    }
+    if(num_consec == NUM_CARDS - 1)
+    {
+        bool isAceFlush = true;
+        for(int i = 0;i < NUM_CARDS - 1;i ++)
+            if(num_in_rank[i] != 1)
+                isAceFlush = false;   
+        if(isAceFlush && (num_in_rank[12] == 1))
+            straight = true;
+    }
+
+    /* check for royal flush */
+    if(flush && straight)
+    {
+        int max_rank = 0, min_rank = 13;
+        for(int rank = 0;rank < NUM_RANKS;rank ++)
+        {
+            if((max_rank < rank) && (num_in_rank[rank] == 1))
+                max_rank = rank;
+            if((min_rank > rank) && (num_in_rank[rank] == 1))
+                min_rank = rank;
+        }
+        // printf("max : %d min: %d\n", max_rank, min_rank);
+        if(max_rank == 12 && min_rank == 8)
+            royal = true;
+    }
+
+    /* check for 4-of-a-kind, 3-of-a-kind, and pairs */
+    for (rank = 0; rank < NUM_RANKS; rank++)
+    {
+        if (num_in_rank[rank] == 4)
+            four = true;
+        if (num_in_rank[rank] == 3)
+            three = true;
+        if (num_in_rank[rank] == 2)
+            pairs++;
+    }
+}
+
+/**********************************************************
+ * print_result: Prints the classification of the hand,   *
+ *               based on the values of the external      *
+ *               variables straight, flush, four, three,  *
+ *               and pairs.                               *
+ **********************************************************/
+void print_result(void)
+{
+    if (royal)
+        printf("Royal flush");
+    else if (straight && flush)
+        printf("Straight flush");
+    else if (four)
+        printf("Four of a kind");
+    else if (three &&
+             pairs == 1)
+        printf("Full house");
+    else if (flush)
+        printf("Flush");
+    else if (straight)
+        printf("Straight");
+    else if (three)
+        printf("Three of a kind");
+    else if (pairs == 2)
+        printf("Two pairs");
+    else if (pairs == 1)
+        printf("Pair");
+    else
+        printf("High card");
+
+    printf("\n\n");
+}
+
+```
+
+```
+alancong@AlanCongdeMacBook-Air chapter_10 % ./a.out
+Enter a card: ac
+Enter a card: 2c
+Enter a card: 3c
+Enter a card: 4c
+Enter a card: 5c
+Straight flush
+
+Enter a card: 0
+```
 
 6. 有些计算器（尤其是惠普的计算器）使用逆波兰表示法（Reverse Polish Notation，RPN）来书写数学表达式。在这一表示法中，运算符放置在操作数的后面而不是放在操作数中间。例如，在逆波兰表示法中1+2将表示为1 2 +，而1+2*3将表示为1 2 3 * +。逆波兰表达式可以很方便地用栈求值。算法从左向右读取运算符和操作数，并执行下列步骤：
 
-   1. 当遇到操作数时，将其压入栈中。
-   2. 当遇到运算符时，从栈中弹出它的操作数，执行运算并把结果压入栈中。
+```
+当遇到操作数时，将其压入栈中。
+当遇到运算符时，从栈中弹出它的操作数，执行运算并把结果压入栈中。
+```
 
-   编写程序对逆波兰表达式求值。操作数都是个位的整数，运算符为+、-、*、/和=。遇到运算符=时，将显示栈顶项，随后清空栈并提示用户计算新的表达式。这一过程持续进行，直到用户输入一个既不是运算符也不是操作数的字符为止：
+编写程序对逆波兰表达式求值。操作数都是个位的整数，运算符为+、-、*、/和=。遇到运算符=时，将显示栈顶项，随后清空栈并提示用户计算新的表达式。这一过程持续进行，直到用户输入一个既不是运算符也不是操作数的字符为止：
 
-   ```
-   Enter an RPN expression: 1 2 3 * + =
-   Value of expression: 7
-   Enter an RPN expression: 5 8 * 4 9 - / =
-   Value of expression: -8
-   Enter an RPN expression: q
-   ```
+```
+Enter an RPN expression: 1 2 3 * + =
+Value of expression: 7
+Enter an RPN expression: 5 8 * 4 9 - / =
+Value of expression: -8
+Enter an RPN expression: q
+```
 
-   如果栈出现上溢，程序将显示消息Expression is too complex并终止。如果栈出现下溢（例如遇到表达式1 2 + +），程序将显示消息Not enough operands in expression并终止。提示：把10.2节的栈代码整合到你的程序中。使用scanf(" %c", &ch)读取运算符和操作数。
+如果栈出现上溢，程序将显示消息Expression is too complex并终止。如果栈出现下溢（例如遇到表达式1 2 + +），程序将显示消息Not enough operands in expression并终止。提示：把10.2节的栈代码整合到你的程序中。使用scanf(" %c", &ch)读取运算符和操作数。
+
+```C
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdbool.h> /* C99 only */
+
+#define STACK_SIZE 100
+/* external variables */
+
+int contents[STACK_SIZE];
+int top = 0;
+
+void calculator(void);
+
+void stack_overflow()
+{
+    printf("Expression is too complex\n");
+    exit(1);
+}
+
+void stack_underflow()
+{
+    printf("Not enough operands in expression\n");
+    exit(1);
+}
+
+void make_empty(void)
+{
+    top = 0;
+}
+
+bool is_empty(void)
+{
+    return top == 0;
+}
+
+bool is_full(void)
+{
+    return top == STACK_SIZE;
+}
+
+void push(int number)
+{
+    if (is_full())
+        stack_overflow();
+    else
+        contents[top++] = number;
+}
+
+int pop(void)
+{
+    if (is_empty())
+    {
+        stack_underflow();
+        return '\0';
+    }
+    else
+        return contents[--top];
+}
+
+int main(void)
+{
+    while(1)
+    {
+        calculator();
+    }
+
+    return 0;
+}
+
+void calculator(void)
+{
+    char ch;
+    int res, op1, op2;
+
+    printf("Enter an RPN expression: ");
+    while(1)
+    {
+        scanf(" %c", &ch);
+        if(ch == 'q')
+            exit(0);
+        if(ch == '=')
+        {
+            printf("Value of expression: %d\n", res);
+            make_empty();
+            return ;
+        }
+        if(ch == '+' || ch == '-' || ch == '*' || ch == '/')
+        {
+            op1 = pop();
+            op2 = pop();
+
+            switch (ch)
+            {
+            case '+':
+                res = op2 + op1;
+                push(res);
+                break;
+            case '-':
+                res = op2 - op1;
+                push(res);
+                break;
+            case '*':
+                res = op2 * op1;
+                push(res);
+                break;
+            case '/':
+                res = op2 / op1;
+                push(res);
+                break;
+            
+            default:
+                break;
+            }
+        }
+        if('0' <= ch && ch <= '9')
+            push(ch - '0');
+    }
+}
+```
+
+```
+alancong@AlanCongdeMacBook-Air chapter_10 % ./a.out 
+Enter an RPN expression: 1 2 3 * + =
+Value of expression: 7
+Enter an RPN expression: 5 8 * 4 9 - / =
+Value of expression: -8
+Enter an RPN expression: q
+```
+
+```
+如果使用(ch = getchar()) ！= '\n'的话，会导致留下的\n多激活一次循环。
+```
+
+
 
 7. 编写程序，提示用户输入一个数并显示该数，使用字符模拟七段显示器的效果：
 
-   ```
-   Enter a number: 491-9014
-   ```
+```
+Enter a number: 491-9014
+     _     _   _
+|_| |_| | |_| | | | |_|
+  |  _| |  _| |_| |   |
+```
 
-   非数字的字符都将被忽略。在程序中用一个名为MAX_DIGITS的宏来控制数的最大位数，MAX_DIGITS的值为10。如果数中包含的数位大于这个数，多出来的数位将被忽略。提示：使用两个外部数组，一个是segments数组（见第8章的练习题6），用于存储表示数字和段之间对应关系的数据；另一个是digits数组，这是一个3行（因为显示出来的每个数字高度都是3个字符）、MAX_DIGITS×4列（数字的宽度是3个字符，但为了可读性需要在数字之间增加一个空格）的字符数组。编写4个函数：main、clear_digits_array、process_digit和print_digits_array。下面是后3个函数的原型：
+非数字的字符都将被忽略。在程序中用一个名为MAX_DIGITS的宏来控制数的最大位数，MAX_DIGITS的值为10。如果数中包含的数位大于这个数，多出来的数位将被忽略。提示：使用两个外部数组，一个是segments数组（见第8章的练习题6），用于存储表示数字和段之间对应关系的数据；另一个是digits数组，这是一个3行（因为显示出来的每个数字高度都是3个字符）、MAX_DIGITS×4列（数字的宽度是3个字符，但为了可读性需要在数字之间增加一个空格）的字符数组。编写4个函数：main、clear_digits_array、process_digit和print_digits_array。下面是后3个函数的原型：
 
-   ```
-   void clear_digits_array(void);
-   void process_digit(int digit, int position);
-   void print_digits_array(void);
-   ```
+```
+void clear_digits_array(void);
+void process_digit(int digit, int position);
+void print_digits_array(void);
+```
 
-   clear_digits_array函数在digits数组的所有元素中存储空白字符。process_digit函数把digit的七段表示存储到digits数组的指定位置（位置为0~MAX_DIGITS-1）。print_digits_array函数分行显示digits数组的每一行，产生的输出如示例图所示。
+clear_digits_array函数在digits数组的所有元素中存储空白字符。process_digit函数把digit的七段表示存储到digits数组的指定位置（位置为0~MAX_DIGITS-1）。print_digits_array函数分行显示digits数组的每一行，产生的输出如示例图所示。
+
+```C
+#include <stdio.h>
+
+#define MAX_DIGITS 10
+#define ROWS 3
+#define COLS_PER_DIGIT 4
+
+int segments[10][7] = {
+    {1, 1, 1, 1, 1, 1, 0}, // 0
+    {0, 1, 1, 0, 0, 0, 0}, // 1
+    {1, 1, 0, 1, 1, 0, 1}, // 2
+    {1, 1, 1, 1, 0, 0, 1}, // 3
+    {0, 1, 1, 0, 0, 1, 1}, // 4
+    {1, 0, 1, 1, 0, 1, 1}, // 5
+    {1, 0, 1, 1, 1, 1, 1}, // 6
+    {1, 1, 1, 0, 0, 0, 0}, // 7
+    {1, 1, 1, 1, 1, 1, 1}, // 8
+    {1, 1, 1, 1, 0, 1, 1}, // 9
+};
+
+char digits[ROWS][MAX_DIGITS * COLS_PER_DIGIT];
+
+void clear_digits_array(void);
+void process_digit(int digit, int position);
+void print_digits_array(void);
+
+int main(void)
+{
+    int count = 0;
+    int ch;
+
+    clear_digits_array();
+
+    printf("Enter a number: ");
+    while ((ch = getchar()) != '\n' && ch != EOF)
+    {
+        if (ch >= '0' && ch <= '9')
+        {
+            if (count < MAX_DIGITS)
+            {
+                process_digit(ch - '0', count);
+                count++;
+            }
+        }
+    }
+
+    print_digits_array();
+    return 0;
+}
+
+void clear_digits_array(void)
+{
+    int r, c;
+    for (r = 0; r < ROWS; r++)
+    {
+        for (c = 0; c < MAX_DIGITS * COLS_PER_DIGIT; c++)
+        {
+            digits[r][c] = ' ';
+        }
+    }
+}
+
+void process_digit(int digit, int position)
+{
+    int off = position * COLS_PER_DIGIT;
+    // 0
+    if (segments[digit][0])
+        digits[0][off + 1] = '_';
+    // 1
+    if (segments[digit][1])
+        digits[1][off + 2] = '|';
+    // 2
+    if (segments[digit][2])
+        digits[2][off + 2] = '|';
+    // 3
+    if (segments[digit][3])
+        digits[2][off + 1] = '_';
+    // 4
+    if (segments[digit][4])
+        digits[2][off] = '|';
+    // 5
+    if (segments[digit][5])
+        digits[1][off] = '|';
+    // 6
+    if (segments[digit][6])
+        digits[1][off + 1] = '_';
+}
+
+void print_digits_array(void)
+{
+    int r, c;
+    for (r = 0; r < ROWS; r++)
+    {
+        for (c = 0; c < MAX_DIGITS * COLS_PER_DIGIT; c++)
+        {
+            putchar(digits[r][c]);
+        }
+        putchar('\n');
+    }
+}
+```
+
+```
+alancong@AlanCongdeMacBook-Air chapter_10 % ./a.out
+Enter a number: 19981223
+     _   _   _       _   _   _          
+  | |_| |_| |_|   |  _|  _|  _|         
+  |  _|  _| |_|   | |_  |_   _|         
+alancong@AlanCongdeMacBook-Air chapter_10 % ./a.out
+Enter a number: 19991024
+     _   _   _       _   _              
+  | |_| |_| |_|   | | |  _| |_|         
+  |  _|  _|  _|   | |_| |_    |  
+```
+
+
 
 ## 第十一章 指针
 
@@ -6550,26 +9389,44 @@ void pb(int n) {
 11.2节
 
 1. 如果i是变量，且p指向i，那么下列哪些表达式是i的别名？
-    (a) *p
-    (b) &p
-    (c) *&p
-    (d) &*p
-    (e) *i
-    (f) &i
-    (g) *&i
-    (h) &*i
+
+```
+(a) *p
+(b) &p
+(c) *&p
+(d) &*p
+(e) *i
+(f) &i
+(g) *&i
+(h) &*i
+```
+
+```
+
+```
+
+
 
 11.3节
 
-1. 如果i是int类型变量，且p和q是指向int的指针，那么下列哪些赋值是合法的？
-    (a) p = i;
-    (b) *p = &i;
-    (c) &p = q;
-    (d) p = &q;
-    (e) p = *&q;
-    (f) p = q;
-    (g) *p = q;
-    (h) *p = *q;
+2. 如果i是int类型变量，且p和q是指向int的指针，那么下列哪些赋值是合法的？
+
+```
+(a) p = i;
+(b) *p = &i;
+(c) &p = q;
+(d) p = &q;
+(e) p = *&q;
+(f) p = q;
+(g) *p = q;
+(h) *p = *q;
+```
+
+```
+
+```
+
+
 
 11.4节
 
@@ -6639,7 +9496,7 @@ void pb(int n) {
 void pay_amount(int dollars, int *twenties, int *tens, int *fives, int *ones);
 ```
 
-​	函数需要确定：为支付参数 `dollars` 表示的付款金额，所需20美元、10美元、5美元和1美元钞票的最小数目。`twenties` 参数所指向的变量存储所需20美	元钞票的数目，`tens`、`fives` 和 `ones` 参数类似。
+函数需要确定：为支付参数 `dollars` 表示的付款金额，所需20美元、10美元、5美元和1美元钞票的最小数目。`twenties` 参数所指向的变量存储所需20美元钞票的数目，`tens`、`fives` 和 `ones` 参数类似。
 
 2. 修改第5章的编程题8，使其包含下列函数：
 
@@ -6647,15 +9504,18 @@ void pay_amount(int dollars, int *twenties, int *tens, int *fives, int *ones);
 void find_closest_flight(int desired_time, int *departure_time, int *arrival_time);
 ```
 
-​	函数需查出起飞时间与 `desired_time`（用从午夜开始的分钟数表示）最接近的航班。该航班的起飞时间和抵达时间（也都用从午夜开始的分钟数表示）将分	别存储在 `departure_time` 和 `arrival_time` 所指向的变量中。
+函数需查出起飞时间与 `desired_time`（用从午夜开始的分钟数表示）最接近的航班。该航班的起飞时间和抵达时间（也都用从午夜开始的分钟数表示）将分	别存储在 `departure_time` 和 `arrival_time` 所指向的变量中。
 
 3. 修改第6章的编程题3，使其包含下列函数：
 
 ```
-void reduce(int numerator, int denominator, int *reduced_numerator, int *reduced_denominator);
+void reduce(int numerator, 
+						int denominator, 
+						int *reduced_numerator, 
+						int *reduced_denominator);
 ```
 
-​	`numerator` 和 `denominator` 分别是分数的分子和分母。`reduced_numerator` 和 `reduced_denominator` 是指向变量的指针，相应变量中分别存储把分	数化为最简形式后的分子和分母。
+`numerator` 和 `denominator` 分别是分数的分子和分母。`reduced_numerator` 和 `reduced_denominator` 是指向变量的指针，相应变量中分别存储把分数化为最简形式后的分子和分母。
 
 4. 修改 10.5节的 `poker.c` 程序，把所有的外部变量移到 `main` 函数中，并修改各个函数，使它们通过参数进行通信。`analyze_hand` 函数需要修改变量 `straight`、`flush`、`four`、`three` 和 `pairs`，所以它需要以指向这些变量的指针作为参数。
 
@@ -6666,70 +9526,131 @@ void reduce(int numerator, int denominator, int *reduced_numerator, int *reduced
 12.1 节
 
 1. 假设下列声明是有效的：
-    `int a[] = {5, 15, 34, 54, 14, 2, 52, 72}; int *p = &a[1], *q = &a[5];`
-    (a) `*(p + 3)`的值是多少？
-    (b) `*(q - 3)`的值是多少？
-    (c) `q - p` 的值是多少？
-    (d) `p < q` 的结果是真还是假？
-    (e) `*p < *q` 的结果是真还是假？
+
+```
+int a[] = {5, 15, 34, 54, 14, 2, 52, 72}; 
+int *p = &a[1], *q = &a[5];
+```
+
+```
+(a) *(p + 3)的值是多少？
+(b) *(q - 3)的值是多少？
+(c) q - p 的值是多少？
+(d) p < q 的结果是真还是假？
+(e) *p < *q 的结果是真还是假？
+```
+
+```
+
+```
+
+
+
 2. 假设 `high`、`low` 和 `middle` 是具有相同类型的指针变量，并且 `low` 和 `high` 指向数组元素。下面的语句为什么是不合法的，如何修改它？
-    `middle = (low + high) / 2;`
+
+```
+middle = (low + high) / 2;
+```
+
+
 
 12.2 节
 
 3. 下列语句执行后，数组 `a` 的内容是什么？
 
- `#define N 10`
- `int a[N] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};`
- `int *p = &a[0], *q = &a[N-1], temp;`
- `while (p < q) { temp = *p; *p++ = *q; *q-- = temp; }`
+```C
+#define N 10
+int a[N] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+int *p = &a[0], *q = &a[N - 1], temp;
+while (p < q)
+{
+    temp = *p;
+    *p++ = *q;
+    *q-- = temp;
+}
+```
 
-1. 用指针变量 `top_ptr` 代替整型变量 `top` 来重新编写 10.2 节的函数 `make_empty`、`is_empty` 和 `is_full`。
+
+
+4. 用指针变量 `top_ptr` 代替整型变量 `top` 来重新编写 10.2 节的函数 `make_empty`、`is_empty` 和 `is_full`。
+
+```
+
+```
 
 12.3 节
 
 5. 假设 `a` 是一维数组而 `p` 是指针变量。如果刚执行了赋值操作 `p = a`，下列哪些表达式会因为类型不匹配而不合法？其他的表达式中哪些为真（有非零值）？
 
- (a) `p == a[0]`
- (b) `p == &a[0]`
- (c) `*p == a[0]`
- (d) `p[0] == a[0]`
+```
+(a) p == a[0]
+(b) p == &a[0]
+(c) *p == a[0]
+(d) p[0] == a[0]
+```
 
-1. 用指针算术运算代替数组取下标来重新编写下面的函数。（换句话说，消除变量 `i` 和所有用 `[]` 运算符的地方。）要求改动尽可能少。
+```
 
-   ```
-   int sum_array(const int a[], int n)  
-   {  
-       int i, sum;  
-       sum = 0;  
-       for (i = 0; i < n; i++)  
-           sum += a[i];  
-       return sum;  
-   }
-   ```
+```
 
-2. 编写下列函数：
-    `bool search(const int a[], int n, int key);`
+
+
+6. 用指针算术运算代替数组取下标来重新编写下面的函数。（换句话说，消除变量 `i` 和所有用 `[]` 运算符的地方。）要求改动尽可能少。
+
+```
+int sum_array(const int a[], int n)  
+{  
+    int i, sum;  
+    sum = 0;  
+    for (i = 0; i < n; i++)  
+        sum += a[i];  
+    return sum;  
+}
+```
+
+1. 编写下列函数：
+
+    ```
+    bool search(const int a[], int n, int key);
+    ```
+
     `a` 是待搜索的数组，`n` 是数组中元素的数量，`key` 是搜索键。如果 `key` 与数组 `a` 的某个元素匹配了，那么 `search` 函数返回 `true`；否则返回 `false`。要求使用指针算术运算而不是取下标来访问数组元素。
 
-3. 用指针算术运算代替数组取下标来重新编写下面的函数。（换句话说，消除变量 `i` 和所有用到 `[]` 运算符的地方。）要求改动尽可能少。
+    ```
+    
+    ```
 
-   ```
-   void store_zeros(int a[], int n)  
-   {  
-       int i;  
-       for (i = 0; i < n; i++)  
-           a[i] = 0;  
-   }
-   ```
+    
 
-4. 编写下列函数：
-    `double inner_product(const double *a, const double *b, int n);`
+2. 用指针算术运算代替数组取下标来重新编写下面的函数。（换句话说，消除变量 `i` 和所有用到 `[]` 运算符的地方。）要求改动尽可能少。
+
+
+```C
+void store_zeros(int a[], int n)  
+{  
+    int i;  
+    for (i = 0; i < n; i++)  
+        a[i] = 0;  
+}
+```
+
+```
+
+```
+
+
+
+1. 编写下列函数：
+
+    ```
+    double inner_product(const double *a, const double *b, int n);
+    ```
+
     `a` 和 `b` 都指向长度为 `n` 的数组。函数返回 `a[0] * b[0] + a[1] * b[1] + ... + a[n-1] * b[n-1]`。要求使用指针算术运算而不是取下标来访问数组元素。
 
-5. 修改 11.5 节的 `find_middle` 函数，用指针算术运算计算返回值。
+2. 修改 11.5 节的 `find_middle` 函数，用指针算术运算计算返回值。
 
-6. 修改 `find_largest` 函数，用指针算术运算（而不是取下标）来访问数组元素。编写下面的函数：
+3. 修改 `find_largest` 函数，用指针算术运算（而不是取下标）来访问数组元素。编写下面的函数：
 
 ```
 void find_two_largest(const int *a, int n, int *largest, int *second_largest);  
@@ -6759,7 +9680,7 @@ int sum_two_dimensional_array(const int a[][LEN], int n)
 }
 ```
 
-1. 编写第 9 章练习题 13 中描述的 `evaluate_position` 函数，使用指针算术运算而不是取下标来访问数组元素。要求使用单层循环而不是嵌套循环。
+18. 编写第 9 章练习题 13 中描述的 `evaluate_position` 函数，使用指针算术运算而不是取下标来访问数组元素。要求使用单层循环而不是嵌套循环。
 
 ### 编程题
 
@@ -6804,17 +9725,21 @@ int sum_two_dimensional_array(const int a[][LEN], int n)
 
 1. 下面的函数调用应该只输出一个换行符，但是其中有一些是错误的。请指出哪些调用是错误的，并说明理由。
 
+   ```
    (a) `printf("%c", '\n');`
-    (b) `printf("%s", '\n');`
-    (c) `printf("%s", "\n");`
-    (d) `printf("%s", "\n");`
-    (e) `printf('\n');`
-    (f) `printf("\n");`
-    (g) `putchar('\n');`
-    (h) `putchar("\n");`
-    (i) `puts('\n');`
-    (j) `puts("\n");`
-    (k) `puts("");`
+   (b) `printf("%s", '\n');`
+   (c) `printf("%s", "\n");`
+   (d) `printf("%s", "\n");`
+   (e) `printf('\n');`
+   (f) `printf("\n");`
+   (g) `putchar('\n');`
+   (h) `putchar("\n");`
+   (i) `puts('\n');`
+   (j) `puts("\n");`
+   (k) `puts("");`
+   ```
+
+   
 
 2. 假设 `p` 的声明如下：
     `char *p = "abc";`
@@ -7225,7 +10150,14 @@ int sum_two_dimensional_array(const int a[][LEN], int n)
 
 ### 编程题
 
-1. 对27.4节的quadratic.c程序做如下修改。  (a) 让用户输入多项式的系数（变量a、b、c的值）。  (b) 让程序在显示根的值之前对判别式进行测试。如果判别式为负，按以前的方式显示根的值；如果判别式非 负，以实数（无虚部）的形式显示根的值。例如，如果二次方程为x2+x2=0，那么程序的输出为  root1 = 1  root2 = -2  (c) 修改程序，使得虚部为负的复数的显示形式为abi而不是a+bi。例如，程序使用原始系数的输出将变为  root1 = -0.2 + 0.4i  root2 = -0.2 – 0.4i  2.  编写程序，把用笛卡儿坐标表示的复数转换为极坐标形式。用户输入a和b（复数的实部和虚部），程序 显示r和θ的值。  3. 编写程序，把用极坐标表示的复数转换为笛卡儿形式。用户输入r和θ的值，程序以a+bi的形式显 示该数，其中  a = r cosθ  b = r sin θ  4. 编写程序，当给定正整数n时显示单位元素（unity，幺元）的n次方根。单位元素的n次方根由公式 e2πik/n 给出，其中 k是0~n1范围内的整数。 
+1. 对27.4节的quadratic.c程序做如下修改。 
+   (a) 让用户输入多项式的系数（变量a、b、c的值）。  
+   (b) 让程序在显示根的值之前对判别式进行测试。
+   如果判别式为负，按以前的方式显示根的值；如果判别式非 负，以实数（无虚部）的形式显示根的值。例如，如果二次方程为x2+x2=0，那么程序的输出为  root1 = 1  root2 = -2  (c) 修改程序，使得虚部为负的复数的显示形式为abi而不是a+bi。例如，程序使用原始系数的输出将变为  root1 = -0.2 + 0.4i  root2 = -0.2 – 0.4i  
+
+2. 编写程序，把用笛卡儿坐标表示的复数转换为极坐标形式。用户输入a和b（复数的实部和虚部），程序 显示r和θ的值。  
+
+3. 编写程序，把用极坐标表示的复数转换为笛卡儿形式。用户输入r和θ的值，程序以a+bi的形式显 示该数，其中  a = r cosθ  b = r sin θ  4. 编写程序，当给定正整数n时显示单位元素（unity，幺元）的n次方根。单位元素的n次方根由公式 e2πik/n 给出，其中 k是$0-(n-1)$范围内的整数。 
 
 ## 第二十八章
 
@@ -7234,19 +10166,50 @@ int sum_two_dimensional_array(const int a[][LEN], int n)
 1. 给定以下代码，主线程main中的断言有可能触发吗？  
 
    ```C
-   # include   
-   # include   
-   # include   
-   # include   
-   atomic_int x = 0, y = 0, z = 0;  
-   int w_x(void * arg)  
-   {   
-     atomic_store_explicit(& x, 1, memory_order_relaxed);   
-     return 0;  
-   }  
-   int w_y(void * arg)  
-   {   
-     atomic_store_explicit(& y, 1, memory_order_relaxed);   return 0;  }int if_x_wz(void * arg)  {   while (! atomic_load_explicit(& x, memory_order_relaxed));   if (atomic_load_explicit(& y, memory_order_relaxed))     z = 1;   return 0;  }  int if_y_wz(void * arg)  {   while (! atomic_load_explicit(& y, memory_order_relaxed));   if (atomic_load_explicit(& x, memory_order_relaxed))     z = 1;   return 0;  }  int main(void)  {   thrd_t t0, t1, t2, t3;   thrd_create(& t0, w_x, 0);   thrd_create(& t1, w_y, 0);   thrd_create(& t2, if_x_wz, 0);   thrd_create(& t3, if_y_wz, 0);   thrd_join(t0, & (int){0});   thrd_join(t1, & (int){0});   thrd_join(t2, & (int){0});   thrd_join(t3, & (int){0});   assert(z == 1);  }  
+   #include
+   #include
+   #include
+   #include
+   atomic_int x = 0, y = 0, z = 0;
+   int w_x(void *arg)
+   {
+       atomic_store_explicit(&x, 1, memory_order_relaxed);
+       return 0;
+   }
+   int w_y(void *arg)
+   {
+       atomic_store_explicit(&y, 1, memory_order_relaxed);
+       return 0;
+   }
+   int if_x_wz(void *arg)
+   {
+       while (!atomic_load_explicit(&x, memory_order_relaxed))
+           ;
+       if (atomic_load_explicit(&y, memory_order_relaxed))
+           z = 1;
+       return 0;
+   }
+   int if_y_wz(void *arg)
+   {
+       while (!atomic_load_explicit(&y, memory_order_relaxed))
+           ;
+       if (atomic_load_explicit(&x, memory_order_relaxed))
+           z = 1;
+       return 0;
+   }
+   int main(void)
+   {
+       thrd_t t0, t1, t2, t3;
+       thrd_create(&t0, w_x, 0);
+       thrd_create(&t1, w_y, 0);
+       thrd_create(&t2, if_x_wz, 0);
+       thrd_create(&t3, if_y_wz, 0);
+       thrd_join(t0, &(int){0});
+       thrd_join(t1, &(int){0});
+       thrd_join(t2, &(int){0});
+       thrd_join(t3, &(int){0});
+       assert(z == 1);
+   }
    ```
 
    

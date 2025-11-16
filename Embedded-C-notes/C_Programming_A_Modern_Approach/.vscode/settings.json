@@ -2,6 +2,21 @@
     "files.associations": {
         "queue": "c",
         "stack": "c",
-        "__locale": "c"
+        "__locale": "c",
+        "__hash_table": "c",
+        "__split_buffer": "c",
+        "algorithm": "c",
+        "deque": "c",
+        "istream": "c",
+        "limits": "c",
+        "locale": "c",
+        "mutex": "c",
+        "ratio": "c",
+        "sstream": "c",
+        "string": "c",
+        "string_view": "c",
+        "variant": "c",
+        "vector": "c",
+        "complex": "c"
     }
 }
