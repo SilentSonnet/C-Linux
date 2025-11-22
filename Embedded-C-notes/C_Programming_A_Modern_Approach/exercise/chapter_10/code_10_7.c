@@ -87,12 +87,12 @@ void process_digit(int digit, int position)
 
 void print_digits_array(void)
 {
-    int r, c;
-    for (r = 0; r < ROWS; r++)
+    int row, col;
+    for (row = 0; row < ROWS; row ++)
     {
-        for (c = 0; c < MAX_DIGITS * COLS_PER_DIGIT; c++)
+        for (col = 0; col < MAX_DIGITS * COLS_PER_DIGIT; col ++)
         {
-            putchar(digits[r][c]);
+            putchar(digits[row][col]);
         }
         putchar('\n');
     }
