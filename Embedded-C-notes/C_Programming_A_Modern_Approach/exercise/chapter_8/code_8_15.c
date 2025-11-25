@@ -16,18 +16,13 @@ int main(void)
     printf("Enter shift amount (1-25): ");
     scanf("%d", &code);
 
-    code %= 26;
-
     printf("Encrypted message: ");
     for(int i = 0;i < length;i ++)
     {
-        if('A' <= toupper(message[i]) && toupper(message[i]) <= 'Z')
-        {
-            if(toupper(message[i]) + code > 'Z')
-                message[i] = message[i] - 'Z' + 'A' - 1 + code ;
-            else
-                message[i] += code;
-        }
+        if('A' <= message[i] && message[i] <= 'Z')
+            message[i] = ((message[i] - 'A') + code) % 26 + 'A';
+        else if('a' <= message[i] && message[i] <= 'z')
+            message[i] = ((message[i] - 'a') + code) % 26 + 'a';
         printf("%c", message[i]);
     }
     printf("\n");

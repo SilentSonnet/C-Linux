@@ -6,9 +6,9 @@ int main(void)
     char name, ch;
     printf("Enter a first and last name: ");
 
-    // 先跳过名字前面的空格
+    // skip leading spaces before the first name
     while((ch = getchar()) == ' ' || ch == '\t');
-    // 然后获取大写的姓名
+    // store the first initial
     name = ch;
 
     while ((ch = getchar()) != '\n')
@@ -22,7 +22,7 @@ int main(void)
             printf("%c", ch);
         }
 
-        // 跳过了姓氏之前的所有字母
+        // skip all letters before the last name
         if ('A' <= ch && ch <= 'Z')
         {
             printf("%c", ch);

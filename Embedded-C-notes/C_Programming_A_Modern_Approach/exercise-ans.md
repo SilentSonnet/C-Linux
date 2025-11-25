@@ -8,421 +8,464 @@
 
 1. 建立并运行由 Kernighan 和 Ritchie 编写的著名的“hello, world”程序：
 
-```C
-#include <stdio.h> 
-int main(void) 
-{ 
-	printf("hello, world\n"); 
-} 
-```
+   ```C
+   #include <stdio.h> 
+   int main(void) 
+   { 
+   	printf("hello, world\n"); 
+   } 
+   ```
 
-在编译时是否有警告信息？如果有，需要如何修改呢？
+   在编译时是否有警告信息？如果有，需要如何修改呢？
+   **ANS：**
 
-**ANS：**
+   ```
+   // 使用的机器型号和编译器版本如下，在编译过程中即使使用了-Wall选项之后也没有任何报错。
+   // 但这个程序的“错误”很明显就是没有return或exit(0)语句。
+   Apple clang version 17.0.0 (clang-1700.3.19.1)
+   Target: arm64-apple-darwin25.0.0
+   Thread model: posix
+   InstalledDir: /Library/Developer/CommandLineTools/usr/bin
+   ```
 
-```C
-// 使用的机器型号和编译器版本如下，在编译过程中即使使用了-Wall选项之后也没有任何报错。
-// 但这个程序的“错误”很明显就是没有return或exit(0)语句。
-Apple clang version 17.0.0 (clang-1700.3.19.1)
-Target: arm64-apple-darwin25.0.0
-Thread model: posix
-InstalledDir: /Library/Developer/CommandLineTools/usr/bin
-```
+   
 
 2. 思考下面的程序：
 
-```C
-#include <stdio.h> 
-int main(void) 
-{ 
-  printf("Parkinson's Law:\nWork expands so as to "); 
-  printf("fill the time\n"); 
-  printf("available for its completion.\n"); 
-  return 0; 
-} 
-```
+   ```C
+   #include <stdio.h> 
+   int main(void) 
+   { 
+     printf("Parkinson's Law:\nWork expands so as to "); 
+     printf("fill the time\n"); 
+     printf("available for its completion.\n"); 
+     return 0; 
+   } 
+   ```
 
-​	(a) 请指出程序中的指令和语句。
-​	(b) 程序的输出是什么？
+   (a) 请指出程序中的指令和语句。
+   (b) 程序的输出是什么？
+   **ANS:**
 
-**ANS:**
+   ```
+   (a)程序共有#include<stdio.h>一个指令，三条`printf`语句和一条`return`共四条语句。
+   (b)程序的输出是三行字符串：
+   ```
 
-(a)程序共有`#include<stdio.h>`一个指令，三条`printf`语句和一条`return`共四条语句。
-(b)程序的输出是三行字符串：
+   ```
+   Parkinson's Law:
+   Work expands so as to fill the time
+   available for its completion.
+   ```
 
-```
-Parkinson's Law:
-Work expands so as to fill the time
-available for its completion.
-```
+   
 
 3. 通过下列方法缩写程序 dweight.c：
 
    (1) 用初始化器替换对变量 height、length 和 width 的赋值；
    (2) 去掉变量 weight，在最后的 printf 语句中计算(volume + 165)/ 166。
-
-**ANS：**
-
-```c
-/* Computes the dimensional weight of a 12" x 10" x 8" box */ 
-#include <stdio.h> 
-int main(void) 
-{ 
-  int height = 8, length = 12, width = 10, volume; 
-  volume = height * length * width; 
-  printf("Dimensions: %dx%dx%d\n", length, width, height); 
-  printf("Volume (cubic inches): %d\n", volume); 
-  printf("Dimensional weight (pounds): %d\n", (volume + 165) / 166); 
-  return 0; 
-}
-```
+   **ANS：**
+   
+   ```C
+   /* Computes the dimensional weight of a 12" x 10" x 8" box */ 
+   #include <stdio.h> 
+   int main(void) 
+   { 
+     int height = 8, length = 12, width = 10, volume; 
+     volume = height * length * width; 
+     printf("Dimensions: %dx%dx%d\n", length, width, height); 
+     printf("Volume (cubic inches): %d\n", volume); 
+     printf("Dimensional weight (pounds): %d\n", (volume + 165) / 166); 
+     return 0; 
+   }
+   ```
+   
+   
 
 4. 编写一个程序来声明几个 int 型和 float 型变量，不对这些变量进行初始化，然后显示它们的值。
    这些值是否有规律？（通常情况下没有。）
-
-**ANS：**
-
-```C
-/*
-  本程序演示了局部变量在未初始化时的行为。
-
-  在 C 语言中，未显式初始化的局部变量（如函数内定义的 int 或 float 变量）
-  的值是“未定义的”（undefined behavior）。也就是说，变量 a、b、c、d、e、f
-  会占用内存中的某个位置，但这些位置可能包含任意残留数据。
-
-  因此：
-    - 这些变量不会自动被赋值为 0；
-    - 它们的输出结果是不可预测的，可能在不同的编译器、运行环境下变化；
-    - 程序虽然能编译通过，但输出没有规律，也不具有参考意义。
-
-  结论：在使用局部变量之前必须先显式初始化，否则会导致不可预期的结果。
-*/
-
-#include <stdio.h>
-int main(void)
-{
-    int a, b, c;
-    float d, e, f;
-
-    printf("%d, %d, %d\n", a, b, c);
-    printf("%f, %f, %f\n", d, e, f);
-
-    return 0;
-}
-
-```
+   **ANS：**
+   
+   ```C
+   /*
+     本程序演示了局部变量在未初始化时的行为。
+   
+     在 C 语言中，未显式初始化的局部变量（如函数内定义的 int 或 float 变量）
+     的值是“未定义的”（undefined behavior）。也就是说，变量 a、b、c、d、e、f
+     会占用内存中的某个位置，但这些位置可能包含任意残留数据。
+   
+     因此：
+       - 这些变量不会自动被赋值为 0；
+       - 它们的输出结果是不可预测的，可能在不同的编译器、运行环境下变化；
+       - 程序虽然能编译通过，但输出没有规律，也不具有参考意义。
+   
+     结论：在使用局部变量之前必须先显式初始化，否则会导致不可预期的结果。
+   */
+   
+   #include <stdio.h>
+   int main(void)
+   {
+       int a, b, c;
+       float d, e, f;
+   
+       printf("%d, %d, %d\n", a, b, c);
+       printf("%f, %f, %f\n", d, e, f);
+   
+       return 0;
+   }
+   
+   ```
+   
+   
 
 5. 下列 C 语言标识符中，哪些是不合法的？
+   
+   ```
    (a) 100_bottles
-   (b) \_100_bottles
-   (c) one\_hundred_bottles _
+   (b) _100_bottles
+   (c) one_hundred_bottles _
    (d) bottles_by_the_hundred_ 
-
-**ANS：**100_bottles是数字开头的，one\_hundred_bottles _中间含有空格，这两个是不合法的。
+   ```
+   
+   **ANS：**
+   
+   ```
+   100_bottles是数字开头的，one\_hundred_bottles _中间含有空格，这两个是不合法的。
+   ```
+   
+   
 
 6. 为什么说在标识符中使用多个相邻的下划线（如 current___balance）不太合适？
+   **ANS：**
 
-**ANS：**
+   ```C
+   /*
+     在 C 语言中，标识符中虽然可以使用下划线 (_)，
+     但不建议在标识符中使用多个相邻的下划线（例如 current___balance），
+     原因如下：
+   
+     1. **可读性差**  
+        多个连续下划线会让标识符在视觉上难以区分，容易与其他变量混淆。
+        例如：
+            current_balance
+            current__balance
+            current___balance
+        这三者看起来非常相似，不利于代码的可维护性。
+   
+     2. **不符合命名规范**  
+        在实际编程规范（如 ISO C 标准及各大公司风格指南）中，
+        推荐使用一个下划线来分隔单词，而不是多个。
+        多个下划线会被认为是命名不规范的“噪声”。
+   
+     3. **潜在的可移植性风险**  
+        尽管编译器不会报错，但在某些系统库或编译环境中，
+        含有多个下划线（特别是以 `__` 开头的）标识符可能被保留用于内部实现，
+        从而导致命名冲突或不可预期的行为。
+   
+     因此：
+        建议使用清晰、规范的命名方式，例如：
+            current_balance
+        而避免使用：
+            current___balance
+   */
+   
+   ```
 
-```C
-/*
-  在 C 语言中，标识符中虽然可以使用下划线 (_)，
-  但不建议在标识符中使用多个相邻的下划线（例如 current___balance），
-  原因如下：
+   
 
-  1. **可读性差**  
-     多个连续下划线会让标识符在视觉上难以区分，容易与其他变量混淆。
-     例如：
-         current_balance
-         current__balance
-         current___balance
-     这三者看起来非常相似，不利于代码的可维护性。
+7. 下列哪些是 C 语言的关键字？
 
-  2. **不符合命名规范**  
-     在实际编程规范（如 ISO C 标准及各大公司风格指南）中，
-     推荐使用一个下划线来分隔单词，而不是多个。
-     多个下划线会被认为是命名不规范的“噪声”。
-
-  3. **潜在的可移植性风险**  
-     尽管编译器不会报错，但在某些系统库或编译环境中，
-     含有多个下划线（特别是以 `__` 开头的）标识符可能被保留用于内部实现，
-     从而导致命名冲突或不可预期的行为。
-
-  因此：
-     建议使用清晰、规范的命名方式，例如：
-         current_balance
-     而避免使用：
-         current___balance
-*/
-
-```
-
-6. 下列哪些是 C 语言的关键字？
+   ```C
    (a) for
    (b) If
    (c) main
    (d) printf
    (e) while
+   ```
 
-**ANS:**在这些选项中，只有 **for** 和 **while** 是 C 语言关键字。“If” 因为大小写错误不是关键字；“main” 是函数名而非关键字；“printf” 是标准库函数而非关键字。
+   **ANS:**
+
+   ```
+   在这些选项中，只有 **for** 和 **while** 是 C 语言关键字。“If” 因为大小写错误不是关键字；“main” 是函数名而非关键字；“printf” 是标准库函数而非关键字。
+   ```
+
+   
 
 8. 下面的语句中有多少个记号？
 
-```c
-answer=(3*q–p*p)/3; 
-```
+   ```C
+   answer=(3*q–p*p)/3; 
+   ```
 
-ANS: 记号分别为 answer、=、(、3、 *、q、-、p、\*、p、)、/、3、；一共14个记号。
+   **ANS:** 
+
+   ```
+   记号分别为 answer、=、(、3、 *、q、-、p、\*、p、)、/、3、；一共14个记号。
+   ```
+
+   
 
 9. 在练习题 8 的记号之间插入空格，使该语句更易于阅读。
 
-```C
-answer = ( 3 * q – p * p ) / 3; 
-```
+   ```C
+   answer = ( 3 * q – p * p ) / 3; 
+   ```
 
-9. 在 dweight.c 程序（2.4 节）中，哪些空格是必不可少的？
+   
 
-**ANS：**本程序中，只有用于分隔关键字与标识符（如 `int main`、`return 0`、`int height`）的空格是必不可少的；其余空格仅用于增强可读性，可以省略。
+10. 在 dweight.c 程序（2.4 节）中，哪些空格是必不可少的？
+    **ANS：**
 
-```C
-/* Computes the dimensional weight of a 12" x 10" x 8" box */ 
-#include<stdio.h> 
-int main(void) 
-{ 
-  int height, length, width, volume, weight; 
-  height = 8; 
-  length = 12; 
-  width = 10; 
-  volume = height * length * width; 
-  weight = (volume + 165) / 166; 
-  printf("Dimensions: %dx%dx%d\n", length, width, height); 
-  printf("Volume (cubic inches): %d\n", volume); 
-  printf("Dimensional weight (pounds): %d\n", weight); 
-  return 0; 
-}
-```
+    ```
+    本程序中，只有用于分隔关键字与标识符（如 int main、return 0、int height）的空格是必不可少的；其余空格仅用于增强可读性，可以省略。
+    ```
 
+    ```C
+    /* Computes the dimensional weight of a 12" x 10" x 8" box */ 
+    #include<stdio.h> 
+    int main(void) 
+    { 
+      int height, length, width, volume, weight; 
+      height = 8; 
+      length = 12; 
+      width = 10; 
+      volume = height * length * width; 
+      weight = (volume + 165) / 166; 
+      printf("Dimensions: %dx%dx%d\n", length, width, height); 
+      printf("Volume (cubic inches): %d\n", volume); 
+      printf("Dimensional weight (pounds): %d\n", weight); 
+      return 0; 
+    }
+    ```
 
+    
 
 ### 编程题
 
 1. 编写一个程序，使用 printf 在屏幕上显示下面的图形：
 
-```
-              *  
-            *
-          *
-*       *
-  *   * 
-    * 
-```
+   ```
+                 *  
+               *
+             *
+   *       *
+     *   * 
+       * 
+   ```
 
-**ANS：**
+   **ANS：**
 
-```c
-#include<stdio.h>
-#include<stdlib.h>
-int main(void)
-{
-    printf("        *\n");
-    printf("       *\n");
-    printf("      *\n");
-    printf("     *\n");
-    printf("*   *\n");
-    printf(" * *\n");
-    printf("  *\n");
+   ```C
+   #include<stdio.h>
+   #include<stdlib.h>
+   int main(void)
+   {
+       printf("        *\n");
+       printf("       *\n");
+       printf("      *\n");
+       printf("     *\n");
+       printf("*   *\n");
+       printf(" * *\n");
+       printf("  *\n");
+   
+       return(0);
+   }
+   ```
 
-    return(0);
-}
-```
+   
 
 2. 球体的体积计算公式为 $ v = \frac{4}{3}\pi r^3 $，其中 $r$ 为球体半径。在程序中，分数部分应写成 `4.0f / 3.0f`，而不能写作 `4 / 3`，因为在 C 语言中，`4` 和 `3` 都是整型常量，`4 / 3` 会执行整数除法，结果为 `1`，从而导致计算结果偏小约三分之一。使用浮点数除法 `4.0f / 3.0f` 才能得到正确的结果（约为 1.3333）。此外，C 语言没有指数运算符，计算 $r^3$ 时应写作 `r * r * r`。
+   **ANS：**
 
+   ```C
+   #include<stdio.h>
+   #include<stdlib.h>
+   int main(void)
+   {
+       float radius = 0.0f, volume = 0.0f, pi = 3.1415926f;
+       printf("Please enter the radius:");
+       scanf("%f", &radius);
+   
+       printf("The volume of the input sphere is:%.2f\n",
+           4 / 3 * radius * radius * radius * pi);
+   
+       return 0;
+   }
+   ```
 
-**ANS：**
-
-```c
-#include<stdio.h>
-#include<stdlib.h>
-int main(void)
-{
-    float radius = 0.0f, volume = 0.0f, pi = 3.1415926f;
-    printf("Please enter the radius:");
-    scanf("%f", &radius);
-
-    printf("The volume of the input sphere is:%.2f\n",
-        4 / 3 * radius * radius * radius * pi);
-
-    return 0;
-}
-```
+   
 
 3. 修改上题中的程序，使用户可以自行输入球体的半径。
+   **ANS:**
 
-**ANS:**
+   ```C
+   #include<stdio.h>
+   #include<stdlib.h>
+   int main(void)
+   {
+       float radius = 0.0f, volume = 0.0f, pi = 3.1415926f;
+       printf("Please enter the radius:");
+       scanf("%f", &radius);
+   
+       printf("The volume of the input sphere is:%.2f\n",
+           4.0f / 3.0f * radius * radius * radius * pi);
+   
+       return 0;
+   }
+   ```
 
-```c
-#include<stdio.h>
-#include<stdlib.h>
-int main(void)
-{
-    float radius = 0.0f, volume = 0.0f, pi = 3.1415926f;
-    printf("Please enter the radius:");
-    scanf("%f", &radius);
-
-    printf("The volume of the input sphere is:%.2f\n",
-        4.0f / 3.0f * radius * radius * radius * pi);
-
-    return 0;
-}
-```
+   
 
 4. 编写一个程序，要求用户输入一个美元数额，然后显示出增加5%税率后的相应金额。格式如下所示：
+   
+   ```
    Enter an amount: 100.00
    With tax added: $105.00 
-
-**ANS:**
-
-```c
-#include<stdio.h>
-#include<stdlib.h>
-int main(void)
-{
-    float amount = 0.0f, tax_rate = 1.05f;
-
-    printf("Enter an amount:");
-    scanf("%f", &amount);
-
-    printf("With tax added:%.2f$\n", amount * tax_rate);
-
-    return 0;
-}
-```
+   ```
+   
+   **ANS:**
+   
+   ```C
+   #include<stdio.h>
+   #include<stdlib.h>
+   int main(void)
+   {
+       float amount = 0.0f, tax_rate = 1.05f;
+   
+       printf("Enter an amount:");
+       scanf("%f", &amount);
+   
+       printf("With tax added:%.2f$\n", amount * tax_rate);
+   
+       return 0;
+   }
+   ```
+   
+   
 
 5. 编程要求用户输入 *x* 的值，然后显示如下多项式的值：
+   多项式表达式为：
+   $$
+   3x^5 + 2x^4 - 5x^3 - x^2 + 7x - 6
+   $$
+   提示：C语言没有指数运算符，所以需要对*x*进行自乘来计算其幂。（例如，x\*x*x就是x的三次方。）
+   **ANS:**
 
-多项式表达式为：
+   ```C
+   #include<stdio.h>
+   int main(void)
+   {
+       float x = 0.0f;
+       printf("Please enter the value of x:");
+       scanf("%f", &x);
+   
+       printf("%.2f\n", 3 * x * x * x * x * x +
+               2 * x * x * x * x - 5 * x * x * x - x * x + 7 * x - 6);
+   
+       return 0;
+   }
+   ```
 
-$$
-3x^5 + 2x^4 - 5x^3 - x^2 + 7x - 6
-$$
-提示：C语言没有指数运算符，所以需要对*x*进行自乘来计算其幂。（例如，x\*x*x就是x的三次方。）
-
-**ANS:**
-
-```c
-#include<stdio.h>
-int main(void)
-{
-    float x = 0.0f;
-    printf("Please enter the value of x:");
-    scanf("%f", &x);
-
-    printf("%.2f\n", 3 * x * x * x * x * x +
-            2 * x * x * x * x - 5 * x * x * x - x * x + 7 * x - 6);
-
-    return 0;
-}
-```
+   
 
 6. 修改上题，用如下公式对多项式求值：
+   $$
+   ((((3x + 2)x - 5)x - 1)x + 7)x - 6
+   $$
+   注意，修改后的程序所需的乘法次数减少了。这种多项式求值方法即 Horner 法则。
+   **ANS:**
 
-$$
-((((3x + 2)x - 5)x - 1)x + 7)x - 6
-$$
+   ```C
+   #include<stdio.h>
+   int main(void)
+   {
+       float x = 0.0f;
+       printf("Please enter the value of x:");
+   
+       scanf("%f", &x);
+   
+       printf("The value of the polynomial is:%.2f\n",
+               ((((3 * x + 2) * x - 5)  * x - 1) * x + 7) * x - 6 );
+       return 0;
+   }
+   ```
 
-注意，修改后的程序所需的乘法次数减少了。这种多项式求值方法即 Horner 法则。
-
-**ANS:**
-
-```c
-#include<stdio.h>
-int main(void)
-{
-    float x = 0.0f;
-    printf("Please enter the value of x:");
-
-    scanf("%f", &x);
-
-    printf("The value of the polynomial is:%.2f\n",
-            ((((3 * x + 2) * x - 5)  * x - 1) * x + 7) * x - 6 );
-    return 0;
-}
-```
+   
 
 7. 编写一个程序，要求用户输入一个美元数额，然后显示出如何用最少张数的 20 美元、10 美元、5 美元和 1 美元钞票来付款：
 
+   ```
+   Enter a dollar amount: 93
+   $20 bills: 4 
+   $10 bills: 1 
+   $5 bills: 0 
+   $1 bills: 3 
+   ```
 
-```
-Enter a dollar amount: 93
-$20 bills: 4 
-$10 bills: 1 
-$5 bills: 0 
-$1 bills: 3 
-```
+   提示：将付款金额除以 20，确定 20 美元钞票的数量，然后从付款金额中减去 20 美元的总金额。对其他面值的钞票重复这一操作。确保在程序中始终使用整数值，不要用浮点数。
+   **ANS:**
 
-提示：将付款金额除以 20，确定 20 美元钞票的数量，然后从付款金额中减去 20 美元的总金额。对其他面值的钞票重复这一操作。确保在程序中始终使用整数值，不要用浮点数。
+   ```C
+   #include<stdio.h>
+   int main(void)
+   {
+       int amount = 0;
+       printf("Please enter a dollar amount:");
+       scanf("%d", &amount);
+   
+       printf("$20 bills:%d\n", amount / 20);
+       amount -= (amount / 20) * 20;
+       printf("$10 bills:%d\n", amount / 10);
+       amount -= (amount / 10) * 10;
+       printf("$ 5 bills:%d\n", amount / 5);
+       amount -= (amount / 5) * 5;
+       printf("$ 1 bills:%d\n", amount);
+   
+       return 0;
+   }
+   ```
 
-**ANS:**
+   
 
-```c
-#include<stdio.h>
-int main(void)
-{
-    int amount = 0;
-    printf("Please enter a dollar amount:");
-    scanf("%d", &amount);
+8. 编程计算第一、第二、第三个月还贷后剩余的贷款金额：
 
-    printf("$20 bills:%d\n", amount / 20);
-    amount -= (amount / 20) * 20;
-    printf("$10 bills:%d\n", amount / 10);
-    amount -= (amount / 10) * 10;
-    printf("$ 5 bills:%d\n", amount / 5);
-    amount -= (amount / 5) * 5;
-    printf("$ 1 bills:%d\n", amount);
+   ```
+   Enter amount of loan: 20000.00
+   Enter interest rate: 6.0
+   Enter monthly payment: 386.66
+   Balance remaining after first payment: $19713.34 
+   Balance remaining after second payment: $19425.25 
+   Balance remaining after third payment: $19135.71 
+   ```
 
-    return 0;
-}
-```
+   在显示每次还款后的余额时保留两位小数。提示：每个月的贷款余额减去还款金额后，还需要加上贷款余额与月利率的乘积。月利率的计算方法是把用户输入的利率转换成百分数再除以 12。
+   **ANS:**
 
-7. 编程计算第一、第二、第三个月还贷后剩余的贷款金额：
+   ```C
+   #include<stdio.h>
+   int main(void)
+   {
+       float loan = 0.0f, rate = 0.0f, payment = 0.0f, left_payment = 0.0f;
+       float first = 0.0f, second = 0.0f, third = 0.0f;
+       printf("Enter amount of loan:");
+       scanf("%f", &loan);
+       printf("Enter interest rate:");
+       scanf("%f", &rate);
+       printf("Enter monthly payment:");
+       scanf("%f", &payment);
+   
+       first = loan * (1.0 + (rate / 1200)) - payment;
+       second = first * (1.0 + (rate / 1200)) - payment;
+       third = second * (1.0 + (rate / 1200)) - payment;
+       printf("Balance remaining after first payment:%.2f\n", first);
+       printf("Balance remaining after second payment:%.2f\n", second);
+       printf("Balance remaining after third payment:%.2f\n", third);
+   
+       return 0;
+   }
+   ```
 
-```
-Enter amount of loan: 20000.00
-Enter interest rate: 6.0
-Enter monthly payment: 386.66
-Balance remaining after first payment: $19713.34 
-Balance remaining after second payment: $19425.25 
-Balance remaining after third payment: $19135.71 
-```
-
-在显示每次还款后的余额时保留两位小数。提示：每个月的贷款余额减去还款金额后，还需要加上贷款余额与月利率的乘积。月利率的计算方法是把用户输入的利率转换成百分数再除以 12。
-
-**ANS:**
-
-```c
-#include<stdio.h>
-int main(void)
-{
-    float loan = 0.0f, rate = 0.0f, payment = 0.0f, left_payment = 0.0f;
-    float first = 0.0f, second = 0.0f, third = 0.0f;
-    printf("Enter amount of loan:");
-    scanf("%f", &loan);
-    printf("Enter interest rate:");
-    scanf("%f", &rate);
-    printf("Enter monthly payment:");
-    scanf("%f", &payment);
-
-    first = loan * (1.0 + (rate / 1200)) - payment;
-    second = first * (1.0 + (rate / 1200)) - payment;
-    third = second * (1.0 + (rate / 1200)) - payment;
-    printf("Balance remaining after first payment:%.2f\n", first);
-    printf("Balance remaining after second payment:%.2f\n", second);
-    printf("Balance remaining after third payment:%.2f\n", third);
-
-    return 0;
-}
-```
+   
 
 ## 第三章 格式化输入/输出
 
@@ -430,348 +473,367 @@ int main(void)
 
 1. 下面的 printf 函数调用产生的输出分别是什么？
 
-```
-(a) printf("%6d,%4d", 86, 1040);
-(b) printf("%12.5e", 30.253);
-(c) printf("%.4f", 83.162);
-(d) printf("%-6.2g", .0000009979);
-```
+   ```
+   (a) printf("%6d,%4d", 86, 1040);
+   (b) printf("%12.5e", 30.253);
+   (c) printf("%.4f", 83.162);
+   (d) printf("%-6.2g", .0000009979);
+   ```
 
-```C
-#include<stdio.h>
-int main(void)
-{
-	printf("%6d,%4d\n", 86, 1040);
-	printf("%12.5e\n", 30.253);
-	printf("%.4f\n", 83.162);
-	printf("%-6.2g\n", .0000009979);
-  
-  return 0;
-}
-```
+   ```C
+   #include<stdio.h>
+   int main(void)
+   {
+   	printf("%6d,%4d\n", 86, 1040);
+   	printf("%12.5e\n", 30.253);
+   	printf("%.4f\n", 83.162);
+   	printf("%-6.2g\n", .0000009979);
+     
+     return 0;
+   }
+   ```
 
-输出为：
+   输出为：
 
-```
-    86,1040
- 3.02530e+01
-83.1620
-1e-06
-```
+   ```
+       86,1040
+    3.02530e+01
+   83.1620
+   1e-06
+   ```
+
+   
 
 2. 编写 printf 函数调用，以下列格式显示 float 型变量 x。
 
-```
-(a) 指数表示形式，栏宽 8，左对齐，小数点后保留 1 位数字。
-(b) 指数表示形式，栏宽 10，右对齐，小数点后保留 6 位数字。
-(c) 定点十进制表示形式，栏宽 8，左对齐，小数点后保留 3 位数字。
-(d) 定点十进制表示形式，栏宽 6，右对齐，小数点后无数字。
-```
+   ```
+   (a) 指数表示形式，栏宽 8，左对齐，小数点后保留 1 位数字。
+   (b) 指数表示形式，栏宽 10，右对齐，小数点后保留 6 位数字。
+   (c) 定点十进制表示形式，栏宽 8，左对齐，小数点后保留 3 位数字。
+   (d) 定点十进制表示形式，栏宽 6，右对齐，小数点后无数字。
+   ```
 
-```C
-(a)printf("%-8.1e",x);
-(b)printf("%10.6e",x);
-(c)printf("%-8.3f",x);
-(d)printf("%6.f",x);
-```
+   ```C
+   (a)printf("%-8.1e",x);
+   (b)printf("%10.6e",x);
+   (c)printf("%-8.3f",x);
+   (d)printf("%6.f",x);
+   ```
 
-默认情况下printf的输出是右对齐的，%m.pX的的m就是栏宽，也就是输出的总字符数。
+   默认情况下printf的输出是右对齐的，%m.pX的的m就是栏宽，也就是输出的总字符数。
 
 3. 说明下列每对 scanf 格式串是否等价？如果不等价，请指出它们的差异。
 
-```
-(a) "%d"与" %d"。
-(b) "%d-%d-%d"与"%d -%d -%d"。
-(c) "%f"与"%f "。
-(d) "%f,%f"与"%f, %f"。
-```
+   ```
+   (a) "%d"与" %d"。
+   (b) "%d-%d-%d"与"%d -%d -%d"。
+   (c) "%f"与"%f "。
+   (d) "%f,%f"与"%f, %f"。
+   ```
 
-```
-(a)等价。scanf在搜索整数的时候会忽略掉前面一个或多个的空格，所以对于任意的输入，二者等价。
-(b)不等价。根据普通字符'-'左右是否有空格一共可分为四种类型的输入：
-   1. 1·-·2·-·3
-   2. 1·-2·-3
-   3. 1-·2-·3
-   4. 1-2-3
-   对于格式串"%d-%d-%d"来说只有3、4可以接收，但是对于格式串"%d -%d -%d"来说四种类型都可以接收，因此二者并不是对于任意输入都有相同的输出结果，二者并不等价。
-(c)等价。对于任意的输入不影响接收到的float类型数据，但是需要注意转换说明后的空格会导致scanf一直在等待下一个非空的字符而一直等待不退出。
-(d)等价。道理同(b)，二者都是能够接收3、4类型的输入。
-```
+   ```
+   (a)等价。scanf在搜索整数的时候会忽略掉前面一个或多个的空格，所以对于任意的输入，二者等价。
+   (b)不等价。根据普通字符'-'左右是否有空格一共可分为四种类型的输入：
+      1. 1·-·2·-·3
+      2. 1·-2·-3
+      3. 1-·2-·3
+      4. 1-2-3
+      对于格式串"%d-%d-%d"来说只有3、4可以接收，但是对于格式串"%d -%d -%d"来说四种类型都可以接收，因此二者并不是对于任意输入都有相同的输出结果，二者并不等价。
+   (c)等价。对于任意的输入不影响接收到的float类型数据，但是需要注意转换说明后的空格会导致scanf一直在等待下一个非空的字符而一直等待不退出。
+   (d)等价。道理同(b)，二者都是能够接收3、4类型的输入。
+   ```
 
-*4. 假设 scanf 函数调用的格式如下：`scanf("%d%f%d", &i, &x, &j);` 如果用户输入3 5 6 调用执行后，变量 i、x 和 j 的值分别是多少？（假设变量 i 和变量 j 都是 int 型，变量 x 是 float型。）
+   
 
-```C
-#include<stdio.h>
-int main(void)
-{
-  int i, j;
-  float x;
-	printf("Enter three number: ");
-	scanf("%d%f%d", &i, &x, &j);
-	printf("%d\n%f\n%d\n", i, x, j);
-  
-  return 0;
-}
-```
+4. 假设 scanf 函数调用的格式如下：`scanf("%d%f%d", &i, &x, &j);` 如果用户输入3 5 6 调用执行后，变量 i、x 和 j 的值分别是多少？（假设变量 i 和变量 j 都是 int 型，变量 x 是 float型。）
 
-输出：
+   ```C
+   #include<stdio.h>
+   int main(void)
+   {
+     int i, j;
+     float x;
+   	printf("Enter three number: ");
+   	scanf("%d%f%d", &i, &x, &j);
+   	printf("%d\n%f\n%d\n", i, x, j);
+     
+     return 0;
+   }
+   ```
 
-```
-Enter three number: 3 5 6
-3
-5.000000
-6
-```
+   输出：
 
-*5. 假设 scanf 函数调用的格式如下：`scanf("%f%d%f", &x, &i, &y);` 如果用户输入3 45.6 789 调用执行后，变量 x、i 和 y 的值分别是多少？（假设变量 x 和变量 y 都是 float 型，变量 i 是 int型。）
+   ```
+   Enter three number: 3 5 6
+   3
+   5.000000
+   6
+   ```
 
-```c
-#include<stdio.h>
-int main(void)
-{
-  int i;
-  float x, y;
-	printf("Enter three number: ");
-	scanf("%f%d%f", &x, &i, &y);
-	printf("%f\n%i\n%f\n", x, i, y);
-  
-  return 0;
-}
-```
+   
 
-输出：
+5. 假设 scanf 函数调用的格式如下：`scanf("%f%d%f", &x, &i, &y);` 如果用户输入3 45.6 789 调用执行后，变量 x、i 和 y 的值分别是多少？（假设变量 x 和变量 y 都是 float 型，变量 i 是 int型。）
 
-```
-Enter three number: 3 45.6 789
-3.000000
-45
-0.600000
-```
+   ```C
+   #include<stdio.h>
+   int main(void)
+   {
+     int i;
+     float x, y;
+   	printf("Enter three number: ");
+   	scanf("%f%d%f", &x, &i, &y);
+   	printf("%f\n%i\n%f\n", x, i, y);
+     
+     return 0;
+   }
+   ```
+
+   输出：
+
+   ```
+   Enter three number: 3 45.6 789
+   3.000000
+   45
+   0.600000
+   ```
+
+   
 
 6. 指出如何修改 3.2 节中的 addfrac.c 程序，使用户可以输入在字符/的前后都有空格的分数。
 
-```C
-#include <stdio.h>
+   ```C
+   #include <stdio.h>
+   
+   int main(void)
+   {
+     int num1, denom1, num2, denom2, result_num, result_denom;
+   
+     printf("Enter first fraction: ");
+     scanf("%d/%d", &num1, &denom1);
+   
+     printf("Enter second fraction: ");
+     // 在scanf的格式串中'/'的左右两边增加空格即可，其中前面的空格是必须的，后面的是可选的。
+     // 因为格式串中一个空格可以匹配输入任意数量的空格，包括零个。
+     // scanf("%d /%d", &i, &j);
+     // scanf("%d / %d", &i, &j);
+     scanf("%d/%d", &num2, &denom2);
+   
+     result_num = num1 * denom2 + num2 * denom1;
+     result_denom = denom1 * denom2;
+     printf("The sum is %d/%d\n", result_num, result_denom);
+   
+     return 0;
+   }
+   ```
 
-int main(void)
-{
-  int num1, denom1, num2, denom2, result_num, result_denom;
+   ```C
+   *如果想在scanf普通字符前后都能够输入任意的空格就写成形如：
+   scanf("%d /%d", &i, &j);
+   scanf("%d / %d", &i, &j);
+   ```
 
-  printf("Enter first fraction: ");
-  scanf("%d/%d", &num1, &denom1);
-
-  printf("Enter second fraction: ");
-  // 在scanf的格式串中'/'的左右两边增加空格即可，其中前面的空格是必须的，后面的是可选的。
-  // 因为格式串中一个空格可以匹配输入任意数量的空格，包括零个。
-  // scanf("%d /%d", &i, &j);
-  // scanf("%d / %d", &i, &j);
-  scanf("%d/%d", &num2, &denom2);
-
-  result_num = num1 * denom2 + num2 * denom1;
-  result_denom = denom1 * denom2;
-  printf("The sum is %d/%d\n", result_num, result_denom);
-
-  return 0;
-}
-```
-
-```
-*如果想在scanf普通字符前后都能够输入任意的空格就写成形如：
-scanf("%d /%d", &i, &j);
-scanf("%d / %d", &i, &j);
-```
+   
 
 ### 编程题
 
 1. 编写一个程序，以月/日/年（即 *mm/dd/yy*）的格式接受用户输入的日期信息，并以年月日（即*yyyymmdd*）的格式将其显示出来：
 
-```
-Enter a date (mm/dd/yyyy): 2/17/2011
-You entered the date 20110217
-```
+   ```c
+   Enter a date (mm/dd/yyyy): 2/17/2011
+   You entered the date 20110217
+   ```
 
-**ANS:**
+   **ANS:**
 
-```C
-#include<stdio.h>
-int main(void)
-{
-    int day = 0, month = 0, year = 0;
-    printf("Enter a date (mm/dd/yyyy):");
-    scanf("%2d/%2d/%4d", &day, &month, &year);
-    
-    printf("You entered the date %4d%2d%.2d\n", year, month, day);
-    return 0;
-}
-```
+   ```C
+   #include<stdio.h>
+   int main(void)
+   {
+       int day = 0, month = 0, year = 0;
+       printf("Enter a date (mm/dd/yyyy):");
+       scanf("%2d/%2d/%4d", &day, &month, &year);
+       
+       printf("You entered the date %4d%2d%.2d\n", year, month, day);
+       return 0;
+   }
+   ```
+
+   
 
 2. 编写一个程序，对用户输入的产品信息进行格式化。程序会话应类似下面这样：
 
-```
-Enter item number: 583
-Enter unit price: 13.5
-Enter purchase date (mm/dd/yyyy): 10/24/2010
-Item Unit Purchase 
-Price Date 
-583 $ 13.50 10/24/2010 
-```
+   ```
+   Enter item number: 583
+   Enter unit price: 13.5
+   Enter purchase date (mm/dd/yyyy): 10/24/2010
+   Item Unit Purchase 
+   Price Date 
+   583 $ 13.50 10/24/2010 
+   ```
 
-其中，产品编号和日期项采用左对齐方式，单位价格采用右对齐方式，允许美元金额最大取值为9999.99。提示：各个列使用制表符控制。
+   其中，产品编号和日期项采用左对齐方式，单位价格采用右对齐方式，允许美元金额最大取值为9999.99。提示：各个列使用制表符控制。
+   **ANS:**
 
-**ANS:**
+   ```C
+   #include<stdio.h>
+   #include<stdlib.h>
+   int main(void)
+   {
+       int number, day, month, year;
+       float price;
+       printf("Enter item number:");
+       scanf("%d", &number);
+       printf("Enter unit price:");
+       scanf("%f", &price);
+       printf("Enter purchase date (mm/dd/yyyy):");
+       scanf("%d/%d/%d", &month, &day, &year);
+   
+       printf("Item\t\tUnit\t\tPurchase\n");
+       printf("\t\tPrice\t\tDate\n");
+       printf("%d\t\t$%7.2f\t%.2d\\%.2d\\%4d\n", number, price, month, day, year);
+   
+       return 0;
+   }
+   ```
 
-```C
-#include<stdio.h>
-#include<stdlib.h>
-int main(void)
-{
-    int number, day, month, year;
-    float price;
-    printf("Enter item number:");
-    scanf("%d", &number);
-    printf("Enter unit price:");
-    scanf("%f", &price);
-    printf("Enter purchase date (mm/dd/yyyy):");
-    scanf("%d/%d/%d", &month, &day, &year);
-
-    printf("Item\t\tUnit\t\tPurchase\n");
-    printf("\t\tPrice\t\tDate\n");
-    printf("%d\t\t$%7.2f\t%.2d\\%.2d\\%4d\n", number, price, month, day, year);
-
-    return 0;
-}
-```
+   
 
 3. 图书用国际标准书号（ISBN）进行标识。2007 年 1 月 1 日之后分配的 ISBN 包含 13 位数字（旧的 ISBN使用 10 位数字），分为 5 组，如 978-0-393-97950-3。第一组（GS1 前缀）目前为 978 或 979。第二组（组标识）指明语言或者原出版国及地区（如 0 和 1 用于讲英语的国家）。第三组（出版商编号）表示出版商（393 是 W. W. Norton 出版社的编号）。第四组（产品编号）是由出版商分配的用于识别具体哪一本书的编号（97950）。ISBN 的末尾是一个校验数字，用于验证前面数字的准确性。编写一个程序来分解用户输入的 ISBN 信息：
 
-```
-Enter ISBN: 978-0-393-97950-3
-GS1 prefix: 978 
-Group identifier: 0 
-Publisher code: 393 
-Item number: 97950 
-Check digit: 3 
-```
+   ```
+   Enter ISBN: 978-0-393-97950-3
+   GS1 prefix: 978 
+   Group identifier: 0 
+   Publisher code: 393 
+   Item number: 97950 
+   Check digit: 3 
+   ```
 
-注意：每组中数字的个数是可变的，不能认为每组的长度都与示例一样。用实际的 ISBN 值（通常放在书的封底和版权页上）测试你编写的程序。
+   注意：每组中数字的个数是可变的，不能认为每组的长度都与示例一样。用实际的 ISBN 值（通常放在书的封底和版权页上）测试你编写的程序。
+   **ANS:**
 
-**ANS:**
+   ```C
+   #include<stdio.h>
+   int main(void)
+   {
+       int prefix, group, code, number, digit;
+       printf("Enter ISBN:");
+       scanf("%d-%d-%d-%d-%d", &prefix, &group, &code, &number, &digit);
+       printf("GS1 prefix: %d\n", prefix);
+       printf("Group identifier: %d\n", group);
+       printf("Publisher code: %d\n", code);
+       printf("Item number: %d\n", number);
+       printf("Check digit: %d\n", digit);
+   
+       return 0;
+   }
+   ```
 
-```C
-#include<stdio.h>
-int main(void)
-{
-    int prefix, group, code, number, digit;
-    printf("Enter ISBN:");
-    scanf("%d-%d-%d-%d-%d", &prefix, &group, &code, &number, &digit);
-    printf("GS1 prefix: %d\n", prefix);
-    printf("Group identifier: %d\n", group);
-    printf("Publisher code: %d\n", code);
-    printf("Item number: %d\n", number);
-    printf("Check digit: %d\n", digit);
-
-    return 0;
-}
-```
+   
 
 4. 编写一个程序，提示用户以(xxx) xxx-xxxx 的格式输入电话号码，并以 xxx.xxx.xxxx 的格式显示该号码：
 
-```
-Enter phone number [(xxx) xxx-xxxx]: (404) 817-6900
-You entered 404.817.6900 
-```
+   ```
+   Enter phone number [(xxx) xxx-xxxx]: (404) 817-6900
+   You entered 404.817.6900 
+   ```
 
-**ANS:**
+   **ANS:**
 
-```C
-#include<stdio.h>
-int main(void)
-{
-    int number1, number2, number3;
-    printf("Enter phone number [(xxx) xxx-xxxx]:");
-    scanf("(%d)%d-%d", &number1, &number2, &number3);
-    printf("%d.%d.%d\n", number1, number2, number3);
+   ```C
+   #include<stdio.h>
+   int main(void)
+   {
+       int number1, number2, number3;
+       printf("Enter phone number [(xxx) xxx-xxxx]:");
+       scanf("(%d)%d-%d", &number1, &number2, &number3);
+       printf("%d.%d.%d\n", number1, number2, number3);
+   
+       return 0;
+   }
+   ```
 
-    return 0;
-}
-```
+   
 
 5. 编写一个程序，要求用户（按任意次序）输入 1~16 的所有整数，然后用 4×4 矩阵的形式将它们显示出来，再计算出每行、每列和每条对角线上的和：
 
-```
-Enter the numbers from 1 to 16 in any order: 
-16 3 2 13 5 10 11 8 9 6 7 12 4 15 14 1
-16 3  2  13 
- 5 10 11 8 
- 9 6  7  12 
- 4 15 14 1 
-Row sums: 34 34 34 34 
-Column sums: 34 34 34 34 
-Diagonal sums: 34 34
-```
+   ```
+   Enter the numbers from 1 to 16 in any order: 
+   16 3 2 13 5 10 11 8 9 6 7 12 4 15 14 1
+   16 3  2  13 
+    5 10 11 8 
+    9 6  7  12 
+    4 15 14 1 
+   Row sums: 34 34 34 34 
+   Column sums: 34 34 34 34 
+   Diagonal sums: 34 34
+   ```
 
-如果行、列和对角线上的和都一样（如本例所示），则称这些数组成一个幻方（magic square）。这里给出的幻方出现于艺术家和数学家 Albrecht Dürer 创作于 1514 年的一幅画中。（注意，矩阵的最后一行中间的两个数给出了该画的创作年代。）
+   如果行、列和对角线上的和都一样（如本例所示），则称这些数组成一个幻方（magic square）。这里给出的幻方出现于艺术家和数学家 Albrecht Dürer 创作于 1514 年的一幅画中。（注意，矩阵的最后一行中间的两个数给出了该画的创作年代。）
+   **ANS:**
 
-**ANS:**
+   ```C
+   #include<stdio.h>
+   int main(void)
+   {
+       int a11, a12, a13, a14;
+       int a21, a22, a23, a24;
+       int a31, a32, a33, a34;
+       int a41, a42, a43, a44;
+   
+       printf("Enter the numbers from 1 to 16 in any order:");
+       scanf("%d%d%d%d %d%d%d%d %d%d%d%d %d%d%d%d",
+               &a11,&a12,&a13,&a14,
+               &a21,&a22,&a23,&a24,
+               &a31,&a32,&a33,&a34,
+               &a41,&a42,&a43,&a44);
+   
+       printf("%d %d %d %d\n", a11, a12, a13, a14);    
+       printf("%d %d %d %d\n", a21, a22, a23, a24);    
+       printf("%d %d %d %d\n", a31, a32, a33, a34);    
+       printf("%d %d %d %d\n", a41, a42, a43, a44);
+   
+       printf("Row sums:%d %d %d %d\n", a11 + a12 + a13 + a14,
+                                        a21 + a22 + a23 + a24,
+                                        a31 + a32 + a33 + a34,
+                                        a41 + a42 + a43 + a44);
+       printf("Column sums:%d %d %d %d\n", a11 + a21 + a31 + a41,
+                                           a12 + a22 + a32 + a42,
+                                           a13 + a23 + a33 + a43,
+                                           a14 + a24 + a34 + a44);
+       printf("Diagonal sums:%d %d\n", a11 + a22 + a33 + a44,
+                                        a14 + a23 + a32 + a41);
+       return 0;
+   }
+   ```
 
-```C
-#include<stdio.h>
-int main(void)
-{
-    int a11, a12, a13, a14;
-    int a21, a22, a23, a24;
-    int a31, a32, a33, a34;
-    int a41, a42, a43, a44;
-
-    printf("Enter the numbers from 1 to 16 in any order:");
-    scanf("%d%d%d%d %d%d%d%d %d%d%d%d %d%d%d%d",
-            &a11,&a12,&a13,&a14,
-            &a21,&a22,&a23,&a24,
-            &a31,&a32,&a33,&a34,
-            &a41,&a42,&a43,&a44);
-
-    printf("%d %d %d %d\n", a11, a12, a13, a14);    
-    printf("%d %d %d %d\n", a21, a22, a23, a24);    
-    printf("%d %d %d %d\n", a31, a32, a33, a34);    
-    printf("%d %d %d %d\n", a41, a42, a43, a44);
-
-    printf("Row sums:%d %d %d %d\n", a11 + a12 + a13 + a14,
-                                     a21 + a22 + a23 + a24,
-                                     a31 + a32 + a33 + a34,
-                                     a41 + a42 + a43 + a44);
-    printf("Column sums:%d %d %d %d\n", a11 + a21 + a31 + a41,
-                                        a12 + a22 + a32 + a42,
-                                        a13 + a23 + a33 + a43,
-                                        a14 + a24 + a34 + a44);
-    printf("Diagonal sums:%d %d\n", a11 + a22 + a33 + a44,
-                                     a14 + a23 + a32 + a41);
-    return 0;
-}
-```
+   
 
 6. 修改 3.2 节的 addfrac.c 程序，使用户可以同时输入两个分数，中间用加号隔开：
 
-```
-Enter two fractions separated by a plus sign: 5/6+3/4
-The sum is 38/24
-```
+   ```
+   Enter two fractions separated by a plus sign: 5/6+3/4
+   The sum is 38/24
+   ```
 
-**ANS:**
+   **ANS:**
 
-```C
-/* Adds two fractions */ 
-#include <stdio.h> 
-int main(void) 
-{ 
-    int num1, denom1, num2, denom2, result_num, result_denom; 
-    printf("Enter two fractions separated by a plus sign: "); 
-    scanf("%d/%d+%d/%d", &num1, &denom1, &num2, &denom2); 
-    result_num = num1 * denom2 + num2 * denom1; 
-    result_denom = denom1 * denom2; 
-    printf("The sum is %d/%d\n", result_num, result_denom); 
-    return 0; 
-}
-```
+   ```C
+   /* Adds two fractions */ 
+   #include <stdio.h> 
+   int main(void) 
+   { 
+       int num1, denom1, num2, denom2, result_num, result_denom; 
+       printf("Enter two fractions separated by a plus sign: "); 
+       scanf("%d/%d+%d/%d", &num1, &denom1, &num2, &denom2); 
+       result_num = num1 * denom2 + num2 * denom1; 
+       result_denom = denom1 * denom2; 
+       printf("The sum is %d/%d\n", result_num, result_denom); 
+       return 0; 
+   }
+   ```
+
+   
 
 ## 第四章 表达式
 
@@ -5949,243 +6011,244 @@ you can't swallow a cage can you?
 
 15. 目前已知的最古老的一种加密技术是恺撒加密（得名于 Julius Caesar）。该方法把一条消息中的每个字母用字母表中固定距离之后的那个字母来替代。（如果越过了字母 Z，则会绕回到字母表的起始位置。例如，如果每个字母都用字母表中两个位置之后的字母代替，那么Y就被替换为A，Z就被替换为 B。）编写程序用恺撒加密方法对消息进行加密。用户输入待加密的消息和移位计数（字母移动的位置数目）
 
-```
-Enter message to be encrypted: Go ahead, make my day.
-Enter shift amount (1-25): 3
-Encrypted message: Jr dkhdg, pdnh pb gdb.
-```
+    ```
+    Enter message to be encrypted: Go ahead, make my day.
+    Enter shift amount (1-25): 3
+    Encrypted message: Jr dkhdg, pdnh pb gdb.
+    ```
 
-注意，当用户输入 26 与移位计数的差值时，程序可以对消息进行解密：
+    注意，当用户输入 26 与移位计数的差值时，程序可以对消息进行解密：
 
-```
-Enter message to be encrypted: Jr dkhdg, pdnh pb gdb.
-Enter shift amount (1-25): 23
-Encrypted message: Go ahead, make my day.
-```
+    ```
+    Enter message to be encrypted: Jr dkhdg, pdnh pb gdb.
+    Enter shift amount (1-25): 23
+    Encrypted message: Go ahead, make my day.
+    ```
 
-可以假定消息的长度不超过 80 个字符。不是字母的那些字符不要改动。此外，加密时不要改变字母的大小写。提示：为了解决前面提到的绕回问题，可以用表达式((ch - 'A') + n) % 26 + 'A'计算大写字母的密码，其中 ch 存储字母，n 存储移位计数。（小写字母也需要一个类似的表达式。）
+    可以假定消息的长度不超过 80 个字符。不是字母的那些字符不要改动。此外，加密时不要改变字母的大小写。提示：为了解决前面提到的绕回问题，可以用表达式((ch - 'A') + n) % 26 + 'A'计算大写字母的密码，其中 ch 存储字母，n 存储移位计数。（小写字母也需要一个类似的表达式。）
 
-```c
-#include <stdio.h>
-#include <ctype.h>
-
-
-int main(void)
-{
-    int length = 0, code;
-    char ch, message[80];
-
-    printf("Enter message to be encrypted: ");
-    while ((ch = getchar()) != '\n')
+    ```C
+    #include <stdio.h>
+    #include <ctype.h>
+    
+    
+    int main(void)
     {
-        message[length ++] = ch;
-    }
-
-    printf("Enter shift amount (1-25): ");
-    scanf("%d", &code);
-
-    code %= 26;
-
-    printf("Encrypted message: ");
-    for(int i = 0;i < length;i ++)
-    {
-        if('A' <= toupper(message[i]) && toupper(message[i]) <= 'Z')
+        int length = 0, code;
+        char ch, message[80];
+    
+        printf("Enter message to be encrypted: ");
+        while ((ch = getchar()) != '\n')
         {
-            if(toupper(message[i]) + code > 'Z')
-                message[i] = message[i] + code - 'Z' + 'A' - 1;
-            else
-                message[i] += code;
+            message[length ++] = ch;
         }
-        printf("%c", message[i]);
+    
+        printf("Enter shift amount (1-25): ");
+        scanf("%d", &code);
+    
+        printf("Encrypted message: ");
+        for(int i = 0;i < length;i ++)
+        {
+            if('A' <= message[i] && message[i] <= 'Z')
+                message[i] = ((message[i] - 'A') + code) % 26 + 'A';
+            else if('a' <= message[i] && message[i] <= 'z')
+                message[i] = ((message[i] - 'a') + code) % 26 + 'a';
+            printf("%c", message[i]);
+        }
+        printf("\n");
+    
+        return 0;
     }
-    printf("\n");
+    ```
 
-    return 0;
-}
-```
+    ```
+    alancong@AlanCongdeMacBook-Air chapter_8 % ./a.out 
+    Enter message to be encrypted: Go ahead, make my day.
+    Enter shift amount (1-25): 3
+    Encrypted message: Jr dkhdg, pdnh pb gdb.
+    alancong@AlanCongdeMacBook-Air chapter_8 % ./a.out              
+    Enter message to be encrypted: Jr dkhdg, pdnh pb gdb
+    Enter shift amount (1-25): 23
+    Encrypted message: Go ahead, make my day
+    ```
 
-```
-alancong@AlanCongdeMacBook-Air chapter_8 % ./a.out 
-Enter message to be encrypted: Go ahead, make my day.
-Enter shift amount (1-25): 3
-Encrypted message: Jr dkhdg, pdnh pb gdb.
-alancong@AlanCongdeMacBook-Air chapter_8 % ./a.out
-Enter message to be encrypted:  Jr dkhdg, pdnh pb gdb.                    
-Enter shift amount (1-25): 23
-Encrypted message:  Go ahead, make my day.
-```
+    
 
 16. 编程测试两个单词是否为变位词（相同字母的重新排列）：
 
-```
-Enter first word: smartest
-Enter second word: mattress
-The words are anagrams.
-```
+    ```
+    Enter first word: smartest
+    Enter second word: mattress
+    The words are anagrams.
+    ```
 
-```
-Enter first word: dumbest
-Enter second word: stumble
-The words are not anagrams.
-```
+    ```
+    Enter first word: dumbest
+    Enter second word: stumble
+    The words are not anagrams.
+    ```
 
-用一个循环逐个字符地读取第一个单词，用一个 26 元的整数数组记录每个字母的出现次数。（例如，读取单词 smartest 之后，数组包含的值为 $10001000000010000122000000$，表明 smartest 包含一个 a、一个 e、一个 m、一个 r、两个 s 和两个 t。）用另一个循环读取第二个单词，这次每读取一个字母就把相应数组元素的值减 1。两个循环都应该忽略不是字母的那些字符，并且不区分大小写。第二个单词读取完毕后，再用一个循环来检查数组元素是否为全 0。如果是全 0，那么这两个单词就是变位词。提示：可以使用<ctype.h>中的函数，如 isalpha 和 tolower。
+    用一个循环逐个字符地读取第一个单词，用一个 26 元的整数数组记录每个字母的出现次数。（例如，读取单词 smartest 之后，数组包含的值为 $10001000000010000122000000$，表明 smartest 包含一个 a、一个 e、一个 m、一个 r、两个 s 和两个 t。）用另一个循环读取第二个单词，这次每读取一个字母就把相应数组元素的值减 1。两个循环都应该忽略不是字母的那些字符，并且不区分大小写。第二个单词读取完毕后，再用一个循环来检查数组元素是否为全 0。如果是全 0，那么这两个单词就是变位词。提示：可以使用<ctype.h>中的函数，如 isalpha 和 tolower。
 
-```C
-#include<stdio.h>
-#include<ctype.h>
-int main(void)
-{
-    int count[26] = {0}, sum = 0;
-    char ch;
-
-    printf("Enter first word: ");
-    while((ch = getchar()) != '\n')
+    ```C
+    #include<stdio.h>
+    #include<ctype.h>
+    int main(void)
     {
-        count[tolower(ch) - 'a'] ++;
+        int count[26] = {0}, sum = 0;
+        char ch;
+    
+        printf("Enter first word: ");
+        while((ch = getchar()) != '\n')
+        {
+            count[tolower(ch) - 'a'] ++;
+        }
+    
+        printf("Enter second word: ");
+        while((ch = getchar()) != '\n')
+        {
+            count[tolower(ch) - 'a'] --;
+        }
+    
+        for(int i = 0;i < 26;i ++)
+            sum += count[i];
+        if(sum == 0)
+            printf("The words are anagrams.\n");
+        else 
+            printf("The words are not anagrams.\n");
+    
+        return 0;
     }
+    ```
 
-    printf("Enter second word: ");
-    while((ch = getchar()) != '\n')
-    {
-        count[tolower(ch) - 'a'] --;
-    }
+    ```
+    alancong@AlanCongdeMacBook-Air chapter_8 % ./a.out 
+    Enter first word: smartlight
+    Enter second word: lightsmart
+    The words are anagrams.
+    ```
 
-    for(int i = 0;i < 26;i ++)
-        sum += count[i];
-    if(sum == 0)
-        printf("The words are anagrams.\n");
-    else 
-        printf("The words are not anagrams.\n");
-
-    return 0;
-}
-```
-
-```
-alancong@AlanCongdeMacBook-Air chapter_8 % ./a.out 
-Enter first word: smartlight
-Enter second word: lightsmart
-The words are anagrams.
-```
+    
 
 17. 编写程序打印 n×n 的幻方（$1, 2, …, n^2$的方阵排列，且每行、每列和每条对角线上的和都相等）。由用户指定 $n$ 的值：
 
-```
-This program creates a magic square of a specified size. 
-The size must be an odd number between 1 and 99.
-Enter size of magic square: 5
-17  24   1   8  15
-23   5   7  14  16
- 4   6  13  20  22
-10  12  19  21   3
-11  18  25   2   9
-```
+    ```
+    This program creates a magic square of a specified size. 
+    The size must be an odd number between 1 and 99.
+    Enter size of magic square: 5
+    17  24   1   8  15
+    23   5   7  14  16
+     4   6  13  20  22
+    10  12  19  21   3
+    11  18  25   2   9
+    ```
 
-把幻方存储在一个二维数组中。起始时把数 1 放在第 0 行的中间，剩下的数 $2, 3, …, n^2$依次向上移动一行并向右移动一列。当可能越过数组边界时需要“绕回”到数组的另一端。例如，如果需要把下一个数放到第$-1$ 行，我们就将其存储到第 $n-1$ 行（最后一行）；如果需要把下一个数放到第 $n$ 列，我们就将其存储到第 0 列。如果某个特定的数组元素已被占用，那就把该数存储在前一个数的正下方。如果你的编译器支持变长数组，则声明数组有 *n* 行 $n$ 列，否则声明数组有 99 行 99 列。
+    把幻方存储在一个二维数组中。起始时把数 1 放在第 0 行的中间，剩下的数 $2, 3, …, n^2$依次向上移动一行并向右移动一列。当可能越过数组边界时需要“绕回”到数组的另一端。例如，如果需要把下一个数放到第$-1$ 行，我们就将其存储到第 $n-1$ 行（最后一行）；如果需要把下一个数放到第 $n$ 列，我们就将其存储到第 0 列。如果某个特定的数组元素已被占用，那就把该数存储在前一个数的正下方。如果你的编译器支持变长数组，则声明数组有 *n* 行 $n$ 列，否则声明数组有 99 行 99 列。
 
-```C
-#include <stdio.h>
-int main(void)
-{
-    int dimension, next_x, next_y, before_x, before_y, count = 0;
-    printf("This program creates a magic square of a specified size.\n");
-    printf("The size must be an odd number between 1 and 99.\n");
-    printf("Enter size of magic square: ");
-
-    scanf("%d", &dimension);
-    if (dimension % 2 == 0)
+    ```C
+    #include <stdio.h>
+    int main(void)
     {
-        printf("Negative input!");
+        int dimension, next_x, next_y, before_x, before_y, count = 0;
+        printf("This program creates a magic square of a specified size.\n");
+        printf("The size must be an odd number between 1 and 99.\n");
+        printf("Enter size of magic square: ");
+    
+        scanf("%d", &dimension);
+        if (dimension % 2 == 0)
+        {
+            printf("Negative input!");
+            return 0;
+        }
+    
+        int square[dimension][dimension];
+        for (int i = 0; i < dimension; i++)
+        {
+            for (int j = 0; j < dimension; j++)
+                square[i][j] = 0;
+        }
+    
+        for (int i = 0; i < dimension * dimension; i++)
+        {
+            if (i == 0)
+            {
+                next_x = ((dimension + 1) / 2) - 1;
+                next_y = 0;
+                square[next_y][next_x] = ++count;
+            }
+            else
+            {
+                if (next_x + 1 >= dimension)
+                {
+                    before_x = next_x;
+                    next_x = 0;
+                }
+                else
+                {
+                    before_x = next_x;
+                    next_x += 1;
+                }
+    
+                if (next_y - 1 < 0)
+                {
+                    before_y = next_y;
+                    next_y = dimension - 1;
+                }
+                else
+                {
+                    before_y = next_y;
+                    next_y -= 1;
+                }
+                    
+                // check if there is already has a number
+                if (square[next_y][next_x] == 0)
+                    square[next_y][next_x] = ++count;
+                else
+                {
+                    next_x = before_x;
+                    next_y = before_y + 1;
+                    square[next_y][next_x] = ++count;
+                }
+            }
+        }
+    
+        for (int i = 0; i < dimension; i++)
+        {
+            for (int j = 0; j < dimension; j++)
+                printf("%2d ", square[i][j]);
+            printf("\n");
+        }
+    
         return 0;
     }
+    ```
 
-    int square[dimension][dimension];
-    for (int i = 0; i < dimension; i++)
-    {
-        for (int j = 0; j < dimension; j++)
-            square[i][j] = 0;
-    }
+    ```
+    alancong@AlanCongdeMacBook-Air chapter_8 % ./a.out
+    This program creates a magic square of a specified size.
+    The size must be an odd number between 1 and 99.
+    Enter size of magic square: 5
+    17 24  1  8 15 
+    23  5  7 14 16 
+     4  6 13 20 22 
+    10 12 19 21  3 
+    11 18 25  2  9 
+    alancong@AlanCongdeMacBook-Air chapter_8 % ./a.out
+    This program creates a magic square of a specified size.
+    The size must be an odd number between 1 and 99.
+    Enter size of magic square: 9
+    47 58 69 80  1 12 23 34 45 
+    57 68 79  9 11 22 33 44 46 
+    67 78  8 10 21 32 43 54 56 
+    77  7 18 20 31 42 53 55 66 
+     6 17 19 30 41 52 63 65 76 
+    16 27 29 40 51 62 64 75  5 
+    26 28 39 50 61 72 74  4 15 
+    36 38 49 60 71 73  3 14 25 
+    37 48 59 70 81  2 13 24 35 
+    ```
 
-    for (int i = 0; i < dimension * dimension; i++)
-    {
-        if (i == 0)
-        {
-            next_x = ((dimension + 1) / 2) - 1;
-            next_y = 0;
-            square[next_y][next_x] = ++count;
-        }
-        else
-        {
-            if (next_x + 1 >= dimension)
-            {
-                before_x = next_x;
-                next_x = 0;
-            }
-            else
-            {
-                before_x = next_x;
-                next_x += 1;
-            }
-
-            if (next_y - 1 < 0)
-            {
-                before_y = next_y;
-                next_y = dimension - 1;
-            }
-            else
-            {
-                before_y = next_y;
-                next_y -= 1;
-            }
-                
-            // check if there is already has a number
-            if (square[next_y][next_x] == 0)
-                square[next_y][next_x] = ++count;
-            else
-            {
-                next_x = before_x;
-                next_y = before_y + 1;
-                square[next_y][next_x] = ++count;
-            }
-        }
-    }
-
-    for (int i = 0; i < dimension; i++)
-    {
-        for (int j = 0; j < dimension; j++)
-            printf("%2d ", square[i][j]);
-        printf("\n");
-    }
-
-    return 0;
-}
-```
-
-```
-alancong@AlanCongdeMacBook-Air chapter_8 % ./a.out
-This program creates a magic square of a specified size.
-The size must be an odd number between 1 and 99.
-Enter size of magic square: 5
-17 24  1  8 15 
-23  5  7 14 16 
- 4  6 13 20 22 
-10 12 19 21  3 
-11 18 25  2  9 
-alancong@AlanCongdeMacBook-Air chapter_8 % ./a.out
-This program creates a magic square of a specified size.
-The size must be an odd number between 1 and 99.
-Enter size of magic square: 9
-47 58 69 80  1 12 23 34 45 
-57 68 79  9 11 22 33 44 46 
-67 78  8 10 21 32 43 54 56 
-77  7 18 20 31 42 53 55 66 
- 6 17 19 30 41 52 63 65 76 
-16 27 29 40 51 62 64 75  5 
-26 28 39 50 61 72 74  4 15 
-36 38 49 60 71 73  3 14 25 
-37 48 59 70 81  2 13 24 35 
-```
+    
 
 ## 第九章 函数
 
@@ -11148,479 +11211,477 @@ White advanced!
    提示：一次读取消息中的一个字符（用 `getchar` 函数），并且把这些字符存储在数组中，当数组满了或者读到字符 `'\n'` 时停止读操作。
 
    (b) 修改上述程序，用指针代替整数来跟踪数组中的当前位置。
-
-```C
-// (a)
-#include<stdio.h>
-#include<ctype.h>
-
-#define SIZE 100
-
-int main(void)
-{
-    char ch, arr[SIZE], index = 0;
-
-    printf("Enter a message: ");
-    while((ch = getchar()) != '\n' && ch != EOF)
-    {
-        arr[index ++] = ch;
-    }
-
-    printf("Reversal is: ");
-    while(index != 0)
-    {
-        printf("%c", arr[--index]);
-    }
-    printf("\n");
-
-    return 0;
-}
-```
-
-OUT
-
-```
-alancong@AlanCongdeMacBook-Air chapter_12 % ./a.out 
-Enter a message: Don't get mad, get even.                  
-Reversal is: .neve teg ,dam teg t'noD
-```
-
-
-
-```C
-// (b)
-#include<stdio.h>
-#include<ctype.h>
-
-#define SIZE 100
-
-int main(void)
-{
-    char ch, arr[SIZE], *p;
-
-    p = &arr[0];
-
-    printf("Enter a message: ");
-    while((ch = getchar()) != '\n' && ch != EOF)
-    {
-        *p++ = ch;
-    }
-
-    printf("Reversal is: ");
-    while(p != arr)
-    {
-        printf("%c", *--p);
-    }
-    printf("\n");
-
-    return 0;
-}
-```
-
-OUT
-
-```
-alancong@AlanCongdeMacBook-Air chapter_12 % ./a.out 
-Enter a message: Don't get mad, get even.
-Reversal is: .neve teg ,dam teg t'noD
-```
-
-
+   
+   ```C
+   // (a)
+   #include<stdio.h>
+   #include<ctype.h>
+   
+   #define SIZE 100
+   
+   int main(void)
+   {
+       char ch, arr[SIZE], index = 0;
+   
+       printf("Enter a message: ");
+       while((ch = getchar()) != '\n' && ch != EOF)
+       {
+           arr[index ++] = ch;
+       }
+   
+       printf("Reversal is: ");
+       while(index != 0)
+       {
+           printf("%c", arr[--index]);
+       }
+       printf("\n");
+   
+       return 0;
+   }
+   ```
+   
+   OUT
+   
+   ```
+   alancong@AlanCongdeMacBook-Air chapter_12 % ./a.out 
+   Enter a message: Don't get mad, get even.                  
+   Reversal is: .neve teg ,dam teg t'noD
+   ```
+   
+   ```C
+   // (b)
+   #include<stdio.h>
+   #include<ctype.h>
+   
+   #define SIZE 100
+   
+   int main(void)
+   {
+       char ch, arr[SIZE], *p;
+   
+       p = &arr[0];
+   
+       printf("Enter a message: ");
+       while((ch = getchar()) != '\n' && ch != EOF)
+       {
+           *p++ = ch;
+       }
+   
+       printf("Reversal is: ");
+       while(p != arr)
+       {
+           printf("%c", *--p);
+       }
+       printf("\n");
+   
+       return 0;
+   }
+   ```
+   
+   OUT
+   
+   ```
+   alancong@AlanCongdeMacBook-Air chapter_12 % ./a.out 
+   Enter a message: Don't get mad, get even.
+   Reversal is: .neve teg ,dam teg t'noD
+   ```
+   
+   
 
 2. (a) 编写程序读一条消息，然后检查这条消息是否是回文（消息中的字母从左往右读和从右往左读是一样的）：
 
-```
-Enter a message: He lived as a devil, eh?
-Palindrome
-```
+   ```
+   Enter a message: He lived as a devil, eh?
+   Palindrome
+   ```
 
-```
-Enter a message: Madam, I am Adam.
-Not a palindrome
-```
+   ```
+   Enter a message: Madam, I am Adam.
+   Not a palindrome
+   ```
 
-忽略所有不是字母的字符。用整型变量来跟踪数组中的位置。
-(b) 修改上述程序，使用指针代替整数来跟踪数组中的位置。
+   忽略所有不是字母的字符。用整型变量来跟踪数组中的位置。
+   (b) 修改上述程序，使用指针代替整数来跟踪数组中的位置。
 
-```C
-// a
-#include<stdio.h>
-#include<stdbool.h>
-#include<ctype.h>
+   ```C
+   // a
+   #include<stdio.h>
+   #include<stdbool.h>
+   #include<ctype.h>
+   
+   #define SIZE 100
+   
+   int main(void)
+   {
+       char ch, arr[SIZE], start = 0, end = 0;
+       bool isPalindrome = true;
+   
+       printf("Enter a message: ");
+       while((ch = getchar()) != '\n' && ch != EOF)
+       {
+           if('a' <= tolower(ch) && tolower(ch) <= 'z')
+               arr[end ++] = ch;
+       }
+   
+       while(start < end)
+       {
+           if(tolower(arr[start ++]) != tolower(arr[-- end]))
+           {
+               isPalindrome = false;
+               break;
+           }
+       }
+   
+       if(isPalindrome)
+           printf("Palindrome\n");
+       else    
+           printf("Not a palindrome\n");
+   
+       return 0;
+   }
+   ```
 
-#define SIZE 100
+   OUT:
 
-int main(void)
-{
-    char ch, arr[SIZE], start = 0, end = 0;
-    bool isPalindrome = true;
+   ```
+   alancong@AlanCongdeMacBook-Air chapter_12 % ./a.out 
+   Enter a message: He lived as a devil, eh?
+   Palindrome
+   alancong@AlanCongdeMacBook-Air chapter_12 % ./a.out
+   Enter a message: Madam, I am Adam.
+   Not a palindrome
+   ```
 
-    printf("Enter a message: ");
-    while((ch = getchar()) != '\n' && ch != EOF)
-    {
-        if('a' <= tolower(ch) && tolower(ch) <= 'z')
-            arr[end ++] = ch;
-    }
+   ```C
+   // b
+   #include<stdio.h>
+   #include<stdbool.h>
+   #include<ctype.h>
+   
+   #define SIZE 100
+   
+   int main(void)
+   {
+       char ch, arr[SIZE], *start = &arr[0], *end = &arr[0];
+       bool isPalindrome = true;
+   
+       printf("Enter a message: ");
+       while((ch = getchar()) != '\n' && ch != EOF)
+       {
+           if('a' <= tolower(ch) && tolower(ch) <= 'z')
+               *end ++ = ch;
+       }
+   
+       while(start < end)
+       {
+           if(tolower(*start ++) != tolower(* -- end))
+           {
+               isPalindrome = false;
+               break;
+           }
+       }
+   
+       if(isPalindrome)
+           printf("Palindrome\n");
+       else    
+           printf("Not a palindrome\n");
+   
+       return 0;
+   }
+   ```
 
-    while(start < end)
-    {
-        if(tolower(arr[start ++]) != tolower(arr[-- end]))
-        {
-            isPalindrome = false;
-            break;
-        }
-    }
+   OUT:
 
-    if(isPalindrome)
-        printf("Palindrome\n");
-    else    
-        printf("Not a palindrome\n");
+   ```
+   alancong@AlanCongdeMacBook-Air chapter_12 % ./a.out 
+   Enter a message: He lived as a devil, eh?
+   Palindrome
+   alancong@AlanCongdeMacBook-Air chapter_12 % ./a.out
+   Enter a message: Madam, I am Adam.
+   Not a palindrome
+   ```
 
-    return 0;
-}
-```
-
-OUT:
-
-```
-alancong@AlanCongdeMacBook-Air chapter_12 % ./a.out 
-Enter a message: He lived as a devil, eh?
-Palindrome
-alancong@AlanCongdeMacBook-Air chapter_12 % ./a.out
-Enter a message: Madam, I am Adam.
-Not a palindrome
-```
-
-
-
-```C
-// b
-#include<stdio.h>
-#include<stdbool.h>
-#include<ctype.h>
-
-#define SIZE 100
-
-int main(void)
-{
-    char ch, arr[SIZE], *start = &arr[0], *end = &arr[0];
-    bool isPalindrome = true;
-
-    printf("Enter a message: ");
-    while((ch = getchar()) != '\n' && ch != EOF)
-    {
-        if('a' <= tolower(ch) && tolower(ch) <= 'z')
-            *end ++ = ch;
-    }
-
-    while(start < end)
-    {
-        if(tolower(*start ++) != tolower(* -- end))
-        {
-            isPalindrome = false;
-            break;
-        }
-    }
-
-    if(isPalindrome)
-        printf("Palindrome\n");
-    else    
-        printf("Not a palindrome\n");
-
-    return 0;
-}
-```
-
-OUT:
-
-```
-alancong@AlanCongdeMacBook-Air chapter_12 % ./a.out 
-Enter a message: He lived as a devil, eh?
-Palindrome
-alancong@AlanCongdeMacBook-Air chapter_12 % ./a.out
-Enter a message: Madam, I am Adam.
-Not a palindrome
-```
-
-
+   
 
 3. 请利用数组名可以用作指针的事实简化编程题 1(b) 的程序。
 
-```C
-#include<stdio.h>
-#include<ctype.h>
+   ```C
+   #include<stdio.h>
+   #include<ctype.h>
+   
+   #define SIZE 100
+   
+   int main(void)
+   {
+       char ch, arr[SIZE], *p;
+   
+       p = arr;
+   
+       printf("Enter a message: ");
+       while((ch = getchar()) != '\n' && ch != EOF)
+       {
+           *p++ = ch;
+       }
+   
+       printf("Reversal is: ");
+       while(p != arr)
+       {
+           printf("%c", *--p);
+       }
+       printf("\n");
+   
+       return 0;
+   }
+   ```
 
-#define SIZE 100
+   ```C
+   alancong@AlanCongdeMacBook-Air chapter_12 % ./a.out 
+   Enter a message: Don't get mad, get even.
+   Reversal is: .neve teg ,dam teg t'noD
+   ```
 
-int main(void)
-{
-    char ch, arr[SIZE], *p;
-
-    p = arr;
-
-    printf("Enter a message: ");
-    while((ch = getchar()) != '\n' && ch != EOF)
-    {
-        *p++ = ch;
-    }
-
-    printf("Reversal is: ");
-    while(p != arr)
-    {
-        printf("%c", *--p);
-    }
-    printf("\n");
-
-    return 0;
-}
-```
-
-```
-alancong@AlanCongdeMacBook-Air chapter_12 % ./a.out 
-Enter a message: Don't get mad, get even.
-Reversal is: .neve teg ,dam teg t'noD
-```
-
-
+   
 
 4. 请利用数组名可以用作指针的事实简化编程题 2(b) 的程序。
 
-```C
-#include<stdio.h>
-#include<stdbool.h>
-#include<ctype.h>
+   ```C
+   #include<stdio.h>
+   #include<stdbool.h>
+   #include<ctype.h>
+   
+   #define SIZE 100
+   
+   int main(void)
+   {
+       char ch, arr[SIZE], *start = arr, *end = arr;
+       bool isPalindrome = true;
+   
+       printf("Enter a message: ");
+       while((ch = getchar()) != '\n' && ch != EOF)
+       {
+           if('a' <= tolower(ch) && tolower(ch) <= 'z')
+               *end ++ = ch;
+       }
+   
+       while(start < end)
+       {
+           if(tolower(*start ++) != tolower(* -- end))
+           {
+               isPalindrome = false;
+               break;
+           }
+       }
+   
+       if(isPalindrome)
+           printf("Palindrome\n");
+       else    
+           printf("Not a palindrome\n");
+   
+       return 0;
+   }
+   ```
 
-#define SIZE 100
+   ```
+   alancong@AlanCongdeMacBook-Air chapter_12 % ./a.out 
+   Enter a message:  He lived as a devil, eh?
+   Palindrome
+   alancong@AlanCongdeMacBook-Air chapter_12 % ./a.out
+   Enter a message: Never odd or even.
+   Palindrome
+   ```
 
-int main(void)
-{
-    char ch, arr[SIZE], *start = arr, *end = arr;
-    bool isPalindrome = true;
-
-    printf("Enter a message: ");
-    while((ch = getchar()) != '\n' && ch != EOF)
-    {
-        if('a' <= tolower(ch) && tolower(ch) <= 'z')
-            *end ++ = ch;
-    }
-
-    while(start < end)
-    {
-        if(tolower(*start ++) != tolower(* -- end))
-        {
-            isPalindrome = false;
-            break;
-        }
-    }
-
-    if(isPalindrome)
-        printf("Palindrome\n");
-    else    
-        printf("Not a palindrome\n");
-
-    return 0;
-}
-```
-
-```
-alancong@AlanCongdeMacBook-Air chapter_12 % ./a.out 
-Enter a message:  He lived as a devil, eh?
-Palindrome
-alancong@AlanCongdeMacBook-Air chapter_12 % ./a.out
-Enter a message: Never odd or even.
-Palindrome
-```
-
-
+   
 
 5. 修改第 8 章的编程题 14，用指针而不是整数来跟踪包含该语句的数组的当前位置。
 
-```C
-#include<stdio.h>
+   ```C
+   #include<stdio.h>
+   
+   #define SIZE 100
+   
+   int main(void)
+   {
+       char sentence[SIZE];
+       char *word_start, *word_end = sentence, end_symbol, ch;
+   
+       printf("Enter a sentence: ");
+   
+       while((ch = getchar()) != '\n')
+       {
+           if(ch == '.' || ch == '?' || ch == '!')
+           {
+               end_symbol = ch;
+               break;
+           }
+           *word_end ++ = ch;
+       }
+   
+       // find the end of the sentence
+       word_end -= 1;
+   
+       while(word_end >= sentence)
+       {
+           while(word_end >= sentence && *word_end == ' ')
+               word_end --;
+   
+           // aviod out-of-bounds memory access
+           if(word_end < sentence)
+               break;
+   
+           // find the end of one word
+           char *end = word_end;
+           // find the begin of one word
+           while(word_end >= sentence && *word_end != ' ')
+               word_end --;
+   
+           // obviously, now *word_end is ' '
+           // so we need to mins 1 to find the begin of one word
+           word_start = word_end + 1;
+   
+           while(word_start <= end)
+               putchar(*word_start ++);
+   
+           if(word_end > sentence)
+               putchar(' ');
+       }
+       printf("%c\n", end_symbol);
+   
+       return 0;
+   }
+   ```
 
-#define SIZE 100
+   ```
+   alancong@AlanCongdeMacBook-Air chapter_12 % cc code_12_5.c
+   alancong@AlanCongdeMacBook-Air chapter_12 % ./a.out 
+   Enter a sentence: you can't swallow a cage can you?
+   you can cage a swallow can't you?
+   ```
 
-int main(void)
-{
-    char sentence[SIZE];
-    char *word_start, *word_end = sentence, end_symbol, ch;
-
-    printf("Enter a sentence: ");
-
-    while((ch = getchar()) != '\n')
-    {
-        if(ch == '.' || ch == '?' || ch == '!')
-        {
-            end_symbol = ch;
-            break;
-        }
-        *word_end ++ = ch;
-    }
-
-    // find the end of the sentence
-    word_end -= 1;
-
-    while(word_end >= sentence)
-    {
-        while(word_end >= sentence && *word_end == ' ')
-            word_end --;
-
-        // aviod out-of-bounds memory access
-        if(word_end < sentence)
-            break;
-
-        // find the end of one word
-        char *end = word_end;
-        // find the begin of one word
-        while(word_end >= sentence && *word_end != ' ')
-            word_end --;
-
-        // obviously, now *word_end is ' '
-        // so we need to mins 1 to find the begin of one word
-        word_start = word_end + 1;
-
-        while(word_start <= end)
-            putchar(*word_start ++);
-
-        if(word_end > sentence)
-            putchar(' ');
-    }
-    printf("%c\n", end_symbol);
-
-    return 0;
-}
-```
-
-```
-alancong@AlanCongdeMacBook-Air chapter_12 % cc code_12_5.c
-alancong@AlanCongdeMacBook-Air chapter_12 % ./a.out 
-Enter a sentence: you can't swallow a cage can you?
-you can cage a swallow can't you?
-```
-
-
+   
 
 6. 修改 9.6 节的 `qsort.c` 程序，使得 `low`、`high` 和 `middle` 是指向数组元素的指针而不是整数。`split` 函数应返回指针而不再是整数。
 
-```C
-/* qsort.c (Chapter 9, page 207) */
-/* Sorts an array of integers using Quicksort algorithm */
+   ```C
+   /* qsort.c (Chapter 9, page 207) */
+   /* Sorts an array of integers using Quicksort algorithm */
+   
+   #include <stdio.h>
+   
+   #define N 10
+   
+   void quicksort(int *a, int *low, int *high);
+   int *split(int *a, int *low, int *high);
+   
+   int main(void)
+   {
+       int a[N];
+   
+       printf("Enter %d numbers to be sorted: ", N);
+       for (int *p = a; p < a + N; p++)
+           scanf("%d", p);
+   
+       quicksort(a, a, a + N - 1);
+   
+       printf("In sorted order: ");
+       for (int *p = a; p < a + N; p ++)
+           printf("%d ", *p);
+       printf("\n");
+   
+       return 0;
+   }
+   
+   void quicksort(int *a, int *low, int *high)
+   {
+       int *middle;
+   
+       if (low >= high)
+           return ;
+       middle = split(a, low, high);
+       quicksort(a, low, middle - 1);
+       quicksort(a, middle + 1, high);
+   }
+   
+   int *split(int *a, int *low, int *high)
+   {
+       int part_element = *low;
+   
+       for (;;)
+       {
+           while (low < high && part_element <= *high)
+               high--;
+           if (low >= high)
+               break;
+           *low ++ = *high;
+   
+           while (low < high && *low <= part_element)
+               low++;
+           if (low >= high)
+               break;
+           *high -- = *low;
+       }
+   
+       *high = part_element;
+       return high;
+   }
+   ```
 
-#include <stdio.h>
+   ```
+   alancong@AlanCongdeMacBook-Air chapter_12 % ./a.out 
+   Enter 10 numbers to be sorted: 3 7 0 5 9 2 6 1 8 4 
+   In sorted order: 0 1 2 3 4 5 6 7 8 9 
+   ```
 
-#define N 10
-
-void quicksort(int *a, int *low, int *high);
-int *split(int *a, int *low, int *high);
-
-int main(void)
-{
-    int a[N];
-
-    printf("Enter %d numbers to be sorted: ", N);
-    for (int *p = a; p < a + N; p++)
-        scanf("%d", p);
-
-    quicksort(a, a, a + N - 1);
-
-    printf("In sorted order: ");
-    for (int *p = a; p < a + N; p ++)
-        printf("%d ", *p);
-    printf("\n");
-
-    return 0;
-}
-
-void quicksort(int *a, int *low, int *high)
-{
-    int *middle;
-
-    if (low >= high)
-        return ;
-    middle = split(a, low, high);
-    quicksort(a, low, middle - 1);
-    quicksort(a, middle + 1, high);
-}
-
-int *split(int *a, int *low, int *high)
-{
-    int part_element = *low;
-
-    for (;;)
-    {
-        while (low < high && part_element <= *high)
-            high--;
-        if (low >= high)
-            break;
-        *low ++ = *high;
-
-        while (low < high && *low <= part_element)
-            low++;
-        if (low >= high)
-            break;
-        *high -- = *low;
-    }
-
-    *high = part_element;
-    return high;
-}
-```
-
-```
-alancong@AlanCongdeMacBook-Air chapter_12 % ./a.out 
-Enter 10 numbers to be sorted: 3 7 0 5 9 2 6 1 8 4 
-In sorted order: 0 1 2 3 4 5 6 7 8 9 
-```
-
-
+   
 
 7. 修改 11.4 节的 `maxmin.c` 程序，使得 `max_min` 函数使用指针而不是整数来跟踪数组中的当前位置。
 
-```C
-/* maxmin.c (Chapter 11, page 250) */
-/* Finds the largest and smallest elements in an array */
+   ```C
+   /* maxmin.c (Chapter 11, page 250) */
+   /* Finds the largest and smallest elements in an array */
+   
+   #include <stdio.h>
+   
+   #define N 10
+   
+   void max_min(int *a, int n, int *max, int *min);
+   
+   int main(void)
+   {
+       int b[N], big, small;
+   
+       printf("Enter %d numbers: ", N);
+       for (int *p = b; p < b + N; p ++)
+           scanf("%d", p);
+   
+       max_min(b, N, &big, &small);
+   
+       printf("Largest: %d\n", big);
+       printf("Smallest: %d\n", small);
+   
+       return 0;
+   }
+   
+   void max_min(int *a, int n, int *max, int *min)
+   {
+       *max = *min = *a;
+       for (int *p = a; p < a + n; p++)
+       {
+           if (*p > *max)
+               *max = *p;
+           else if (*p < *min)
+               *min = *p;
+       }
+   }
+   ```
 
-#include <stdio.h>
+   ```
+   alancong@AlanCongdeMacBook-Air chapter_12 % ./a.out 
+   Enter 10 numbers: 3 7 0 5 9 2 6 1 8 4
+   Largest: 9
+   Smallest: 0
+   ```
 
-#define N 10
-
-void max_min(int *a, int n, int *max, int *min);
-
-int main(void)
-{
-    int b[N], big, small;
-
-    printf("Enter %d numbers: ", N);
-    for (int *p = b; p < b + N; p ++)
-        scanf("%d", p);
-
-    max_min(b, N, &big, &small);
-
-    printf("Largest: %d\n", big);
-    printf("Smallest: %d\n", small);
-
-    return 0;
-}
-
-void max_min(int *a, int n, int *max, int *min)
-{
-    *max = *min = *a;
-    for (int *p = a; p < a + n; p++)
-    {
-        if (*p > *max)
-            *max = *p;
-        else if (*p < *min)
-            *min = *p;
-    }
-}
-```
-
-```
-alancong@AlanCongdeMacBook-Air chapter_12 % ./a.out 
-Enter 10 numbers: 3 7 0 5 9 2 6 1 8 4
-Largest: 9
-Smallest: 0
-```
+   
 
 
 
@@ -11634,8 +11695,8 @@ Smallest: 0
 
    ```
    (a) printf("%c", '\n');
-   (b) printf("%s", '\n');
-   (c) printf("%s", "\n");
+   (b) printf("%c", "\n");
+   (c) printf("%s", '\n');
    (d) printf("%s", "\n");
    (e) printf('\n');
    (f) printf("\n");
@@ -11647,7 +11708,17 @@ Smallest: 0
    ```
 
    ```
-   
+   (a) printf("%c", '\n'); //正确，%c是字符格式说明符，'\n'是字符常量(char)，类型匹配
+   (b) printf("%c", "\n"); //错误，%c是字符格式说明符，"\n"是字符串常量(char *)，类型不匹配
+   (c) printf("%s", '\n'); //错误，%s是字符串格式说明符，'\n'是字符常量(char)，类型不匹配
+   (d) printf("%s", "\n"); //正确，%s是字符串格式说明符，"\n"是字符串常量(char *)，类型匹配
+   (e) printf('\n'); //错误，printf第一个参数必须是格式字符串，'\n'是字符常量(char)，类型不匹配
+   (f) printf("\n"); //正确，printf第一个参数必须是格式字符串，"\n"是字符串常量(char *)，类型不匹配
+   (g) putchar('\n'); // 正确，putchar函数接收的是字符参数，'\n'是字符常量(char)，类型匹配
+   (h) putchar("\n"); // 错误，putchar函数接收的是字符参数，"\n"是字符串常量(char *)，类型不匹配
+   (i) puts('\n'); // 错误，puts函数接收的时字符串常量，'\n'是字符常量(char)，类型不匹配
+   (j) puts("\n"); // 正确，puts函数接收的时字符串常量，"\n"是字符串常量(char *)，类型匹配
+   (k) puts(""); // 正确，puts函数接收的是字符串常量，" "是字符串常量(char *)，类型匹配
    ```
 
    
@@ -11664,7 +11735,10 @@ Smallest: 0
    ```
 
    ```
-   
+   (a) putchar(p); //不合法，putchar函数接收的是字符参数，p是指向字符串常量的指针，类型不匹配
+   (b) putchar(*p); //合法，putchar函数接收的是字符参数，*p代表的是'a'也就是p[0]，类型匹配
+   (c) puts(p); // 合法，puts接收的参数是字符串常量(char *)，p是指向字符串常量的指针，类型匹配
+   (d) puts(*p); // 不合法，putsputs接收的参数是字符串常量(char *)，*p是字符串常量的第一个字符，类型不匹配
    ```
 
    
@@ -11673,39 +11747,282 @@ Smallest: 0
     `scanf("%d%s%d", &i, s, &j);`
     如果用户输入 `12abc34 56def78`，那么调用后 `i`、`s` 和 `j` 的值分别是多少？（假设 `i` 和 `j` 是 `int` 类型变量，`s` 是字符数组。）
 
+    ```
+    因为第一个格式符为%d，scanf函数会从输入流中读取整数12，并将其存入变量i中。此时输入流的当前位置指向字符'a'，%s会从当前位置开始读取连续的非空白符，直到遇到空白字符为止。因此scanf函数会将"abc34"读入字符数组s，并在末尾自动添加字符串结束符'\0'。紧接着是格式符%d，scanf函数会继续从剩余的输入" 56def78"中读取下一个整数56，并将其存入变量j中，多余的"def78"没有对应格式说明符处理，因此仍保留在输入缓冲区中。
+    ```
 
+    ```C
+    #include<stdio.h>
+    
+    #define SIZE 100
+    
+    int main(void)
+    {
+        char s[SIZE];
+        int i, j;
+        printf("Enter something : ");
+        
+        scanf("%d%s%d", &i, s, &j);
+    
+        printf("i is : %d\n", i);
+        printf("s is : %s\n", s);
+        printf("j is : %d\n", j);
+    
+        return 0;
+    }
+    ```
+
+    ```
+    alancong@AlanCongdeMacBook-Air chapter_13 % ./a.out
+    Enter something : 12abc34 56def78
+    i is : 12
+    s is : abc34
+    j is : 56
+    ```
+
+    
 
 
 4. 按照下述要求分别修改 `read_line` 函数。
 
-```
-(a) 在开始存储输入字符前跳过空白字符。
-(b) 在遇到第一个空白字符时停止读入。提示：调用 `isspace` 函数（23.5节）来检查字符是否为空白字符。
-(c) 在遇到第一个换行符时停止读入，然后把换行符存储到字符串中。
-(d) 把没有空间存储的字符留下以备后用。
-```
+   ```
+   (a) 在开始存储输入字符前跳过空白字符。
+   (b) 在遇到第一个空白字符时停止读入。提示：调用 isspace 函数（23.5节）来检查字符是否为空白字符。
+   (c) 在遇到第一个换行符时停止读入，然后把换行符存储到字符串中。
+   (d) 把没有空间存储的字符留下以备后用。
+   ```
+
+   ```C
+   int read_line(char str[], int n)
+   {
+       int ch, i = 0;
+       while ((ch = getchar()) != '\n')
+           if (i < n)
+               str[i++] = ch;
+       str[i] = '\0';
+       return i;
+   }
+   ```
+
+   ```C
+   // a
+   int read_line(char str[], int n)
+   {
+       int ch, i = 0;
+       while ((ch = getchar()) != '\n')
+       {
+           if(i == 0 && isspace(ch))
+               continue;
+           if (i < n)
+               str[i++] = ch;
+       }
+       str[i] = '\0';
+       return i;
+   }
+   ```
+
+   ```
+   alancong@AlanCongdeMacBook-Air chapter_13 % ./a.out 
+   Enter a string :     1234
+   The string is : 1234
+   ```
+
+   ```C
+   // b
+   int read_line(char str[], int n)
+   {
+       int ch, i = 0;
+       while ((ch = getchar()) != '\n' && !isspace(ch))
+           if (i < n)
+               str[i++] = ch;
+       str[i] = '\0';
+       return i;
+   }
+   ```
+
+   ```
+   alancong@AlanCongdeMacBook-Air chapter_13 % ./a.out 
+   Enter a string : 12 34
+   The string is : 12
+   ```
+
+   ```C
+   // c
+   int read_line(char str[], int n)
+   {
+       int ch, i = 0;
+       do
+       {
+           ch = getchar();
+           if (i < n)
+               str[i++] = ch;
+       } while (ch != '\n');
+   
+       str[i] = '\0';
+       return i;
+   }
+   ```
+
+   ```
+   alancong@AlanCongdeMacBook-Air chapter_13 % ./a.out 
+   Enter a string : 1234 
+   The string is : 1234
+   
+   ```
+
+   ```
+   // d
+   int read_line(char str[], int n)
+   {
+       int ch, i = 0;
+       while ((i < n) && (ch = getchar()) != '\n')
+           str[i++] = ch;
+       str[i] = '\0';
+       return i;
+   }
+   ```
+
+   ```C
+   // d 
+   // The STD ans is better than me, use for loop for counting loop
+   int read_line(char str[], int n)
+   {
+       int ch, i;
+   
+       for (i = 0; i < n; i++)
+       {
+           ch = getchar();
+           if (ch == '\n')
+               break;
+           str[i] = ch;
+       }
+       str[i] = '\0';
+       return i;
+   }
+   ```
+
+   ```
+   alancong@AlanCongdeMacBook-Air chapter_13 % ./a.out 
+   Enter a string : 123456789123456789
+   The string is : 1234567891
+   The string is : 23456789
+   ```
+
+   
 
 **13.4节**
 
 5. (a) 编写名为 `capitalize` 的函数，把参数中的字母都改为大写字母。参数是空字符结尾的字符串，且此字符串可以包含任意字符而不仅是字母。使用数组取下标操作访问字符串中的字符。提示：使用 `toupper` 函数（23.5节）把每个字符转换成大写。
+   (b) 重写 `capitalize` 函数，这次使用指针算术运算来访问字符串中的字符。
 
-(b) 重写 `capitalize` 函数，这次使用指针算术运算来访问字符串中的字符。
+   ```C
+   // a
+   #include<stdio.h>
+   #include<string.h>
+   #include<ctype.h>
+   
+   #define SIZE 100
+   
+   void capitalize(char *a, int n);
+   
+   int main(void)
+   {
+       char arr[SIZE] = "aBCdeFGHIJK!@#$";
+   
+       capitalize(arr, strlen(arr));
+   
+       printf("The output is : %s\n", arr);
+   
+       return 0;
+   }
+   
+   void capitalize(char *a, int n)
+   {
+       for(int i = 0;i < n;i ++)
+           if('a' <= a[i] && a[i] <= 'z')
+               a[i] = toupper(a[i]);
+   }
+   ```
 
-```
+   ```
+   alancong@AlanCongdeMacBook-Air chapter_13 % ./a.out 
+   The output is : ABCDEFGHIJK!@#$
+   ```
 
-```
+   ```C
+   #include<stdio.h>
+   #include<string.h>
+   #include<ctype.h>
+   
+   #define SIZE 100
+   
+   void capitalize(char *a, int n);
+   
+   int main(void)
+   {
+       char arr[SIZE] = "aBCdeFGHIJK!@#$";
+   
+       capitalize(arr, strlen(arr));
+   
+       printf("The output is : %s\n", arr);
+   
+       return 0;
+   }
+   
+   void capitalize(char *a, int n)
+   {
+       for(char *p = a;p < a + n;p ++)
+           if('a' <= *p && *p <= 'z')
+               *p = toupper(*p);
+   }
+   ```
 
+   ```
+   alancong@AlanCongdeMacBook-Air chapter_13 % ./a.out 
+   The output is : ABCDEFGHIJK!@#$
+   ```
 
+   
 
 6. 编写名为 `censor` 的函数，把字符串中出现的每一处 `foo` 替换为 `xxx`。例如，字符串 `"food fool"` 会变为 `"xxxd xxxl"`。在不失清晰性的前提下程序越短越好。
 
-```
+   ```C
+   #include <stdio.h>
+   #include <string.h>
+   
+   #define SIZE 100
+   
+   void censor(char s[]);
+   
+   int main(void)
+   {
+       char arr[SIZE] = "abcdefoofofoo&&fffoo";
+   
+       printf("The string is : %s\n", arr);
+   
+       censor(arr);
+   
+       printf("The string is : %s\n", arr);
+   
+       return 0;
+   }
+   
+   void censor(char s[])
+   {
+       for(int i = 0;s[i] != '\0';i ++)
+           if(s[i] == 'f' && s[i + 1] == 'o' && s[i + 2] == 'o')
+               s[i] = s[i + 1] = s[i + 2] = 'x';
+   }
+   ```
 
-```
+   ```
+   The string is : abcdefoofofoo&&fffoo
+   The string is : abcdexxxfoxxx&&ffxxx
+   ```
 
 **13.5节**
 
-1. 假设 `str` 是字符数组，下面哪条语句与其他 3 条语句不等价？
+7. 假设 `str` 是字符数组，下面哪条语句与其他 3 条语句不等价？
 
    ```
    (a) *str = 0;
@@ -11714,9 +12031,15 @@ Smallest: 0
    (d) strcat(str, "");
    ```
 
-   
+   ```
+   (a) *str = 0; // 将字符串第一个字符赋值为数值 0，相当于 str[0] = '\0'，表示空字符串。
+   (b) str[0] = '\0'; // 显式将字符串第一个字符设为字符串结束符，等价于清空字符串。
+   (c) strcpy(str, ""); // 将空字符串复制到 str 中，效果是 str[0] = '\0'，也表示空字符串。
+   (d) strcat(str, ""); 
+   // 将空字符串拼接到已有的字符串后。行为依赖于 str 原始内容必须是以 '\0' 结尾的有效字符串。若 str 本身未被初始化为有效字符串（例如你仅仅设置了 str[0] = 'X'; 而没有终止符），那么该调用会引发未定义行为。因此它与前面三句不等价。
+   ```
 
-2. 在执行下列语句后，字符串 `str` 的值是什么？
+8. 在执行下列语句后，字符串 `str` 的值是什么？
 
    ```
    strcpy(str, "tire-bouchon");
@@ -11724,9 +12047,40 @@ Smallest: 0
    strcat(str, "red?");
    ```
 
-3. 在执行下列语句后，字符串 `s1` 的值是什么？
+   ```
+   假设str当前没有存储任何字符串，也就是""，那么strcpy(str, "tire-bouchon");会将str的值修改为"tire-bouchon"，strcpy(&str[4], "d-or-wi");会将str数组从第五个元素开始的值修改为"d-or-wi"，因此目前str的值为"tired-or-wi"，strcat(str, "red?");会在当前字符串的末尾附上"red?"，因此现在字符串的值为"tired-or-wired?"
+   ```
+
+   ```c
+   #include <stdio.h>
+   #include <string.h>
+   
+   #define SIZE 100
+   
+   int main(void)
+   {
+       char str[SIZE];
+   
+       strcpy(str, "tire-bouchon");
+       strcpy(&str[4], "d-or-wi");
+       strcat(str, "red?");
+   
+       printf("The string is : %s\n", str);
+   
+       return 0;
+   }
+   ```
 
    ```
+   alancong@AlanCongdeMacBook-Air chapter_13 % ./a.out 
+   The string is : tired-or-wired?
+   ```
+
+   
+
+9. 在执行下列语句后，字符串 `s1` 的值是什么？
+
+   ```C
    strcpy(s1, "computer");
    strcpy(s2, "science");
    if (strcmp(s1, s2) < 0)
@@ -11736,84 +12090,476 @@ Smallest: 0
    s1[strlen(s1)-6] = '\0';
    ```
 
-4. 下面的函数用于创建字符串的相同副本。请指出这个函数中的错误。
-
    ```
-   char *duplicate(const char *p) {
-       char *q;
-       strcpy(q, p);
-       return q;
-   }
+   假设当前字符串s1没有任何值，也就是""，那么strcpy(s1, "computer");会将s1的值修改为"computer"，strcpy(s2, "science");会将s2的值修改为"science"，因为两个字符串从第一个字符就不相等，且's'>'c'，所以strcat(s1, s2);会将字符串s2的内容附到字符串s1的后面，因此现在的值为，"computerscience"，s1[strlen(s1)-6] = '\0';相当于将现在字符串s1的内容从后往前删掉留个字符，尾零不参与计数，因此最终字符串s1的值就是"computers"。
    ```
 
-5. 本章的“问与答”部分说明了利用数组取下标操作来编写 `strcmp` 函数的方法。请修改此函数，改用指针算术运算来编写。
-
-6. 编写下面的函数：
-
-   ```
-   void get_extension(const char *file_name, char *extension);
-   ```
-
-   `file_name` 指向包含文件名的字符串。函数把文件名的扩展存储在 `extension` 指向的字符串中。例如，如果文件名是 `"memo.txt"`，函数将把 `"txt"` 存储到 `extension` 指向的字符串中。如果文件名没有扩展名，函数将在 `extension` 指向的字符串中存储一个空字符串（仅由一个空字符构成）。在函数中使用 `strlen` 函数和 `strcpy` 函数，使其尽可能简单。
-
-7. 编写下面的函数：
-
-   ```
-   void build_index_url(const char *domain, char *index_url);
-   ```
-
-   `domain` 指向包含因特网域名的字符串，例如 `"knking.com"`。函数应在该字符串的前面加上 `"http://www."`，在后面加上 `"/index.html"`，并把结果存储到 `index_url` 指向的字符串中。（在这个例子中，结果为 `"http://www.knking.com/index.html"`。）可以假定 `index_url` 所指向的变量长度足以装下整个字符串。在函数中使用 `strcat` 函数和 `strcpy` 函数，使其尽可能简单。
-
-**13.6节**
-
-1. 下面程序的输出是什么？
-
-   ```
-   #include
-   int main(void) {
-       char s[] = "Hsjodi", *p;
-       for (p = s; *p; p++)
-           --*p;
-       puts(s);
+   ```C
+   #include <stdio.h>
+   #include <string.h>
+   
+   #define SIZE 100
+   
+   int main(void)
+   {
+       char s1[SIZE], s2[SIZE];
+   
+       strcpy(s1, "computer");
+       strcpy(s2, "science");
+       if (strcmp(s1, s2) < 0)
+           strcat(s1, s2);
+       else
+           strcat(s2, s1);
+       s1[strlen(s1) - 6] = '\0';
+   
+       printf("The string is : %s\n", s1);
+   
        return 0;
    }
    ```
 
-2. 函数 `f` 如下所示：
-
    ```
-   int f(char *s, char *t) {
-       char *p1, *p2;
-       for (p1 = s; *p1; p1++) {
-           for (p2 = t; *p2; p2++)
-               if (*p1 == *p2) break;
-           if (*p2 == '\0') break;
-       }
-       return p1 - s;
-   }
+   alancong@AlanCongdeMacBook-Air chapter_13 % ./a.out 
+   The string is : computers
    ```
 
-   (a) `f("abcd", "babc")` 的值是多少？
-   (b) `f("abcd", "bcd")` 的值是多少？
-   (c) 当传递两个字符串 `s` 和 `t` 时，函数 `f` 的返回值一般是什么？
+   
 
-3. 利用 13.6 节中的方法来精简 13.4 节的 `count_space` 函数。具体而言要用 `while` 循环替换 `for` 语句。
+10. 下面的函数用于创建字符串的相同副本。请指出这个函数中的错误。
 
-4. 编写下面的函数：
+    ```
+    char *duplicate(const char *p) {
+        char *q;
+        strcpy(q, p);
+        return q;
+    }
+    ```
 
-   ```
-   bool test_extension(const char *file_name, const char *extension);
-   ```
+    ```C
+    #include <stdio.h>
+    #include <string.h>
+    
+    #define SIZE 100
+    
+    void duplicate(const char *p, char *q);
+    
+    int main(void)
+    {
+        char string[SIZE] = "string";
+        char string_copy[SIZE];
+        duplicate(string, string_copy);
+        printf("The string is : %s\n", string_copy);
+    
+        return 0;
+    }
+    
+    void duplicate(const char *p, char *q)
+    {
+        strcpy(q, p);
+    }
+    ```
 
-   `file_name` 指向包含文件名的字符串。如果文件的扩展名与 `extension` 指向的字符串匹配（不区分大小写），函数返回 `true`。例如，函数调用 `test_extension("memo.txt", "TXT")` 将返回 `true`。要求在函数中使用“搜索字符串结尾”的惯用法。提示：在比较字符之前使用 `toupper` 函数（23.5节）把字符转换成大写形式。
+    ```
+    alancong@AlanCongdeMacBook-Air chapter_13 % ./a.out 
+    The string is : string
+    ```
 
-5. 编写下面的函数：
+    
 
-   ```
-   void remove_filename(char *url);
-   ```
+11. 本章的“问与答”部分说明了利用数组取下标操作来编写 `strcmp` 函数的方法。请修改此函数，改用指针算术运算来编写。
 
-   `url` 指向一个包含以文件名结尾的统一资源定位器（Uniform Resource Locator, URL）的字符串，例如 `"http://www.knking.com/index.html"`。函数应通过移除文件名和前面的斜杠来修改字符串。（在上面的例子中，结果为 `"http://www.knking.com"`。）要求在函数中使用“搜索字符串结尾”的惯用法。提示：把字符串中的最后一个斜杠替换为空字符。
+    ```c
+    #include<stdio.h>
+    
+    #define SIZE 100
+    
+    char my_strcmp(char *s, char *t);
+    
+    int main(void)
+    {
+        char str_1[SIZE] = "Hello world!";
+        char str_2[SIZE] = "Hello world!";
+    
+        if(my_strcmp(str_1, str_2) == 0)
+            printf("The result is equal.\n");
+        else    
+            printf("The result is unequal.\n");
+    
+        return 0;
+    }
+    
+    char my_strcmp(char *s, char *t)
+    {
+        char *p = s, *q = t;
+        while(*p == *q)
+        {
+            if(*p == '\0')
+                return 0;
+            p ++;
+            q ++;
+        }
+        return *p - *q;
+    }
+    ```
+
+    ```
+    alancong@AlanCongdeMacBook-Air chapter_13 % ./a.out 
+    The result is equal.
+    ```
+
+    
+
+12. 编写下面的函数：
+
+    ```
+    void get_extension(const char *file_name, char *extension);
+    ```
+
+     `file_name` 指向包含文件名的字符串。函数把文件名的扩展存储在 `extension` 指向的字符串中。例如，如果文件名是 `"memo.txt"`，函数将把 `"txt"` 存储到 `extension` 指向的字符串中。如果文件名没有扩展名，函数将在 `extension` 指向的字符串中存储一个空字符串（仅由一个空字符构成）。在函数中使用 `strlen` 函数和 `strcpy` 函数，使其尽可能简单。
+
+    ```C
+    #include<stdio.h>
+    #include<string.h>
+    #include<stdbool.h>
+    
+    #define SIZE 100
+    
+    void get_extension(const char *file_name, char *extension);
+    
+    int main(void)
+    {
+        char file_name_1[SIZE] = "main.c";
+        char file_name_2[SIZE] = "main", extension[SIZE];
+    
+        printf("The file name is : %s\n", file_name_1);
+        get_extension(file_name_1, extension);
+        printf("The extension of the file is : %s\n", extension);
+    
+        printf("The file name is : %s\n", file_name_2);
+        get_extension(file_name_2, extension);
+        printf("The extension of the file is : %s\n", extension);
+    
+        return 0;
+    }
+    
+    void get_extension(const char *file_name, char *extension)
+    {
+        const char *p = file_name;
+        bool found = false;
+        while(*p != '\0')
+        {
+            if(*p == '.')
+            {
+                found = true;
+                break;
+            }
+            p ++;
+        }
+        if(found && *(p + 1) != '\0')
+            strcpy(extension, p + 1);
+        else
+            strcpy(extension, "");
+    }
+    ```
+    
+    ```
+    alancong@AlanCongdeMacBook-Air chapter_13 % ./a.out 
+    The file name is : main.c
+    The extension of the file is : c
+    The file name is : main
+    The extension of the file is : 
+    ```
+    
+    
+
+13. 编写下面的函数：
+
+    ```
+    void build_index_url(const char *domain, char *index_url);
+    ```
+
+    `domain` 指向包含因特网域名的字符串，例如 `"knking.com"`。函数应在该字符串的前面加上 `"http://www."`，在后面加上 `"/index.html"`，并把结果存储到 `index_url` 指向的字符串中。（在这个例子中，结果为 `"http://www.knking.com/index.html"`。）可以假定 `index_url` 所指向的变量长度足以装下整个字符串。在函数中使用 `strcat` 函数和 `strcpy` 函数，使其尽可能简单。
+
+    ```C
+    #include<stdio.h>
+    #include<string.h>
+    #include<stdbool.h>
+    
+    #define SIZE 100
+    
+    void build_index_url(const char *domain, char *index_url);
+    
+    int main(void)
+    {
+        char domain[SIZE] = "knking.com", index_url[SIZE];
+    
+        build_index_url(domain, index_url);
+        printf("The result is : %s\n", index_url);
+    
+        return 0;
+    }
+    
+    void build_index_url(const char *domain, char *index_url)
+    {
+        strcpy(index_url, "http://www.");
+        strcat(index_url, domain);
+        strcat(index_url, "/index.html");
+    }
+    ```
+    
+    ```
+    alancong@AlanCongdeMacBook-Air chapter_13 % ./a.out 
+    The result is : http://www.knking.com/index.html
+    ```
+    
+    
+
+**13.6节**
+
+14. 下面程序的输出是什么？
+
+    ```C
+    #include <stdio.h>
+    int main(void)
+    {
+        char s[] = "Hsjodi", *p;
+        for (p = s; *p; p++)
+            --*p;
+        puts(s);
+        return 0;
+    }
+    ```
+
+    ```
+    程序是每个字符值都向前减一。
+    ```
+
+    ```
+    alancong@AlanCongdeMacBook-Air chapter_13 % ./a.out 
+    Grinch
+    ```
+
+    
+
+15. 函数 `f` 如下所示：
+
+    ```C
+    int f(char *s, char *t) {
+        char *p1, *p2;
+        for (p1 = s; *p1; p1++) {
+            for (p2 = t; *p2; p2++)
+                if (*p1 == *p2) break;
+            if (*p2 == '\0') break;
+        }
+        return p1 - s;
+    }
+    ```
+
+    ```
+    (a) f("abcd", "babc") 的值是多少？
+    (b) f("abcd", "bcd") 的值是多少？
+    (c) 当传递两个字符串 s 和 t 时，函数 f 的返回值一般是什么？
+    ```
+
+    ```C
+    // a & b
+    #include <stdio.h>
+    
+    int f(char *s, char *t);
+    
+    int main(void)
+    {
+        printf("The result of f(\"abcd\", \"babc\") is %d\n", f("abcd", "babc")); 
+        printf("The result of f(\"abcd\", \"bcd\")) is %d\n", f("abcd", "bcd"));
+        return 0;
+    }
+    
+    int f(char *s, char *t)
+    {
+        char *p1, *p2;
+        for (p1 = s; *p1; p1++)
+        {
+            for (p2 = t; *p2; p2++)
+                if (*p1 == *p2)
+                    break;
+            if (*p2 == '\0')
+                break;
+        }
+        return p1 - s;
+    }
+    ```
+
+    ```
+    // c
+    程序是用来判断在s序列中存在的但是在t序列中不存在的字符，并返回其在s序列中的位置。
+    ```
+
+    
+
+16. 利用 13.6 节中的方法来精简 13.4 节的 `count_space` 函数。具体而言要用 `while` 循环替换 `for` 语句。
+
+    ```C
+    #include<stdio.h>
+    
+    #define SIZE 100
+    
+    int count_spaces(const char *s);
+    
+    int main(void)
+    {
+        char str[SIZE] = "12 34 56 78";
+    
+        printf("There is %d space in the string of %s\n", count_spaces(str), str);
+    
+        return 0;
+    }
+    
+    int count_spaces(const char *s)
+    {
+        int count = 0;
+        while(*s)
+        {
+            if(*s == ' ')
+                count++;
+            s ++;
+        }
+        return count;
+    }
+    ```
+
+    ```
+    alancong@AlanCongdeMacBook-Air chapter_13 % ./a.out 
+    There is 3 space in the string of 12 34 56 78
+    ```
+
+    
+
+17. 编写下面的函数：
+
+    ```
+    bool test_extension(const char *file_name, const char *extension);
+    ```
+
+     `file_name` 指向包含文件名的字符串。如果文件的扩展名与 `extension` 指向的字符串匹配（不区分大小写），函数返回 `true`。例如，函数调用 `test_extension("memo.txt", "TXT")` 将返回 `true`。要求在函数中使用“搜索字符串结尾”的惯用法。提示：在比较字符之前使用 `toupper` 函数（23.5节）把字符转换成大写形式。
+
+    ```C
+    #include<stdio.h>
+    #include<string.h>
+    #include<stdbool.h>
+    #include<ctype.h>
+    
+    #define SIZE 100
+    
+    bool test_extension(const char *file_name, const char *extension);
+    void get_extension(const char *file_name, char *extension);
+    
+    int main(void)
+    {
+        char file_name_1[SIZE] = "main.txt";
+        char file_name_2[SIZE] = "main", extension[SIZE];
+    
+        if(test_extension(file_name_1, "TXT"))
+            printf("Match!\n");
+        else
+            printf("Don't match!\n");
+    
+        return 0;
+    }
+    
+    void get_extension(const char *file_name, char *extension)
+    {
+        const char *p = file_name;
+        bool found = false;
+        while(*p != '\0')
+        {
+            if(*p == '.')
+            {
+                found = true;
+                break;
+            }
+            p ++;
+        }
+        if(found && *(p + 1) != '\0')
+            strcpy(extension, p + 1);
+        else
+            strcpy(extension, "");
+    }
+    
+    bool test_extension(const char *file_name, const char *extension)
+    {
+        char file_extension[SIZE], *p = file_extension;
+    
+        get_extension(file_name, file_extension);
+    
+        while(*p)
+        {
+            *p = toupper(*p);
+            p ++;
+        }
+    
+        if(strcmp(file_extension, extension) == 0)
+            return true;
+        else 
+            return false;
+    }
+    ```
+
+    ```
+    alancong@AlanCongdeMacBook-Air chapter_13 % ./a.out 
+    Match!
+    ```
+
+    
+
+18. 编写下面的函数：
+
+    ```
+    void remove_filename(char *url);
+    ```
+
+    `url` 指向一个包含以文件名结尾的统一资源定位器（Uniform Resource Locator, URL）的字符串，例如 `"http://www.knking.com/index.html"`。函数应通过移除文件名和前面的斜杠来修改字符串。（在上面的例子中，结果为 `"http://www.knking.com"`。）要求在函数中使用“搜索字符串结尾”的惯用法。提示：把字符串中的最后一个斜杠替换为空字符。
+
+    ```C
+    #include<stdio.h>
+    #include<ctype.h>
+    #include<string.h>
+    
+    #define SIZE 100
+    
+    void remove_filename(char *url);
+    
+    int main(void)
+    {
+        char url[SIZE] = "http://www.knking.com/index.html";
+    
+        remove_filename(url);
+    
+        printf("The string is : %s\n", url);
+    
+        return 0;
+    }
+    
+    void remove_filename(char *url)
+    {
+        char *str = url + strlen(url) - 1;
+        while(*str)
+        {
+            if(*str == '/')
+            {
+                *str = '\0';
+                break;
+            }
+            str --;
+        }
+    }
+    ```
+
+    ```
+    alancong@AlanCongdeMacBook-Air chapter_13 % ./a.out 
+    The string is : http://www.knking.com
+    ```
+
+    
 
 ### 编程题
 
@@ -11826,17 +12572,172 @@ Smallest: 0
    Enter word: catfish
    Enter word: walrus
    Enter word: cat
+   Enter word: fish
    Smallest word: cat
    Largest word: zebra
    ```
 
    提示：使用两个名为 `smallest_word` 和 `largest_word` 的字符串来分别记录所有输入中的“最小”单词和“最大”单词。用户每输入一个新单词，都要用 `strcmp` 函数把它与 `smallest_word` 进行比较。如果新的单词比 `smallest_word`“小”，就用 `strcpy` 函数把新单词保存到 `smallest_word` 中。用类似的方式与 `largest_word` 进行比较。用 `strlen` 函数来判断用户是否输入了 4 个字母的单词。
 
+   ```C
+   #include <stdio.h>
+   #include <string.h>
+   
+   #define SIZE 20
+   
+   int main(void)
+   {
+       char smallest_word[SIZE], largest_word[SIZE], word[SIZE];
+   
+       printf("Enter word: ");
+       scanf("%s", word);
+   
+       if(strlen(word) == 4)
+       {
+           printf("Error!\n");
+           return 0;
+       }
+   
+       strcpy(smallest_word, word);
+       strcpy(largest_word, word);
+   
+       while (1)
+       {
+           printf("Enter word: ");
+           scanf("%s", word);
+   
+           if (strlen(word) == 4)
+               break;
+   
+           if (strcmp(smallest_word, word) > 0)
+               strcpy(smallest_word, word);
+           if (strcmp(largest_word, word) < 0)
+               strcpy(largest_word, word);
+       }
+   
+       printf("Smallest word: %s\n", smallest_word);
+       printf("Largest word: %s\n", largest_word);
+   
+       return 0;
+   }
+   ```
+
+   ```
+   alancong@AlanCongdeMacBook-Air chapter_13 % ./a.out 
+   Enter word: dog
+   Enter word: zebra
+   Enter word: rabbit
+   Enter word: catfish
+   Enter word: walrus
+   Enter word: cat
+   Enter word: fish
+   Smallest word: cat
+   Largest word: zebra
+   ```
+
+   
+
 2. 按如下方式改进 13.5 节的 `remind.c` 程序：
 
-   (a) 如果对应的日期为负数或大于 31，程序显示出错消息，并忽略提醒。提示：使用 `continue` 语句。
-    (b) 允许用户输入日期、24 小时格式的时间和提醒。显示的提醒列表必须先按日期排序，然后再按时间排序。（原始的 `remind.c` 程序允许用户输入时间，但是它把时间作为提醒的一部分来处理。）
-    (c) 程序显示一年的提醒列表。要求用户按照 `月/日` 的格式输入日期。
+   ```
+   (a) 如果对应的日期为负数或大于 31，程序显示出错消息，并忽略提醒。提示：使用 continue 语句。✅
+   (b) 允许用户输入日期、24 小时格式的时间和提醒。显示的提醒列表必须先按日期排序，然后再按时间排序。（原始的 remind.c 程序允许用户输入时间，但是它把时间作为提醒的一部分来处理。）✅
+   (c) 程序显示一年的提醒列表。要求用户按照 月/日 的格式输入日期。✅
+   ```
+
+   ```C
+   /* remind.c (Chapter 13, page 294) */
+   /* Prints a one-month reminder list */
+   
+   #include <stdio.h>
+   #include <string.h>
+   
+   #define MAX_REMIND 50 /* maximum number of reminders */
+   #define MSG_LEN 60    /* max length of reminder message */
+   
+   int read_line(char str[], int n);
+   
+   int main(void)
+   {
+       char reminders[MAX_REMIND][MSG_LEN + 3];
+       char day_str[10], msg_str[MSG_LEN + 1];
+       int month, day, hour, i, j, num_remind = 0;
+   
+       for (;;)
+       {
+           if (num_remind == MAX_REMIND)
+           {
+               printf("-- No space left --\n");
+               break;
+           }
+   
+           printf("Enter date and time (MM/DD/HH) and reminder: ");
+           scanf("%2d / %2d / %2d", &month, &day, &hour);
+   
+           // if the date is negative or greater than 31
+           if(month < 0 || month > 12 || day < 0 || day > 31 || hour < 0 || hour > 24)
+           {
+               printf("False input.");
+               continue;
+           }
+   
+           if (day == 0)
+               break;
+   
+           sprintf(day_str, "%2d/%2d/%2d", month, day, hour);
+           read_line(msg_str, MSG_LEN);
+   
+           for (i = 0; i < num_remind; i++)
+               if (strcmp(day_str, reminders[i]) < 0)
+                   break;
+   
+           for (j = num_remind; j > i; j--)
+               strcpy(reminders[j], reminders[j - 1]);
+   
+           strcpy(reminders[i], day_str);
+           strcat(reminders[i], msg_str);
+   
+           num_remind++;
+       }
+   
+       printf("\nDay Reminder\n");
+       for (i = 0; i < num_remind; i++)
+           printf(" %s\n", reminders[i]);
+   
+       return 0;
+   }
+   
+   int read_line(char str[], int n)
+   {
+       int ch, i = 0;
+   
+       while ((ch = getchar()) != '\n')
+           if (i < n)
+               str[i++] = ch;
+       str[i] = '\0';
+       return i;
+   }
+   ```
+
+   ```
+   alancong@AlanCongdeMacBook-Air chapter_13 % ./a.out 
+   Enter day and reminder: 3/14/9 Midterm exam
+   Enter day and reminder: 3/2/10 Doctor appointment
+   Enter day and reminder: 3/14/8 Project deadline
+   Enter day and reminder: 2/28/14 Friend's birthday
+   Enter day and reminder: 3/14/14 Call mom
+   Enter day and reminder: 0/0/0
+   
+   Day Reminder
+     2/28/14 Friend's birthday
+     3/ 2/10 Doctor appointment
+     3/14/ 8 Project deadline
+     3/14/ 9 Midterm exam
+     3/14/14 Call mom
+   alancong@AlanCongdeM
+   ```
+
+   
 
 3. 修改 8.2 节的 `deal.c` 程序，使它显示出牌的全名：
 
@@ -11852,11 +12753,84 @@ Smallest: 0
 
    提示：用指向字符串的指针的数组来替换数组 `rank_code` 和数组 `suit_code`。
 
-4. 编写名为 `reverse.c` 的程序，用来逆序输出命令行参数。如果输入 `reverse void and null` 运行程序，产生的输出应为：
+   ```C
+   /* deal.c (Chapter 8, page 173) */
+   /* Deals a random hand of cards */
+   
+   #include <stdbool.h> /* C99 only */
+   #include <stdio.h>
+   #include <stdlib.h>
+   #include <time.h>
+   
+   #define NUM_SUITS 4
+   #define NUM_RANKS 13
+   
+   int main(void)
+   {
+       bool in_hand[NUM_SUITS][NUM_RANKS] = {false};
+       int num_cards, rank, suit;
+   
+       const char *rank_code[] = {"Two", "Three", "Four", "Five", "Six", "Seven", "Eight",
+                                  "Nine", "Ten", "Jack", "Queen", "King", "Ace"};
+       const char *suit_code[] = {"clubs", "diamonds", "hearts", "spades"};
+   
+       srand((unsigned)time(NULL));
+   
+       printf("Enter number of cards in hand: ");
+       scanf("%d", &num_cards);
+   
+       printf("Your hand:");
+       while (num_cards > 0)
+       {
+           suit = rand() % NUM_SUITS; /* picks a random suit */
+           rank = rand() % NUM_RANKS; /* picks a random rank */
+           if (!in_hand[suit][rank])
+           {
+               in_hand[suit][rank] = true;
+               num_cards--;
+               printf("\n%s %s", rank_code[rank], suit_code[suit]);
+           }
+       }
+       printf("\n");
+   
+       return 0;
+   }
+   ```
 
    ```
-   null and void
+   alancong@AlanCongdeMacBook-Air chapter_13 % ./a.out 
+   Enter number of cards in hand: 5
+   Your hand:
+   Ace clubs
+   King diamonds
+   Four hearts
+   Jack diamonds
+   Queen diamonds
    ```
+
+   
+
+4. 编写名为 `reverse.c` 的程序，用来逆序输出命令行参数。如果输入 `reverse void and null` 运行程序，产生的输出应为：`null and void`
+
+   ```C
+   #include<stdio.h>
+   
+   int main(int argc, char *argv[])
+   {
+       for(int i = argc - 1;i > 0;i --)
+           printf("%s ", argv[i]);
+       printf("\n");
+   
+       return 0;
+   }
+   ```
+
+   ```
+   alancong@AlanCongdeMacBook-Air chapter_13 % ./reverse null and void
+   void and null
+   ```
+
+   
 
 5. 编写名为 `sum.c` 的程序，用来对命令行参数（假设都是整数）求和。如果输入 `sum 8 24 62` 运行程序，产生的输出应为：
 
@@ -11866,9 +12840,144 @@ Smallest: 0
 
    提示：用 `atoi` 函数（26.2 节）把每个命令行参数从字符串格式转换为整数格式。
 
+   ```C
+   #include <stdio.h>
+   #include <stdlib.h>
+   
+   int main(int argc, char *argv[])
+   {
+       int sum = 0;
+       for (int i = 1; i < argc; i++)
+           sum += atoi(argv[i]);
+       printf("Total: %d\n", sum);
+   
+       return 0;
+   }
+   ```
+
+   ```
+   alancong@AlanCongdeMacBook-Air chapter_13 % cc code_13_5.c -o sum
+   alancong@AlanCongdeMacBook-Air chapter_13 % ./sum 8 24 62        
+   Total: 94
+   ```
+
+   
+
 6. 改进 13.7 节的程序 `planet.c`，使它在对命令行参数和 `planets` 数组中的字符串进行比较时忽略大小写。
 
+   ```c
+   /* planet.c (Chapter 13, page 304) */
+   /* Checks planet names */
+   
+   #include <stdio.h>
+   #include <string.h>
+   #include<ctype.h>
+   #include<stdbool.h>
+   
+   #define NUM_PLANETS 9
+   
+   bool string_equal(char *s, char *t);
+   
+   int main(int argc, char *argv[])
+   {
+       char *planets[] = {"Mercury", "Venus", "Earth",
+                          "Mars", "Jupiter", "Saturn",
+                          "Uranus", "Neptune", "Pluto"};
+       int i, j;
+   
+       for (i = 1; i < argc; i++)
+       {
+           for (j = 0; j < NUM_PLANETS; j++)
+               if (string_equal(argv[i], planets[j]) == 0)
+               {
+                   printf("%s is planet %d\n", argv[i], j + 1);
+                   break;
+               }
+           if (j == NUM_PLANETS)
+               printf("%s is not a planet\n", argv[i]);
+       }
+   
+       return 0;
+   }
+   
+   bool string_equal(char *s, char *t)
+   {
+       while(*s && *t)
+       {
+           if(toupper(*s) != toupper(*t))
+               return false;
+           s ++;
+           t ++;
+       }
+       return *s == *t;
+   }
+   ```
+
+   ```
+   alancong@AlanCongdeMacBook-Air chapter_13 % ./planet Mercury venus MARS jUpiTer banana
+   Mercury is planet 2
+   venus is planet 1
+   MARS is planet 1
+   jUpiTer is planet 1
+   banana is planet 1
+   ```
+
+   
+
 7. 修改第 5 章的编程题 11，用字符串指针数组取代 `switch` 语句。例如，现在不再用 `switch` 语句来显示第一位数字对应的单词，而把该数字用作下标，从包含 `"twenty"`、`"thirty"` 等字符串的数组中搜索。
+
+   ```C
+   #include <stdio.h>
+   
+   const char *teens[] = {
+       "ten", "eleven", "twelve", "thirteen", "fourteen",
+       "fifteen", "sixteen", "seventeen", "eighteen", "nineteen"};
+   
+   const char *tens_words[] = {
+       "", "", "twenty", "thirty", "forty", "fifty",
+       "sixty", "seventy", "eighty", "ninety"};
+   
+   const char *ones_words[] = {
+       "", "-one", "-two", "-three", "-four", "-five",
+       "-six", "-seven", "-eight", "-nine"};
+   
+   int main(void)
+   {
+       int number, ones, tens;
+   
+       printf("Enter a two-digit number: ");
+       scanf("%d", &number);
+   
+       if (number < 10 || number > 99)
+       {
+           printf("Error: input must be a two-digit number.\n");
+           return 1;
+       }
+   
+       printf("You entered the number ");
+   
+       if (number >= 10 && number < 20)
+           printf("%s\n", teens[number - 10]);
+       else
+       {
+           tens = number / 10;
+           ones = number % 10;
+   
+           printf("%s", tens_words[tens]);
+           printf("%s\n", ones_words[ones]);
+       }
+   
+       return 0;
+   }
+   ```
+
+   ```
+   alancong@AlanCongdeMacBook-Air chapter_13 % ./a.out 
+   Enter a two-digit number: 42
+   You entered the number forty-two
+   ```
+
+   
 
 8. 修改第 7 章的编程题 5，使其包含如下函数：
 
@@ -11878,6 +12987,81 @@ Smallest: 0
 
    函数返回 `word` 所指向的字符串的拼字值。
 
+   ```C
+   #include<stdio.h>
+   #include<ctype.h>
+   
+   #define SIZE 100
+   
+   int compute_scrabble_value(const char *word);
+   
+   int main(void)
+   {
+       char word[SIZE];
+   
+       printf("Enter a word: ");
+       scanf("%s", word);
+   
+       printf("Scrabble value: %d\n", compute_scrabble_value(word));
+       return 0;
+   }
+   
+   int compute_scrabble_value(const char *word)
+   {
+       int sum = 0;
+       const char *p = word;
+       while(*p)
+       {
+           char ch = toupper(*p);
+           // AEILNORSTU
+           if(ch == 'A' || ch == 'E' || ch == 'I' || ch == 'L' || ch == 'N' || ch == 'O' || ch == 'R' || ch == 'S' || ch == 'T' || ch == 'U')
+           {
+               sum += 1;
+           }
+           // DG
+           if(ch == 'D' || ch == 'G')
+           {
+               sum += 2;
+           }
+           // BCMP
+           if(ch == 'B' || ch == 'C' || ch == 'M' || ch == 'P')
+           {
+               sum += 3;
+           }
+           // FHVWY
+           if(ch == 'F' || ch == 'H' || ch == 'V' || ch == 'W' || ch == 'Y')
+           {
+               sum += 3;
+           }
+           // K
+           if(ch == 'K')
+           {
+               sum += 4;
+           }
+           // JX
+           if(ch == 'J' || ch == 'X')
+           {
+               sum += 5;
+           }
+           // QZ
+           if(ch == 'Q' || ch == 'Z')
+           {
+               sum += 5;
+           }
+           p ++;
+       }
+       return sum;
+   }
+   ```
+
+   ```
+   alancong@AlanCongdeMacBook-Air chapter_13 % ./a.out
+   Enter a word: QUIZ
+   Scrabble value: 12
+   ```
+
+   
+
 9. 修改第 7 章的编程题 10，使其包含如下函数：
 
    ```
@@ -11885,6 +13069,55 @@ Smallest: 0
    ```
 
    函数返回 `sentence` 所指向的字符串中元音字母的个数。
+
+   ```C
+   #include<stdio.h>
+   #include<ctype.h>
+   
+   #define SIZE 100
+   
+   int compute_vowel_count(const char *sentence);
+   
+   int main(void)
+   {
+       char sentence[SIZE], ch;
+       int i = 0;
+   
+       printf("Enter a sentence: ");
+       while((ch = getchar()) != '\n')
+       {
+           sentence[i ++] = ch;
+       }
+       sentence[i] = '\0';
+   
+       printf("Your sentence contains %d vowels.\n", compute_vowel_count(sentence));
+   
+       return 0;
+   }
+   
+   int compute_vowel_count(const char *sentence)
+   {
+       int sum = 0;
+       const char *p = sentence;
+   
+       while(*p)
+       {
+           char ch = toupper(*p);
+           if(ch == 'A' || ch == 'E' || ch == 'I' || ch == 'O' || ch == 'U')
+               sum ++;
+           p ++;
+       }
+       return sum;
+   }
+   ```
+
+   ```
+   alancong@AlanCongdeMacBook-Air chapter_13 % ./a.out 
+   Enter a sentence: And that's the way it is.
+   Your sentence contains 6 vowels.
+   ```
+
+   
 
 10. 修改第 7 章的编程题 11，使其包含如下函数：
 
@@ -11894,6 +13127,58 @@ Smallest: 0
 
     在参数 `name` 指向的字符串中，名在前、姓在后。在修改后的字符串中，姓在前，其后跟一个逗号和一个空格，然后是名的首字母，最后加一个点。原始的字符串中，名的前面、名和姓之间、姓的后面都可以有额外的空格。
 
+    ```C
+    #include <stdio.h>
+    #include <ctype.h>
+    #include <stdbool.h>
+    
+    #define SIZE 100
+    
+    void reverse_name(char *name);
+    
+    int main(void)
+    {
+        int i = 0;
+        char name[SIZE], ch;
+        printf("Enter a first and last name: ");
+    
+        while((ch = getchar()) != '\n')
+            name[i ++] = ch;
+        name[i] = '\0';
+    
+        reverse_name(name);
+    
+        return 0;
+    }
+    
+    void reverse_name(char *name)
+    {
+        char *p = name, firstLetter;
+        while(isspace(*p))
+            p ++;
+        firstLetter = *p;
+    
+        while(!isspace(*p))
+            p ++;
+    
+        while(isspace(*p))
+            p ++;
+    
+        while(*p && !isspace(*p))
+            printf("%c", *p++);
+        
+        printf(", %c\n", firstLetter);
+    }
+    ```
+
+    ```
+    alancong@AlanCongdeMacBook-Air chapter_13 % ./a.out 
+    Enter a first and last name:         Lloyd       Fosdick       
+    Fosdick, L
+    ```
+
+    
+
 11. 修改第 7 章的编程题 13，使其包含如下函数：
 
     ```
@@ -11902,7 +13187,108 @@ Smallest: 0
 
     函数返回 `sentence` 所指向的字符串中单词的平均长度。
 
+    ```C
+    #include <stdio.h>
+    
+    #define SIZE 100
+    
+    double compute_average_word_length(const char *sentence);
+    
+    int main(void)
+    {
+        char sentence[SIZE], ch;
+        int i = 0;
+    
+            printf("Enter a sentence: ");
+        while((ch = getchar()) != '\n')
+            sentence[i ++] = ch;
+        sentence[i] = '\0';
+    
+        printf("Average word length: %.1f\n", compute_average_word_length(sentence));
+        
+        return 0;
+    }
+    
+    double compute_average_word_length(const char *sentence)
+    {
+        int w_num = 1, c_num = 0;
+        const char *p = sentence;
+        double ave;
+    
+        while (*p)
+        {
+            if (*p == ' ')
+                w_num++;
+            else if (*p != ' ' && *p != '.')
+                c_num++;
+            p ++;
+        }
+        return c_num * 1.0f / w_num;
+    }
+    ```
+
+    ```
+    alancong@AlanCongdeMacBook-Air chapter_13 % ./a.out 
+    Enter a sentence: It was deja vu all over again.
+    Average word length: 3.3
+    ```
+
+    
+
 12. 修改第 8 章的编程题 14，读取句子时把单词存储在一个二维的 `char` 类型数组中，每行存储一个单词。假定句子中的单词数不超过 30，且每个单词的长度都不超过 20 个字符。注意，要在每个单词的后面存储一个空字符，使其可以作为字符串处理。
+
+    ```C
+    #include <stdio.h>
+    #include <string.h>
+    #include <ctype.h>
+    
+    #define NUM 21
+    #define LENGTH 31
+    
+    int main(void)
+    {
+        char word[NUM][LENGTH], ch, symbol;
+        int number = 0, length = 0;
+    
+        printf("Enter a sentence: ");
+    
+        while ((ch = getchar()) != '\n')
+        {
+            if (ch == '?' || ch == '.' || ch == '!')
+            {
+                word[number][length] = '\0';
+                symbol = ch;
+                break;
+            }
+    
+            if (!isspace(ch))
+                word[number][length++] = ch;
+            else
+            {
+                word[number][length] = '\0';
+                number++;
+                length = 0;
+            }
+        }
+    
+        for (int i = number; i >= 0; i--)
+        {
+            printf("%s", word[i]);
+    
+            if(i)
+                printf(" ");
+        }
+        printf("%c\n", symbol);
+    }
+    ```
+
+    ```
+    alancong@AlanCongdeMacBook-Air chapter_13 % ./a.out 
+    Enter a sentence: you can cage a swallow can't you?
+    you can't swallow a cage can you?
+    ```
+
+    
 
 13. 修改第 8 章的编程题 15，使其包含如下函数：
 
@@ -11912,6 +13298,59 @@ Smallest: 0
 
     参数 `message` 指向一个包含待加密消息的字符串，`shift` 表示消息中每个字母需要移动的位数。
 
+    ```C
+    #include <stdio.h>
+    #include <ctype.h>
+    
+    void encrypt(char *message, int shift);
+    
+    int main(void)
+    {
+        int length = 0, shift;
+        char ch, message[80];
+    
+        printf("Enter message to be encrypted: ");
+        while ((ch = getchar()) != '\n')
+            message[length ++] = ch;
+        message[length] = '\0';
+    
+        printf("Enter shift amount (1-25): ");
+        scanf("%d", &shift);
+    
+        encrypt(message, shift % 26);
+    
+        printf("Encrypted message: %s\n", message);
+    
+        return 0;
+    }
+    
+    void encrypt(char *message, int shift)
+    {
+        char *p = message;
+        while(*p)
+        {
+            if(isupper(*p))
+                *p = ((*p - 'A') + shift) % 26 + 'A';
+            else if(islower(*p))
+                *p = ((*p - 'a') + shift) % 26 + 'a';
+            p ++;
+        }
+    }
+    ```
+
+    ```
+    alancong@AlanCongdeMacBook-Air chapter_13 % ./a.out 
+    Enter message to be encrypted: Go ahead, make my day.
+    Enter shift amount (1-25): 3
+    Encrypted message: Jr dkhdg, pdnh pb gdb.
+    alancong@AlanCongdeMacBook-Air chapter_13 % ./a.out
+    Enter message to be encrypted: Jr dkhdg, pdnh pb gdb.
+    Enter shift amount (1-25): 23
+    Encrypted message: Go ahead, make my day.
+    ```
+
+    
+
 14. 修改第 8 章的编程题 16，使其包含如下函数：
 
     ```
@@ -11919,6 +13358,80 @@ Smallest: 0
     ```
 
     如果 `word1` 和 `word2` 指向的字符串是变位词，函数返回 `true`。
+
+    ```C
+    #include <stdio.h>
+    #include <stdbool.h>
+    #include <ctype.h>
+    
+    #define SIZE 100
+    
+    bool are_anagrams(const char *word1, const char *word2);
+    
+    int main(void)
+    {
+        char word1[SIZE], word2[SIZE];
+    
+        printf("Enter first word: ");
+        scanf("%s", word1);
+    
+        printf("Enter second word: ");
+        scanf("%s", word2);
+    
+        if (are_anagrams(word1, word2))
+            printf("The words are anagrams.\n");
+        else
+            printf("The words are not anagrams.\n");
+    
+        return 0;
+    }
+    
+    bool are_anagrams(const char *word1, const char *word2)
+    {
+        int sum = 0, count[26] = {0};
+        const char *p = word1, *q = word2;
+    
+        while (*p)
+        {
+            if (isalpha(*p))
+                count[tolower(*p++) - 'a']++;
+            else
+                p++;
+        }
+    
+        while (*q)
+        {
+            if (isalpha(*q))
+                count[tolower(*q++) - 'a']--;
+            else
+                q++;
+        }
+    
+        for (int i = 0; i < 26; i++)
+            sum += count[i];
+    
+        return sum == 0;
+    }
+    ```
+
+    ```
+    alancong@AlanCongdeMacBook-Air chapter_13 % ./a.out 
+    Enter first word: smartlight
+    Enter second word: lightsmart
+    The words are anagrams.
+    ```
+
+    ```C
+    // 笔记
+    if(sum == 0)
+            return true;
+        else
+            return false;
+    // 可以优化为
+    return sum == 0;
+    ```
+
+    
 
 15. 修改第 10 章的编程题 6，使其包含如下函数：
 
@@ -11928,6 +13441,154 @@ Smallest: 0
 
     函数返回 `expression` 指向的 RPN 表达式的值。
 
+    ```C
+    #include <stdio.h>
+    #include <stdlib.h>
+    #include <stdbool.h> /* C99 only */
+    
+    #define STACK_SIZE 100
+    #define SIZE 100
+    /* external variables */
+    
+    int contents[STACK_SIZE];
+    int top = 0;
+    
+    void calculator(void);
+    int evaluate_RPN_expression(const char *expression);
+    
+    void stack_overflow()
+    {
+        printf("Expression is too complex\n");
+        exit(1);
+    }
+    
+    void stack_underflow()
+    {
+        printf("Not enough operands in expression\n");
+        exit(1);
+    }
+    
+    void make_empty(void)
+    {
+        top = 0;
+    }
+    
+    bool is_empty(void)
+    {
+        return top == 0;
+    }
+    
+    bool is_full(void)
+    {
+        return top == STACK_SIZE;
+    }
+    
+    void push(int number)
+    {
+        if (is_full())
+            stack_overflow();
+        else
+            contents[top++] = number;
+    }
+    
+    int pop(void)
+    {
+        if (is_empty())
+        {
+            stack_underflow();
+            return '\0';
+        }
+        else
+            return contents[--top];
+    }
+    
+    int main(void)
+    {
+        while(1)
+        {
+            calculator();
+        }
+    
+        return 0;
+    }
+    
+    void calculator(void)
+    {
+        char ch, expression[SIZE];
+        int i = 0;
+    
+        printf("Enter an RPN expression: ");
+        while((ch = getchar()) != '\n')
+            expression[i ++] = ch;
+        expression[i] = '\0';
+    
+        printf("Value of expression: %d\n", evaluate_RPN_expression(expression));
+    }
+    
+    int evaluate_RPN_expression(const char *expression)
+    {
+        const char *p = expression;
+            int res, op1, op2;
+    
+        while(*p)
+        {
+            if(*p == 'q')
+                exit(0);
+            if(*p == '=')
+            {
+                res = pop();
+                make_empty();
+                return res;
+            }
+            if(*p == '+' || *p == '-' || *p == '*' || *p == '/')
+            {
+                op1 = pop();
+                op2 = pop();
+    
+                switch (*p)
+                {
+                case '+':
+                    res = op2 + op1;
+                    push(res);
+                    break;
+                case '-':
+                    res = op2 - op1;
+                    push(res);
+                    break;
+                case '*':
+                    res = op2 * op1;
+                    push(res);
+                    break;
+                case '/':
+                    res = op2 / op1;
+                    push(res);
+                    break;
+                
+                default:
+                    break;
+                }
+            }
+    
+            if('0' <= *p && *p <= '9')
+                push(*p - '0');
+    
+            p ++;
+        }
+        return 1;
+    }
+    ```
+
+    ```
+    alancong@AlanCongdeMacBook-Air chapter_13 % ./a.out 
+    Enter an RPN expression: 1 2 3 * + =
+    Value of expression: 7
+    Enter an RPN expression: 5 8 * 4 9 - / =
+    Value of expression: -8
+    Enter an RPN expression: q
+    ```
+
+    
+
 16. 修改第 12 章的编程题 1，使其包含如下函数：
 
     ```
@@ -11936,6 +13597,58 @@ Smallest: 0
 
     函数的作用是反转 `message` 指向的字符串。提示：使用两个指针，初始时一个指向字符串的第一个字符，另一个指向最后一个字符；交换这两个字符，然后让两个指针相向移动；重复这一过程直到两个指针相遇。
 
+    ```C
+    #include <stdio.h>
+    #include <string.h>
+    #include <ctype.h>
+    
+    #define SIZE 100
+    
+    void reverse(char *message);
+    
+    int main(void)
+    {
+        char ch, arr[SIZE], *p;
+        int i = 0;
+    
+        p = &arr[0];
+    
+        printf("Enter a message: ");
+    
+        while ((ch = getchar()) != '\n')
+            arr[i++] = ch;
+        arr[i] = '\0';
+    
+        reverse(arr);
+    
+        printf("Reversal is: %s\n", arr);
+    
+        return 0;
+    }
+    
+    void reverse(char *message)
+    {
+        char *p = message, *q = message + strlen(message) - 1, temp;
+        while (p < q)
+        {
+            temp = *p;
+            *p = *q;
+            *q = temp;
+    
+            p++;
+            q--;
+        }
+    }
+    ```
+
+    ```
+    alancong@AlanCongdeMacBook-Air chapter_13 % ./a.out 
+    Enter a message: Don't get mad, get even.
+    Reversal is: .neve teg ,dam teg t'noD
+    ```
+
+    
+
 17. 修改第 12 章的编程题 2，使其包含如下函数：
 
     ```
@@ -11943,6 +13656,63 @@ Smallest: 0
     ```
 
     如果 `message` 指向的字符串是回文，函数返回 `true`。
+
+    ```C
+    #include <stdio.h>
+    #include <stdbool.h>
+    #include <string.h>
+    #include <ctype.h>
+    
+    #define SIZE 100
+    
+    bool is_palindrome(const char *message);
+    
+    int main(void)
+    {
+        int i = 0;
+        char ch, arr[SIZE];
+        bool isPalindrome = true;
+    
+        printf("Enter a message: ");
+        while ((ch = getchar()) != '\n')
+            if ('a' <= tolower(ch) && tolower(ch) <= 'z')
+                arr[i ++] = ch;
+        arr[i] = '\0';
+    
+        if (is_palindrome(arr))
+            printf("Palindrome\n");
+        else
+            printf("Not a palindrome\n");
+    
+        return 0;
+    }
+    
+    bool is_palindrome(const char *message)
+    {
+        const char *start = message, *end;
+        end = start + strlen(message) - 1;
+    
+        while (start < end)
+        {
+            if (tolower(*start ++) != tolower(*end --))
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+    ```
+
+    ```
+    alancong@AlanCongdeMacBook-Air chapter_13 % ./a.out 
+    Enter a message: He lived as a devil, eh?
+    Palindrome
+    alancong@AlanCongdeMacBook-Air chapter_13 % ./a.out
+    Enter a message: A man a plan a canal Panama
+    Palindrome
+    ```
+
+    
 
 18. 编写程序，按“月/日/年”的格式接受用户输入的日期，然后按“月 日，年”的格式显示，其中“月”用英文全名：
 
@@ -11953,6 +13723,37 @@ Smallest: 0
 
     用字符串指针数组存储月份的名字。
 
+    ```C
+    #include<string.h>
+    #include<stdio.h>
+    
+    #define NUM_MONTHS 13
+    
+        const char *months[NUM_MONTHS] = {
+            "", "January", "February", "March", "April", "May", "June", 
+            "July", "August", "September", "October", "November", "December"
+        };
+    
+    int main(void)
+    {
+        int year, month, day;
+    
+        printf("Enter a date (mm/dd/yyyy): ");
+        scanf("%d/%d/%d", &month, &day, &year);
+        printf("You entered the date %s %d, %d\n", months[month], day, year);
+    
+        return 0;
+    }
+    ```
+    
+    ```
+    alancong@AlanCongdeMacBook-Air chapter_13 % ./a.out
+    Enter a date (mm/dd/yyyy): 2/17/2011
+    You entered the date February 17, 2011
+    ```
+    
+    
+
 ## 第十四章 预处理器
 
 ### 练习题
@@ -11960,12 +13761,17 @@ Smallest: 0
 14.3 节  
 
 1. 编写宏来计算下面的值。  
+   
+   ```
    (a) x 的立方。  
    (b) n 除以 4的余数。  
-   (c) 如果 x与y的乘积小于100则值为1，否则值为0。  
-   你写的宏始终正常工作吗？如果不是，哪些参数会导致失败呢？  
-
-2. 编写一个宏NELEMS(a)来计算一维数组a中元素的个数。提示：见8.1节中有关sizeof运算符的 讨论。  
+   (c) 如果 x与y的乘积小于100则值为1，否则值为0。   
+   ```
+   你写的宏始终正常工作吗？如果不是，哪些参数会导致失败呢？
+   ```
+   
+   ```
+2. 编写一个宏NELEMS(a)来计算一维数组a中元素的个数。提示：见8.1节中有关sizeof运算符的讨论。  
 3. 假定DOUBLE 是如下宏：  #define DOUBLE(x) 2*x  *
    *(a) DOUBLE(1+2)的值是多少？  *
    *(b) 4/DOUBLE(2)的值是多少？  *
@@ -11988,7 +13794,14 @@ Smallest: 0
 14.4节  
 
 12. 假定宏M有如下定义：   #define M 10    下面哪些测试会失败？   (a) #if M   (b) #ifdef M   (c) #ifndef M   (d) #if defined(M)   (e) #if !defined(M)  
-13. (a) 指出下面的程序在预处理后的形式。因为包含了头而多出来的代码行可以忽略。   #include    #define N 100   void f(void);   int main(void)  {   f();  #ifdef N  #undef N  #endif   return 0;  }   void f(void)  {  #if defined(N)   printf("N is %d\n", N);  #else   printf("N is undefined\n");  #endif  }    (b) 这个程序的输出是什么？  
+
+13. (a) 指出下面的程序在预处理后的形式。因为包含了头而多出来的代码行可以忽略。   
+
+    ```
+    #include    #define N 100   void f(void);   int main(void)  {   f();  #ifdef N  #undef N  #endif   return 0;  }   void f(void)  {  #if defined(N)   printf("N is %d\n", N);  #else   printf("N is undefined\n");  #endif  }  
+    ```
+
+      (b) 这个程序的输出是什么？  
 
 \*14.指出下面的程序在预处理后的形式。其中有几行可能会导致编译错误，请找出这些错误。   #define N = 10  #define INC(x) x+1  #define SUB (x,y) x-y  #define SQR(x) ((x)*(x))  #define CUBE(x) (SQR(x)*(x))  #deflne M1(x,y) x##y  #define M2(x,y) #x #y   int main(void)  {   int a[N], i, j, k, m;   #ifdef N   i = j;\#else   j = i;  #endif   i = 10 * INC(j);   i = SUB(j, k);   i = SQR(SQR(j));   i = CUBE(j);   i = M1(j, k);   puts(M2(i, j));  #undef SQR   i = SQR(j);  #define SQR   i = SQR(j);   return 0;  }  
 
@@ -12005,17 +13818,29 @@ Smallest: 0
 15.1节  
 
 1. 15.1节列出了把程序分割成多个源程序的几个优点。  
+
+   ```
    (a) 请描述几个其他的优点。   
    (b) 请描述一些缺点。  
+   ```
+
+   
 
 15.2节   
 
 2. 下面哪个不应该放置在头文件中？为什么？   
+
+   ```
    (a) 函数原型。   
    (b) 函数定义。  
-    (c) 宏定义。   
+   (c) 宏定义。   
    (d) 类型定义。  
+   ```
+
+   
+
 3. 我们已经知道，如果文件是我们自己编写的，那么用#include <文件>代替#include "文件"可能无 法工作。如果文件是系统头，那么用#include "文件"代替#include <文件>是否有什么问题？  
+
 4. 假设debug.h是具有如下内容的头文件：   
 
 ```C
