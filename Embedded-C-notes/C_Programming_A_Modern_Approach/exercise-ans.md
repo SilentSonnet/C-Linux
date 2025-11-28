@@ -841,712 +841,743 @@
 
 1. 给出下列程序片段的输出结果。假设 i、j 和 k 都是 int 型变量。
 
-```c
-(a) i = 5; 
-		j = 3; 
-		printf("%d %d", i / j, i % j); 
-(b) i = 2; 
-		j = 3; 
-		printf("%d", (i + 10) % j); 
-(c) i = 7; 
-		j = 8; 
-		k = 9; 
-		printf("%d", (i + 10) % k / j); 
-(d) i = 1; 
-		j = 2; 
-		k = 3; 
-		printf("%d", (i + 5) % (j + 2) / k); 
-```
+   ```C
+   (a) i = 5; 
+   		j = 3; 
+   		printf("%d %d", i / j, i % j); 
+   (b) i = 2; 
+   		j = 3; 
+   		printf("%d", (i + 10) % j); 
+   (c) i = 7; 
+   		j = 8; 
+   		k = 9; 
+   		printf("%d", (i + 10) % k / j); 
+   (d) i = 1; 
+   		j = 2; 
+   		k = 3; 
+   		printf("%d", (i + 5) % (j + 2) / k); 
+   ```
 
-```C
-#include<stdio.h>
-int main(void)
-{
-  int i, j, k;
-  i = 5; 
-  j = 3; 
-  printf("%d %d\n", i / j, i % j);
-  i = 2; 
-  j = 3; 
-  printf("%d\n", (i + 10) % j); 
-  i = 7; 
-  j = 8; 
-  k = 9; 
-  printf("%d\n", (i + 10) % k / j);
-  i = 1; 
-  j = 2; 
-  k = 3; 
-  printf("%d\n", (i + 5) % (j + 2) / k); 
-  
-  return 0;
-}
-```
+   ```C
+   #include<stdio.h>
+   int main(void)
+   {
+     int i, j, k;
+     i = 5; 
+     j = 3; 
+     printf("%d %d\n", i / j, i % j);
+     i = 2; 
+     j = 3; 
+     printf("%d\n", (i + 10) % j); 
+     i = 7; 
+     j = 8; 
+     k = 9; 
+     printf("%d\n", (i + 10) % k / j);
+     i = 1; 
+     j = 2; 
+     k = 3; 
+     printf("%d\n", (i + 5) % (j + 2) / k); 
+     
+     return 0;
+   }
+   ```
 
-输出：
+   输出：
 
-```
-1 2
-0
-1
-0
-```
+   ```
+   1 2
+   0
+   1
+   0
+   ```
 
-\*2. 如果 i 和 j 都是正整数，(-i) / j 的值和-(i / j)的值是否总一样？验证你的答案。
+   
 
-**ANS：**这个题我是认为出的有问题的，因为如果这两者的值是不相同的，那只能是在C89标准下不同的CPU环境中才能验证，因为C89标准之下在进行除法和取余运算的时候既可能向上舍入也可能向下舍入，但是在C99标准之下都是趋零截尾的，因此在C99标准之下都是相同的。
+2. 如果 i 和 j 都是正整数，(-i) / j 的值和-(i / j)的值是否总一样？验证你的答案。
+   **ANS：**
+   这个题我是认为出的有问题的，因为如果这两者的值是不相同的，那只能是在C89标准下不同的CPU环境中才能验证，因为C89标准之下在进行除法和取余运算的时候既可能向上舍入也可能向下舍入，但是在C99标准之下都是趋零截尾的，因此在C99标准之下都是相同的。
 
-```
-cc -std=<标准> source.c -o output
-c89 / c90 : ANSI C 标准（早期版本）
-gnu89     : C89 + GNU 扩展
-c99       : ISO C99 标准
-gnu99     : C99 + GNU 扩展
-c11       : ISO C11 标准
-gnu11     : C11 + GNU 扩展
-```
+   ```
+   cc -std=<标准> source.c -o output
+   c89 / c90 : ANSI C 标准（早期版本）
+   gnu89     : C89 + GNU 扩展
+   c99       : ISO C99 标准
+   gnu99     : C99 + GNU 扩展
+   c11       : ISO C11 标准
+   gnu11     : C11 + GNU 扩展
+   ```
+
+   
 
 3. 下列表达式在 C89 中的值是多少？（如果表达式有多个可能的值，都列出来。）
 
-```c
-(a) 8 / 5 
-(b) -8 / 5 
-(c) 8 / -5 
-(d) -8 / -5 
-```
+   ```
+   (a) 8 / 5 
+   (b) -8 / 5 
+   (c) 8 / -5 
+   (d) -8 / -5 
+   ```
 
-**ANS：**
+   **ANS：**
 
-```
-8 / 5 对于C89为1。
--8 / 5 对于C89既可能是-1也可能是-2，需要视具体的实现。
-8 / -5 对于C89既可能是-1也可能是-2，需要视具体的实现。
--8 / -5 对于C89既可能是-1也可能是-2，需要视具体的实现。
-纠正：最后一道题写错了，因为负号的优先级是最高的，因此这个相当于是8 / 5因此是确定性的1。
-```
+   ```
+   8 / 5 对于C89为1。
+   -8 / 5 对于C89既可能是-1也可能是-2，需要视具体的实现。
+   8 / -5 对于C89既可能是-1也可能是-2，需要视具体的实现。
+   -8 / -5 对于C89既可能是-1也可能是-2，需要视具体的实现。
+   纠正：最后一道题写错了，因为负号的优先级是最高的，因此这个相当于是8 / 5因此是确定性的1。
+   ```
 
-```C
-#include<stdio.h>
-int main(void)
-{
-  printf("8 / 5 is %d\n", 8 / 5);
-  printf("-8 / 5 is %d\n", -8 / 5);
-  printf("8 / -5 is %d\n", 8 / -5);
-  printf("-8 / -5 is %d\n", -8 / -5);
-  
-  return 0;
-}
-```
+   ```C
+   #include<stdio.h>
+   int main(void)
+   {
+     printf("8 / 5 is %d\n", 8 / 5);
+     printf("-8 / 5 is %d\n", -8 / 5);
+     printf("8 / -5 is %d\n", 8 / -5);
+     printf("-8 / -5 is %d\n", -8 / -5);
+     
+     return 0;
+   }
+   ```
 
-**输出：**
+   **输出：**
 
-```
-使用的机器环境是MacbookAir M4
-Apple clang version 17.0.0 (clang-1700.3.19.1)
-Target: arm64-apple-darwin25.0.0
-Thread model: posix
-InstalledDir: /Library/Developer/CommandLineTools/usr/bin
-8 / 5 is 1
--8 / 5 is -1
-8 / -5 is -1
--8 / -5 is 1
-```
+   ```
+   使用的机器环境是MacbookAir M4
+   Apple clang version 17.0.0 (clang-1700.3.19.1)
+   Target: arm64-apple-darwin25.0.0
+   Thread model: posix
+   InstalledDir: /Library/Developer/CommandLineTools/usr/bin
+   8 / 5 is 1
+   -8 / 5 is -1
+   8 / -5 is -1
+   -8 / -5 is 1
+   ```
+
+   
 
 4. 对 C99 重复上题。
+   **ANS：**
 
-**ANS：**
+   ```
+   8 / 5 对于C99趋向于零截尾，因此是1。
+   -8 / 5 对于C99趋向于零截尾，因此是-1。
+   8 / -5 对于C99趋向于零截尾，因此是-1。
+   -8 / -5 对于C99趋向于零截尾，因此是1。但是注意负号的优先级是最高的，这个相当于是8 / 5。
+   ```
 
-```
-8 / 5 对于C99趋向于零截尾，因此是1。
--8 / 5 对于C99趋向于零截尾，因此是-1。
-8 / -5 对于C99趋向于零截尾，因此是-1。
--8 / -5 对于C99趋向于零截尾，因此是1。但是注意负号的优先级是最高的，这个相当于是8 / 5。
-```
+   ```C
+   #include<stdio.h>
+   int main(void)
+   {
+     printf("8 / 5 is %d\n", 8 / 5);
+     printf("-8 / 5 is %d\n", -8 / 5);
+     printf("8 / -5 is %d\n", 8 / -5);
+     printf("-8 / -5 is %d\n", -8 / -5);
+     
+     return 0;
+   }
+   ```
 
-```C
-#include<stdio.h>
-int main(void)
-{
-  printf("8 / 5 is %d\n", 8 / 5);
-  printf("-8 / 5 is %d\n", -8 / 5);
-  printf("8 / -5 is %d\n", 8 / -5);
-  printf("-8 / -5 is %d\n", -8 / -5);
-  
-  return 0;
-}
-```
+   **输出：**
 
-**输出：**
+   ```
+   8 / 5 is 1
+   -8 / 5 is -1
+   8 / -5 is -1
+   -8 / -5 is 1
+   ```
 
-```
-8 / 5 is 1
--8 / 5 is -1
-8 / -5 is -1
--8 / -5 is 1
-```
+   
 
 5. 下列表达式在 C89 中的值是多少？（如果表达式有多个可能的值，都列出来。）
 
-```c
-(a) 8 % 5 
-(b) -8 % 5 
-(c) 8 % -5 
-(d) -8 % -5 
-```
+   ```
+   (a) 8 % 5 
+   (b) -8 % 5 
+   (c) 8 % -5 
+   (d) -8 % -5 
+   ```
 
-**ANS：**
+   **ANS：**
 
-```
-// 答案写错完了
-8 % 5 对于C89为3。
--8 % 5 对于C89既可能是-3也可能是3，需要视具体的实现。
-8 % -5 对于C89既可能是-3也可能是-3，需要视具体的实现。
--8 % -5 负号的优先级是最高的，因此这个相当于是8 % 5因此对于C89是确定性的3。
-```
+   ```
+   // 答案写错完了
+   8 % 5 对于C89为3。
+   -8 % 5 对于C89既可能是-3也可能是3，需要视具体的实现。
+   8 % -5 对于C89既可能是-3也可能是-3，需要视具体的实现。
+   -8 % -5 负号的优先级是最高的，因此这个相当于是8 % 5因此对于C89是确定性的3。
+   ```
 
-```C
-#include<stdio.h>
-int main(void)
-{
-  printf("8 %% 5 is %d\n", 8 % 5);
-  printf("-8 %% 5 is %d\n", -8 % 5);
-  printf("8 %% -5 is %d\n", 8 % -5);
-  printf("-8 %% -5 is %d\n", -8 % -5);
-  
-  return 0;
-}
-```
+   ```C
+   #include<stdio.h>
+   int main(void)
+   {
+     printf("8 %% 5 is %d\n", 8 % 5);
+     printf("-8 %% 5 is %d\n", -8 % 5);
+     printf("8 %% -5 is %d\n", 8 % -5);
+     printf("-8 %% -5 is %d\n", -8 % -5);
+     
+     return 0;
+   }
+   ```
 
-**输出：**
+   **输出：**
 
-```
-使用的机器环境是MacbookAir M4
-Apple clang version 17.0.0 (clang-1700.3.19.1)
-Target: arm64-apple-darwin25.0.0
-Thread model: posix
-InstalledDir: /Library/Developer/CommandLineTools/usr/bin
-8 % 5 is 3
--8 % 5 is -3
-8 % -5 is 3
--8 % -5 is -3
-```
+   ```
+   使用的机器环境是MacbookAir M4
+   Apple clang version 17.0.0 (clang-1700.3.19.1)
+   Target: arm64-apple-darwin25.0.0
+   Thread model: posix
+   InstalledDir: /Library/Developer/CommandLineTools/usr/bin
+   8 % 5 is 3
+   -8 % 5 is -3
+   8 % -5 is 3
+   -8 % -5 is -3
+   ```
 
-```
-更正
-在C89标准中，操作数是负数时的除法运算比较容易理解，而操作数是负数时的模运算容易混淆，对此我们可以通过除法进行转换计算。由于C89和C99都要确保（ a / b ）* b + a % b的结果总是等于a，因此我们可以通过除法运算推算出模运算的结果，也就是说a % b == a - （ a / b ）* b，这样更加有利于理解。例如，C89下-9/7的结果可能为-1或者-2 。因此-9%7的值可能是-2或者5。
+   ```
+   更正
+   在C89标准中，操作数是负数时的除法运算比较容易理解，而操作数是负数时的模运算容易混淆，对此我们可以通过除法进行转换计算。由于C89和C99都要确保（ a / b ）* b + a % b的结果总是等于a，因此我们可以通过除法运算推算出模运算的结果，也就是说a % b == a - （ a / b ）* b，这样更加有利于理解。例如，C89下-9/7的结果可能为-1或者-2 。因此-9%7的值可能是-2或者5。
+   
+   参考答案
+   (a) 8 % 5 的运算结果为3，操作数为整数，结果为余数。
+   (b) -8 % 5 由于在C89下（-8/5）的运算结果为-1或者-2，因此-8%5的运算结果为-3或者2 。
+   (c) 8 % -5 由于在C89下（8/-5）的运算结果为-1或者-2，因此-8%5的运算结果为-3或者2 。
+   (d) -8 % -5 C89下（-8/-5）的运算结果为1，因此-8%-5的运算结果为-3 。
+   ```
 
-参考答案
-(a) 8 % 5 的运算结果为3，操作数为整数，结果为余数。
-(b) -8 % 5 由于在C89下（-8/5）的运算结果为-1或者-2，因此-8%5的运算结果为-3或者2 。
-(c) 8 % -5 由于在C89下（8/-5）的运算结果为-1或者-2，因此-8%5的运算结果为-3或者2 。
-(d) -8 % -5 C89下（-8/-5）的运算结果为1，因此-8%-5的运算结果为-3 。
-```
-
-
+   
 
 6. 对 C99 重复上题。
 
-```
-#include<stdio.h>
-int main(void)
-{
-  printf("8 %% 5 is %d\n", 8 % 5);
-  printf("-8 %% 5 is %d\n", -8 % 5);
-  printf("8 %% -5 is %d\n", 8 % -5);
-  printf("-8 %% -5 is %d\n", -8 % -5);
-  
-  return 0;
-}
-```
+   ```C
+   #include<stdio.h>
+   int main(void)
+   {
+     printf("8 %% 5 is %d\n", 8 % 5);
+     printf("-8 %% 5 is %d\n", -8 % 5);
+     printf("8 %% -5 is %d\n", 8 % -5);
+     printf("-8 %% -5 is %d\n", -8 % -5);
+     
+     return 0;
+   }
+   ```
 
-```
-8 % 5 is 3
--8 % 5 is -3
-8 % -5 is 3
--8 % -5 is -3
-```
+   ```
+   8 % 5 is 3
+   -8 % 5 is -3
+   8 % -5 is 3
+   -8 % -5 is -3
+   ```
 
-```
-在C99标准中，操作数是负数时的除法运算比较容易理解，均是向0取整。此时模运算%的运算结果和运算符和操作数左侧操作数符号相同，可以沿用 a / b ）* b + a % b的结果总是等于a的定义，推测出模运算的结果。
-(a) 8 % 5 的运算结果为3，操作数为整数，结果为余数。
-(b) -8 % 5 由于在C99下（-8 / 5）的运算结果为-1，因此-8 % 5的运算结果为-3 。
-(c) 8 % -5 由于在C99下（8 / -5）的运算结果为-1，因此-8 % 5的运算结果为3
-(d) -8 % -5 由于在C99下（-8 / -5）的运算结果为1，因此-8 % 5的运算结果为-3
-```
+   ```
+   在C99标准中，操作数是负数时的除法运算比较容易理解，均是向0取整。此时模运算%的运算结果和运算符和操作数左侧操作数符号相同，可以沿用 a / b ）* b + a % b的结果总是等于a的定义，推测出模运算的结果。
+   (a) 8 % 5 的运算结果为3，操作数为整数，结果为余数。
+   (b) -8 % 5 由于在C99下（-8 / 5）的运算结果为-1，因此-8 % 5的运算结果为-3 。
+   (c) 8 % -5 由于在C99下（8 / -5）的运算结果为-1，因此-8 % 5的运算结果为3
+   (d) -8 % -5 由于在C99下（-8 / -5）的运算结果为1，因此-8 % 5的运算结果为-3
+   ```
+
+   
 
 7. 本章计算 UPC 校验位方法的最后几步是：把总的结果减去 1，相减后的结果除以 10 取余数，用 9 减去余数。换成下面的步骤也可以：总的结果除以 10 取余数，用 10 减去余数。这样做为什么可行？
+   **这道题不会，看的习题解析**
 
-**这道题不会，看的习题解析**
+   ```
+   该章中的UPC校验方法可以表示为：首先把第1位、第3位、第5位、第7位、第9位和第11位数字相加；然后把第2位、第4位、第6位、第8位和第10位数字相加；接着把第一次加法的结果乘以3，再和第二次加法的结果相加；随后把上述结果减去1；相减后的结果除以10取余数；最后用9减去上一步得到的余数。
+   检验过程中假设加法运算的结果为total，计算校验位的基本操作步骤可以表示为：9-((total-1)%10)。从公式化简似乎可以得到(10 - total % 10)。但是当我们考虑结果取值范围就会发现，原公式的取值范围是0~9；而化简后公式的取值范围是1~10，即当total为10的整数倍时，两者结果不同。其主要原因是不能将9-((total-1)%10)简单等价于(10 - total % 10)。原算法通过9求补数的方式保证了运算结果0的校验位是0，转换后不能保证该运算结果。
+   
+   也就是说，修改UPC校验算法为总的结果除以10取余数，用10减去余数的方式与原有方式所生成的校验位在实际应用中可行，但是并不能保证与原有计算方法完全一致。
+   ```
 
-```
-该章中的UPC校验方法可以表示为：首先把第1位、第3位、第5位、第7位、第9位和第11位数字相加；然后把第2位、第4位、第6位、第8位和第10位数字相加；接着把第一次加法的结果乘以3，再和第二次加法的结果相加；随后把上述结果减去1；相减后的结果除以10取余数；最后用9减去上一步得到的余数。
-检验过程中假设加法运算的结果为total，计算校验位的基本操作步骤可以表示为：9-((total-1)%10)。从公式化简似乎可以得到(10 - total % 10)。但是当我们考虑结果取值范围就会发现，原公式的取值范围是0~9；而化简后公式的取值范围是1~10，即当total为10的整数倍时，两者结果不同。其主要原因是不能将9-((total-1)%10)简单等价于(10 - total % 10)。原算法通过9求补数的方式保证了运算结果0的校验位是0，转换后不能保证该运算结果。
+   
 
-也就是说，修改UPC校验算法为总的结果除以10取余数，用10减去余数的方式与原有方式所生成的校验位在实际应用中可行，但是并不能保证与原有计算方法完全一致。
-```
+8. 如果把表达式 `9 - ((total - 1) % 10)`改成`(10 - (total % 10)) % 10`，upc.c程序是否仍然正确？
+   **这道题不会，看的习题解析**
 
-8. 如果把表达式 9 - ((total - 1) % 10)改成(10 - (total % 10)) % 10，upc.c程序是否仍然正确？
+   ```
+   参考练习题7，UPC校验方法中如果将表达式替换为(10 - (total % 10)) % 10，其运算结果是正确的。先将表达式9 - ((total - 1) % 10)转换成(10 - total % 10)，再对10取模，就可以保证校验位正确地转换。再次取模的目的是按10求补数后，将0的补数转化成最终校验位0 。
+   
+   也就是说，UPC校验程序使用(10 - (total % 10)) % 10的计算方法可以实现与9 - ((total - 1) % 10)相同的效果，因此是正确的。
+   ```
 
-**这道题不会，看的习题解析**
-
-```
-参考练习题7，UPC校验方法中如果将表达式替换为(10 - (total % 10)) % 10，其运算结果是正确的。先将表达式9 - ((total - 1) % 10)转换成(10 - total % 10)，再对10取模，就可以保证校验位正确地转换。再次取模的目的是按10求补数后，将0的补数转化成最终校验位0 。
-
-也就是说，UPC校验程序使用(10 - (total % 10)) % 10的计算方法可以实现与9 - ((total - 1) % 10)相同的效果，因此是正确的。
-```
+   
 
 9. 给出下列程序片段的输出结果。假设 i、j 和 k 都是 int 型变量。
 
-```C
-(a) i = 7; 
-		j = 8;
-		i *= j + 1; 
-		printf("%d %d", i, j);
-(b) i = j = k = 1;  
-		i += j += k; 
-		printf("%d %d %d", i, j, k); 
-(c) i = 1; 
-		j = 2; 
-		k = 3; 
-		i -= j -= k; 
-		printf("%d %d %d", i, j, k); 
-(d) i = 2; 
-		j = 1; 
-		k = 0; 
-		i *= j *= k;  
-		printf("%d %d %d", i, j, k); 
-```
+   ```
+   (a) i = 7; 
+   		j = 8;
+   		i *= j + 1; 
+   		printf("%d %d", i, j);
+   (b) i = j = k = 1;  
+   		i += j += k; 
+   		printf("%d %d %d", i, j, k); 
+   (c) i = 1; 
+   		j = 2; 
+   		k = 3; 
+   		i -= j -= k; 
+   		printf("%d %d %d", i, j, k); 
+   (d) i = 2; 
+   		j = 1; 
+   		k = 0; 
+   		i *= j *= k;  
+   		printf("%d %d %d", i, j, k); 
+   ```
 
-```C
-#include<stdio.h>
-int main(void)
-{
-  	int i, j, k;
-  	i = 7; 
-		j = 8;
-		i *= j + 1; 
-		printf("%d %d\n", i, j);
-		i = j = k = 1;  
-		i += j += k; 
-		printf("%d %d %d\n", i, j, k); 
-		i = 1; 
-		j = 2; 
-		k = 3; 
-		i -= j -= k; 
-		printf("%d %d %d\n", i, j, k); 
-		i = 2; 
-		j = 1; 
-		k = 0; 
-		i *= j *= k;  
-		printf("%d %d %d\n", i, j, k); 
-  
-  return 0;
-}
-```
+   ```C
+   #include<stdio.h>
+   int main(void)
+   {
+     	int i, j, k;
+     	i = 7; 
+   		j = 8;
+   		i *= j + 1; 
+   		printf("%d %d\n", i, j);
+   		i = j = k = 1;  
+   		i += j += k; 
+   		printf("%d %d %d\n", i, j, k); 
+   		i = 1; 
+   		j = 2; 
+   		k = 3; 
+   		i -= j -= k; 
+   		printf("%d %d %d\n", i, j, k); 
+   		i = 2; 
+   		j = 1; 
+   		k = 0; 
+   		i *= j *= k;  
+   		printf("%d %d %d\n", i, j, k); 
+     
+     return 0;
+   }
+   ```
 
-```
-63 8
-3 2 1
-2 -1 3
-0 0 0
-```
+   ```
+   63 8
+   3 2 1
+   2 -1 3
+   0 0 0
+   ```
+
+   
 
 10. 给出下列程序片段的输出结果。假设 i 和 j 都是 int 型变量。
 
-```C
-(a) i = 6;  
-		j = i += i; 
-		printf("%d %d", i, j); 
-(b) i = 5; 
-		j = (i -= 2) + 1;  
-		printf("%d %d", i, j); 
-(c) i = 7; 
-		j = 6 + (i = 2.5); 
-		printf("%d %d", i, j); 
-(d) i = 2; 
-		j = 8; 
-		j = (i = 6) + (j = 3); 
-		printf("%d %d", i, j); 
-```
+    ```
+    (a) i = 6;  
+    		j = i += i; 
+    		printf("%d %d", i, j); 
+    (b) i = 5; 
+    		j = (i -= 2) + 1;  
+    		printf("%d %d", i, j); 
+    (c) i = 7; 
+    		j = 6 + (i = 2.5); 
+    		printf("%d %d", i, j); 
+    (d) i = 2; 
+    		j = 8; 
+    		j = (i = 6) + (j = 3); 
+    		printf("%d %d", i, j); 
+    ```
 
-```C
-#include<stdio.h>
-int main(void)
-{
-  	int i, j;
-  	i = 6;  
-		j = i += i; 
-		printf("%d %d\n", i, j); 
-		i = 5; 
-		j = (i -= 2) + 1;  
-		printf("%d %d\n", i, j); 
-		i = 7; 
-		j = 6 + (i = 2.5); 
-		printf("%d %d\n", i, j); 
-		i = 2; 
-		j = 8; 
-		j = (i = 6) + (j = 3); 
-		printf("%d %d\n", i, j); 
-  
-  	return 0;
-}
-```
+    ```C
+    #include<stdio.h>
+    int main(void)
+    {
+      	int i, j;
+      	i = 6;  
+    		j = i += i; 
+    		printf("%d %d\n", i, j); 
+    		i = 5; 
+    		j = (i -= 2) + 1;  
+    		printf("%d %d\n", i, j); 
+    		i = 7; 
+    		j = 6 + (i = 2.5); 
+    		printf("%d %d\n", i, j); 
+    		i = 2; 
+    		j = 8; 
+    		j = (i = 6) + (j = 3); 
+    		printf("%d %d\n", i, j); 
+      
+      	return 0;
+    }
+    ```
 
-```
-12 12
-3 4
-2.5 8.5 // 这个写错了，注意输出，变量要服从格式符！所以应该是2 8
-6 9
-```
+    ```
+    12 12
+    3 4
+    2.5 8.5 // 这个写错了，注意输出，变量要服从格式符！所以应该是2 8
+    6 9
+    ```
 
-*11. 给出下列程序片段的输出结果。假设 i、j 和 k 都是 int 型变量。
+    
 
-```C
-(a) i = 1; 
-		printf("%d ", i++ - 1); 
-		printf("%d", i); 
-(b) i = 10; 
-		j = 5; 
-		printf("%d ", i++ - ++j); 
-		printf("%d %d", i, j); 
-(c) i = 7; 
-		j = 8; 	
-		printf("%d ", i++ - --j); 
-		printf("%d %d", i, j); 
-(d) i = 3; 
-		j = 4; 
-		k = 5; 
-		printf("%d ", i++ - j++ + --k); 
-		printf("%d %d %d", i, j, k); 
-```
+11. 给出下列程序片段的输出结果。假设 i、j 和 k 都是 int 型变量。
 
-```C
-#include<stdio.h>
-int main(void)
-{
-		int i, j, k;
-		i = 1; 
-		printf("%d \n", i++ - 1); 
-		printf("%d\n", i); 
-		i = 10; 
-		j = 5; 
-		printf("%d \n", i++ - ++j); 
-		printf("%d %d\n", i, j); 
-		i = 7; 
-		j = 8; 	
-		printf("%d \n", i++ - --j); 
-		printf("%d %d\n", i, j); 
-		i = 3; 
-		j = 4; 
-		k = 5; 
-		printf("%d \n", i++ - j++ + --k); 
-		printf("%d %d %d\n", i, j, k); 
-		
-		return 0;
-}
-```
+    ```C
+    (a) i = 1; 
+    		printf("%d ", i++ - 1); 
+    		printf("%d", i); 
+    (b) i = 10; 
+    		j = 5; 
+    		printf("%d ", i++ - ++j); 
+    		printf("%d %d", i, j); 
+    (c) i = 7; 
+    		j = 8; 	
+    		printf("%d ", i++ - --j); 
+    		printf("%d %d", i, j); 
+    (d) i = 3; 
+    		j = 4; 
+    		k = 5; 
+    		printf("%d ", i++ - j++ + --k); 
+    		printf("%d %d %d", i, j, k); 
+    ```
 
-```
-0
-2
-4
-11 6
-0
-8 7
-3
-4 5 4
-```
+    ```C
+    #include<stdio.h>
+    int main(void)
+    {
+    		int i, j, k;
+    		i = 1; 
+    		printf("%d \n", i++ - 1); 
+    		printf("%d\n", i); 
+    		i = 10; 
+    		j = 5; 
+    		printf("%d \n", i++ - ++j); 
+    		printf("%d %d\n", i, j); 
+    		i = 7; 
+    		j = 8; 	
+    		printf("%d \n", i++ - --j); 
+    		printf("%d %d\n", i, j); 
+    		i = 3; 
+    		j = 4; 
+    		k = 5; 
+    		printf("%d \n", i++ - j++ + --k); 
+    		printf("%d %d %d\n", i, j, k); 
+    		
+    		return 0;
+    }
+    ```
+
+    ```
+    0
+    2
+    4
+    11 6
+    0
+    8 7
+    3
+    4 5 4
+    ```
+
+    
 
 12. 给出下列程序片段的输出结果。假设 i 和 j 都是 int 型变量。
 
-```C
-(a) i = 5; 
-		j = ++i * 3 – 2; 
-		printf("%d %d", i, j); 
-(b) i = 5; 
-		j = 3 – 2 * i++; 
-		printf("%d %d", i, j);
-(c) i = 7; 
-		j = 3 * i-- + 2; 
-		printf("%d %d", i, j); 
-(d) i = 7; 
-		j = 3 + --i * 2; 
-		printf("%d %d", i, j); 
-```
+    ```C
+    (a) i = 5; 
+    		j = ++i * 3 – 2; 
+    		printf("%d %d", i, j); 
+    (b) i = 5; 
+    		j = 3 – 2 * i++; 
+    		printf("%d %d", i, j);
+    (c) i = 7; 
+    		j = 3 * i-- + 2; 
+    		printf("%d %d", i, j); 
+    (d) i = 7; 
+    		j = 3 + --i * 2; 
+    		printf("%d %d", i, j); 
+    ```
 
-```C
-#include<stdio.h>
-int main(void)
-{
-	int i, j;
-  i = 5; 
-  j = ++i * 3 - 2; 
-  printf("%d %d\n", i, j);
-  i = 5; 
-  j = 3 - 2 * i++; 
-  printf("%d %d\n", i, j);
-  i = 7; 
-  j = 3 * i-- + 2; 
-  printf("%d %d\n", i, j);
-  i = 7; 
-  j = 3 + --i * 2; 
-  printf("%d %d\n", i, j);
-  
-  return 0;
-}
-```
+    ```C
+    #include<stdio.h>
+    int main(void)
+    {
+    	int i, j;
+      i = 5; 
+      j = ++i * 3 - 2; 
+      printf("%d %d\n", i, j);
+      i = 5; 
+      j = 3 - 2 * i++; 
+      printf("%d %d\n", i, j);
+      i = 7; 
+      j = 3 * i-- + 2; 
+      printf("%d %d\n", i, j);
+      i = 7; 
+      j = 3 + --i * 2; 
+      printf("%d %d\n", i, j);
+      
+      return 0;
+    }
+    ```
 
-```
-6 16
-6 -7
-6 23
-6 15
-```
+    ```
+    6 16
+    6 -7
+    6 23
+    6 15
+    ```
+
+    
 
 13. 表达式++i 和 i++中只有一个是与表达式(i += 1)完全相同的，是哪一个呢？验证你的答案。
 
+    ```
+    // 表达式 ++i和(i += 1)的值相同，因为++i表达式的值为i+1，和(i += 1)相同，但i++表达式的值是1。
+    ```
 
-```
-// 表达式 ++i和(i += 1)的值相同，因为++i表达式的值为i+1，和(i += 1)相同，但i++表达式的值是1。
-```
+    ```C
+    #include<stdio.h>
+    int main(void)
+    {
+    	int i = 1;
+      printf("++i = %d", ++i);
+      i = 1;
+      printf("i++ = %d", i++);
+      i = 1;
+      printf("(i += 1) = %d", (i += 1);
+      
+      return 0;
+    }
+    ```
 
-```C
-#include<stdio.h>
-int main(void)
-{
-	int i = 1;
-  printf("++i = %d", ++i);
-  i = 1;
-  printf("i++ = %d", i++);
-  i = 1;
-  printf("(i += 1) = %d", (i += 1);
-  
-  return 0;
-}
-```
+    ```
+    ++i = 2
+    i++ = 1
+    (i += 1) = 2
+    ```
 
-```
-++i = 2
-i++ = 1
-(i += 1) = 2
-```
+    
 
 14. 添加圆括号，说明 C 语言编译器如何解释下列表达式。
 
-```C
-(a) a * b – c * d + e 
-(b) a / b % c / d
-(c) – a – b + c - + d
-(d) a * - b / c - d
-```
+    ```
+    (a) a * b – c * d + e 
+    (b) a / b % c / d
+    (c) – a – b + c - + d
+    (d) a * - b / c - d
+    ```
 
-```
-(a) (((a * b) – (c * d)) + e) 
-(b) (((a / b) % c) / d)
-(c) ((((– a) – b) + c) - (+ d))
-(d) (((a * (- b)) / c) - d)
-```
+    ```
+    (a) (((a * b) – (c * d)) + e) 
+    (b) (((a / b) % c) / d)
+    (c) ((((– a) – b) + c) - (+ d))
+    (d) (((a * (- b)) / c) - d)
+    ```
+
+    
 
 15. 给出下列每条表达式语句执行以后 i 和 j 的值。（假设 i 的初始值为 1，j 的初始值为 2。）
 
-```C
-(a) i += j; 
-(b) i--;
-(c) i * j / i; 
-(d) i % ++j;
-```
+    ```
+    (a) i += j; 
+    (b) i--;
+    (c) i * j / i; 
+    (d) i % ++j;
+    ```
 
-```C
-#include<stdio.h>
-int main(void)
-{
-	int i, j;
-	i = 1, j = 2;
-  printf("i += j = %d\n", i += j);
-  printf("i-- = %d\n", i--);
-  printf("i * j / i = %d\n", i * j / i);
-  printf("i %% ++j = %d\n", i % ++j);
-  
-  return 0;
-}
-```
+    ```C
+    #include<stdio.h>
+    int main(void)
+    {
+    	int i, j;
+    	i = 1, j = 2;
+      printf("i += j = %d\n", i += j);
+      printf("i-- = %d\n", i--);
+      printf("i * j / i = %d\n", i * j / i);
+      printf("i %% ++j = %d\n", i % ++j);
+      
+      return 0;
+    }
+    ```
 
-```
-3
-2 // 这个地方是一个陷阱，我写成了i的值，其实要写出表达式的值，i的值在表达式的值算出之后才会产生副作用。
-2
-2
+    ```
+    3
+    2 // 这个地方是一个陷阱，我写成了i的值，其实要写出表达式的值，i的值在表达式的值算出之后才会产生副作用。
+    2
+    2
+    
+    电脑程序输出结果
+    i += j = 3
+    i-- = 3
+    i * j / i = 2
+    i % ++j = 2
+    ```
 
-电脑程序输出结果
-i += j = 3
-i-- = 3
-i * j / i = 2
-i % ++j = 2
-```
+    
 
 ### 编程题
 
 1. 编写一个程序，要求用户输入一个两位数，然后按数位的逆序打印出这个数。程序会话应类似下面这样：
 
-```
-Enter a two-digit number: 28
-The reversal is: 82 
-```
+   ```
+   Enter a two-digit number: 28
+   The reversal is: 82 
+   ```
 
-用%d 读入两位数，然后分解成两个数字。提示：如果 n 是整数，那么 n % 10 是个位数，而 n / 10则是移除个位数后剩下的数。
+   用%d 读入两位数，然后分解成两个数字。提示：如果 n 是整数，那么 n % 10 是个位数，而 n / 10则是移除个位数后剩下的数。
+   **ANS:**
 
-**ANS:**
+   ```C
+   #include<stdio.h>
+   int main(void)
+   {
+       int number, first, second;
+       printf("Enter a two-digit number:");
+       scanf("%d", &number);
+       first = number % 10;
+       second = (number / 10) % 10;
+   
+       printf("The reversal is: %d\n", first * 10 + second);
+       return 0;
+   }
+   ```
 
-```c
-#include<stdio.h>
-int main(void)
-{
-    int number, first, second;
-    printf("Enter a two-digit number:");
-    scanf("%d", &number);
-    first = number % 10;
-    second = (number / 10) % 10;
-
-    printf("The reversal is: %d\n", first * 10 + second);
-    return 0;
-}
-```
+   
 
 2. 扩展上题中的程序，使其可以处理 3 位数。
+   **ANS:**
 
-**ANS:**
+   ```C
+   #include<stdio.h>
+   int main(void)
+   {
+       int number, first, second, third;
+       printf("Enter a two-digit number:");
+       scanf("%d", &number);
+       first = number % 10;
+       second = (number / 10) % 10;
+       third = number / 10 / 10;
+   
+       printf("The reversal is: %d\n", first * 100 + second * 10 + third);
+       return 0;
+   }
+   ```
 
-```c
-#include<stdio.h>
-int main(void)
-{
-    int number, first, second, third;
-    printf("Enter a two-digit number:");
-    scanf("%d", &number);
-    first = number % 10;
-    second = (number / 10) % 10;
-    third = number / 10 / 10;
-
-    printf("The reversal is: %d\n", first * 100 + second * 10 + third);
-    return 0;
-}
-```
+   
 
 3. 重新编写编程题2中的程序，使新程序不需要利用算术分割就可以显示出3位数的逆序。提示：参考4.1 节的 upc.c 程序。
+   **ANS:**
 
-**ANS:**
+   ```C
+   #include<stdio.h>
+   int main(void)
+   {
+       int number, first, second, third;
+       printf("Enter a two-digit number: ");
+       scanf("%1d%1d%1d", &third, &second, &first);
+   
+       printf("The reversal is: %1d%1d%1d\n", first, second, third);
+       return 0;
+   }
+   ```
 
-```C
-#include<stdio.h>
-int main(void)
-{
-    int number, first, second, third;
-    printf("Enter a two-digit number: ");
-    scanf("%1d%1d%1d", &third, &second, &first);
-
-    printf("The reversal is: %1d%1d%1d\n", first, second, third);
-    return 0;
-}
-```
+   
 
 4. 编写一个程序，读入用户输入的整数并按八进制（基数为 8）显示出来：
 
-```
-Enter a number between 0 and 32767: 1953
-In octal, your number is: 03641 
-```
+   ```
+   Enter a number between 0 and 32767: 1953
+   In octal, your number is: 03641 
+   ```
 
-输出应为 5 位数，即便不需要这么多数位也要如此。提示：要把一个数转换成八进制，首先将其除以 8，所得的余数是八进制数的最后一位（本例中为 1）；然后把原始的数除以 8，对除法结果重复上述过程，得到倒数第二位。（如第 7 章所示，printf 可以显示八进制的数，所以这个程序实际上有更简单的写法。）
+   输出应为 5 位数，即便不需要这么多数位也要如此。提示：要把一个数转换成八进制，首先将其除以 8，所得的余数是八进制数的最后一位（本例中为 1）；然后把原始的数除以 8，对除法结果重复上述过程，得到倒数第二位。（如第 7 章所示，printf 可以显示八进制的数，所以这个程序实际上有更简单的写法。）
+   **ANS:**
 
-**ANS:**
+   ```C
+   #include<stdio.h>
+   int main(void)
+   {
+       int number, o1, o2, o3, o4, o5;
+       printf("Enter a number between 0 and 32767: ");
+       scanf("%d", &number);
+   
+       o5 = number % 8;
+       number /= 8;
+       o4 = number % 8;
+       number /= 8;
+       o3 = number % 8;
+       number /= 8;
+       o2 = number % 8;
+       number /= 8;
+       o1 = number % 8;
+       number /= 8;
+   
+       printf("In octal, your number is: %1d%1d%1d%1d%1d\n", o1, o2, o3, o4, o5);
+   
+       return 0;
+   }
+   ```
 
-```c
-#include<stdio.h>
-int main(void)
-{
-    int number, o1, o2, o3, o4, o5;
-    printf("Enter a number between 0 and 32767: ");
-    scanf("%d", &number);
-
-    o5 = number % 8;
-    number /= 8;
-    o4 = number % 8;
-    number /= 8;
-    o3 = number % 8;
-    number /= 8;
-    o2 = number % 8;
-    number /= 8;
-    o1 = number % 8;
-    number /= 8;
-
-    printf("In octal, your number is: %1d%1d%1d%1d%1d\n", o1, o2, o3, o4, o5);
-
-    return 0;
-}
-```
+   
 
 5. 重写 4.1 节的 upc.c 程序，使用户可以一次输入 11 位数字，而不用先输入 1 位，再输入 5 位，最后再输入 5 位。
 
-```
-Enter the first 11 digits of a UPC: 01380015173
-Check digit: 5 
-```
+   ```
+   Enter the first 11 digits of a UPC: 01380015173
+   Check digit: 5 
+   ```
 
-**ANS:**
+   **ANS:**
 
-```c
-#include <stdio.h>
+   ```C
+   #include <stdio.h>
+   
+   int main(void)
+   {
+       int d, i1, i2, i3, i4, i5, j1, j2, j3, j4, j5,
+         first_sum, second_sum, total;
+   
+       printf("Enter the first 11 digits of a UPC: ");
+       scanf("%1d%1d%1d%1d%1d%1d%1d%1d%1d%1d%1d", &d, &i1, &i2, &i3, &i4, &i5,
+                                               &j1, &j2, &j3, &j4, &j5);
+       first_sum = d + i2 + i4 + j1 + j3 + j5;
+       second_sum = i1 + i3 + i5 + j2 + j4;
+       total = 3 * first_sum + second_sum;
+   
+       printf("Check digit: %d\n", 9 - ((total - 1) % 10));
+   
+       return 0;
+   }
+   ```
 
-int main(void)
-{
-    int d, i1, i2, i3, i4, i5, j1, j2, j3, j4, j5,
-      first_sum, second_sum, total;
-
-    printf("Enter the first 11 digits of a UPC: ");
-    scanf("%1d%1d%1d%1d%1d%1d%1d%1d%1d%1d%1d", &d, &i1, &i2, &i3, &i4, &i5,
-                                            &j1, &j2, &j3, &j4, &j5);
-    first_sum = d + i2 + i4 + j1 + j3 + j5;
-    second_sum = i1 + i3 + i5 + j2 + j4;
-    total = 3 * first_sum + second_sum;
-
-    printf("Check digit: %d\n", 9 - ((total - 1) % 10));
-
-    return 0;
-}
-```
+   
 
 6. 欧洲国家及地区不使用北美的 12 位通用产品代码（UPC），而使用 13 位的欧洲商品编码（European Article Number, EAN）。跟 UPC 一样，每个 EAN 码的最后也有一个校验位。计算校验位的方法也类似：首先把第 2位、第 4位、第 6位、第 8位、第 10位和第 12位数字相加；然后把第 1位、第 3位、第 5 位、第 7 位、第 9 位和第 11位数字相加；接着把第一次加法的结果乘以 3，再和第二次加法的结果相加；随后，再把上述结果减去 1；相减后的结果除以 10 取余数；最后用 9 减去上一步骤中得到的余数。
 
    以 Güllüoglu 牌土耳其软糖（开心果和椰子口味）为例，其 EAN 码为 8691484260008。第一个和为6+1+8+2+0+0=17，第二个和为 8+9+4+4+6+0=31。第一个和乘以 3 再加上第二个和得到 82，减 1 得到 81。这个结果除以 10 的余数是 1，再用 9 减去余数得到 8，与原始编码的最后一位一致。请修改
-
-​	4.1 节的 upc.c 程序以计算 EAN 的校验位。用户把 EAN 的前 12 位当作一个数输入：
-
-```
-Enter the first 12 digits of an EAN: 869148426000
-Check digit: 8
-```
-
-**ANS:**
-
-```c
-#include <stdio.h>
-
-int main(void)
-{
-    int d, i1, i2, i3, i4, i5, j1, j2, j3, j4, j5, j6,
-      first_sum, second_sum, total;
-
-    printf("Enter the first 11 digits of an EAN: ");
-    scanf("%1d%1d%1d%1d%1d%1d%1d%1d%1d%1d%1d%1d", &d, &i1, &i2, &i3, &i4, &i5,
-                                            &j1, &j2, &j3, &j4, &j5, &j6);
-    first_sum = d + i2 + i4 + j1 + j3 + j5;
-    second_sum = i1 + i3 + i5 + j2 + j4 + j6;
-    total =first_sum + second_sum * 3;
-
-    printf("Check digit: %d\n", 9 - ((total - 1) % 10));
-
-    return 0;
-}
-```
+   4.1 节的 upc.c 程序以计算 EAN 的校验位。用户把 EAN 的前 12 位当作一个数输入：
+   
+   ```
+   Enter the first 12 digits of an EAN: 869148426000
+   Check digit: 8
+   ```
+   
+   **ANS:**
+   
+   ```C
+   #include <stdio.h>
+   
+   int main(void)
+   {
+       int d, i1, i2, i3, i4, i5, j1, j2, j3, j4, j5, j6,
+         first_sum, second_sum, total;
+   
+       printf("Enter the first 11 digits of an EAN: ");
+       scanf("%1d%1d%1d%1d%1d%1d%1d%1d%1d%1d%1d%1d", &d, &i1, &i2, &i3, &i4, &i5,
+                                               &j1, &j2, &j3, &j4, &j5, &j6);
+       first_sum = d + i2 + i4 + j1 + j3 + j5;
+       second_sum = i1 + i3 + i5 + j2 + j4 + j6;
+       total =first_sum + second_sum * 3;
+   
+       printf("Check digit: %d\n", 9 - ((total - 1) % 10));
+   
+       return 0;
+   }
+   ```
+   
+   
 
 ## 第五章 选择语句
 
@@ -1554,450 +1585,466 @@ int main(void)
 
 1. 下列代码片段给出了关系运算符和判等运算符的示例。假设 i、j 和 k 都是 int 型变量，请给出每道题的输出结果。
 
-```C
-(a) i = 2; 
-		j = 3; 
-		k = i * j == 6; 
-		printf("%d", k); 
-(b) i = 5; 
-		j = 10; 
-		k = 1; 
-		printf("%d", k > i < j); 
-(c) i = 3; 
-		j = 2; 
-		k = 1; 
-		printf("%d", i < j == j < k); 
-(d) i = 3; 
-		j = 4; 
-		k = 5; 
-		printf("%d", i % j + i < k); 
-```
+   ```
+   (a) i = 2; 
+   		j = 3; 
+   		k = i * j == 6; 
+   		printf("%d", k); 
+   (b) i = 5; 
+   		j = 10; 
+   		k = 1; 
+   		printf("%d", k > i < j); 
+   (c) i = 3; 
+   		j = 2; 
+   		k = 1; 
+   		printf("%d", i < j == j < k); 
+   (d) i = 3; 
+   		j = 4; 
+   		k = 5; 
+   		printf("%d", i % j + i < k); 
+   ```
 
-```C
-#include<stdio.h>
-int main(void)
-{
-    int i, j, k;
-    i = 2; 
-    j = 3; 
-    k = i * j == 6; 
-    printf("%d\n", k); 
-    i = 5; 
-    j = 10; 
-    k = 1; 
-    printf("%d\n", k > i < j); 
-    i = 3; 
-    j = 2; 
-    k = 1; 
-    printf("%d\n", i < j == j < k); 
-    i = 3; 
-    j = 4; 
-    k = 5; 
-    printf("%d\n", i % j + i < k); 
+   ```C
+   #include<stdio.h>
+   int main(void)
+   {
+       int i, j, k;
+       i = 2; 
+       j = 3; 
+       k = i * j == 6; 
+       printf("%d\n", k); 
+       i = 5; 
+       j = 10; 
+       k = 1; 
+       printf("%d\n", k > i < j); 
+       i = 3; 
+       j = 2; 
+       k = 1; 
+       printf("%d\n", i < j == j < k); 
+       i = 3; 
+       j = 4; 
+       k = 5; 
+       printf("%d\n", i % j + i < k); 
+   
+       return 0;
+   }
+   ```
 
-    return 0;
-}
-```
+   ```
+   1
+   1
+   1
+   0
+   ```
 
-```
-1
-1
-1
-0
-```
+   
 
-2.下列代码片段给出了逻辑运算符的示例。假设 i、j 和 k 都是 int 型变量，请给出每道题的输出结果。
+2. 下列代码片段给出了逻辑运算符的示例。假设 i、j 和 k 都是 int 型变量，请给出每道题的输出结果。
 
-```C
-(a) i = 10; 
-		j = 5; 
-		printf("%d", !i < j); 
-(b) i = 2; 
-		j = 1; 
-		printf("%d", !!i + !j); 
-(c) i = 5; 
-		j = 0; 
-		k = -5; 
-		printf("%d", i && j || k); 
-(d) i = 1;
-		j = 2; 
-		k = 3; 
-		printf("%d", i < j || k); 
-```
+   ```C
+   (a) i = 10; 
+   		j = 5; 
+   		printf("%d", !i < j); 
+   (b) i = 2; 
+   		j = 1; 
+   		printf("%d", !!i + !j); 
+   (c) i = 5; 
+   		j = 0; 
+   		k = -5; 
+   		printf("%d", i && j || k); 
+   (d) i = 1;
+   		j = 2; 
+   		k = 3; 
+   		printf("%d", i < j || k); 
+   ```
 
-```C
-#include<stdio.h>
-int main(void)
-{
-    int i, j, k;
-    i = 10; 
-    j = 5; 
-    printf("%d\n", !i < j); 
-    i = 2; 
-    j = 1; 
-    printf("%d\n", !!i + !j); 
-    i = 5; 
-    j = 0; 
-    k = -5; 
-    printf("%d\n", i && j || k); 
-    i = 1;
-    j = 2; 
-    k = 3; 
-    printf("%d\n", i < j || k);
+   ```C
+   #include<stdio.h>
+   int main(void)
+   {
+       int i, j, k;
+       i = 10; 
+       j = 5; 
+       printf("%d\n", !i < j); 
+       i = 2; 
+       j = 1; 
+       printf("%d\n", !!i + !j); 
+       i = 5; 
+       j = 0; 
+       k = -5; 
+       printf("%d\n", i && j || k); 
+       i = 1;
+       j = 2; 
+       k = 3; 
+       printf("%d\n", i < j || k);
+   
+       return 0;
+   }
+   ```
 
-    return 0;
-}
-```
+   ```
+   1
+   1
+   1
+   1
+   ```
 
-```
-1
-1
-1
-1
-```
+   
 
-*3. 下列代码片段给出了逻辑表达式的短路行为的示例。假设 i、j 和 k 都是 int 型变量，请给出每道题的输出结果。
+3. 下列代码片段给出了逻辑表达式的短路行为的示例。假设 i、j 和 k 都是 int 型变量，请给出每道题的输出结果。
 
-```C
-(a) i = 3; 
-		j = 4; 
-		k = 5; 
-		printf("%d", i < j || ++j < k); 
-		printf("%d %d %d", i, j, k);
-(b) i = 7; 
-		j = 8; 
-		k = 9; 
-		printf("%d", i – 7 && j++ < k); 
-		printf("%d %d %d", i, j, k); 
-(c) i = 7; 
-		j = 8; 
-		k = 9; 
-		printf("%d", (i = j) || (j = k)); 
-		printf("%d %d %d", i, j, k); 
-(d) i = 1; 
-		j = 1; 
-		k = 1; 
-		printf("%d", ++i || ++j && ++k); 
-		printf("%d %d %d", i, j, k); 
-```
+   ```C
+   (a) i = 3; 
+   		j = 4; 
+   		k = 5; 
+   		printf("%d", i < j || ++j < k); 
+   		printf("%d %d %d", i, j, k);
+   (b) i = 7; 
+   		j = 8; 
+   		k = 9; 
+   		printf("%d", i – 7 && j++ < k); 
+   		printf("%d %d %d", i, j, k); 
+   (c) i = 7; 
+   		j = 8; 
+   		k = 9; 
+   		printf("%d", (i = j) || (j = k)); 
+   		printf("%d %d %d", i, j, k); 
+   (d) i = 1; 
+   		j = 1; 
+   		k = 1; 
+   		printf("%d", ++i || ++j && ++k); 
+   		printf("%d %d %d", i, j, k); 
+   ```
 
-```c
-#include<stdio.h>
-int main(void)
-{
-    int i, j, k; 
-    i = 3; 
-    j = 4; 
-    k = 5; 
-    printf("%d\n", i < j || ++j < k); 
-    printf("%d %d %d\n", i, j, k);
-    i = 7; 
-    j = 8; 
-    k = 9; 
-    printf("%d\n", i - 7 && j++ < k); 
-    printf("%d %d %d\n", i, j, k); 
-    i = 7; 
-    j = 8; 
-    k = 9; 
-    printf("%d\n", (i = j) || (j = k)); 
-    printf("%d %d %d\n", i, j, k); 
-    i = 1; 
-    j = 1; 
-    k = 1; 
-    printf("%d\n", ++i || ++j && ++k); 
-    printf("%d %d %d\n", i, j, k); 
+   ```C
+   #include<stdio.h>
+   int main(void)
+   {
+       int i, j, k; 
+       i = 3; 
+       j = 4; 
+       k = 5; 
+       printf("%d\n", i < j || ++j < k); 
+       printf("%d %d %d\n", i, j, k);
+       i = 7; 
+       j = 8; 
+       k = 9; 
+       printf("%d\n", i - 7 && j++ < k); 
+       printf("%d %d %d\n", i, j, k); 
+       i = 7; 
+       j = 8; 
+       k = 9; 
+       printf("%d\n", (i = j) || (j = k)); 
+       printf("%d %d %d\n", i, j, k); 
+       i = 1; 
+       j = 1; 
+       k = 1; 
+       printf("%d\n", ++i || ++j && ++k); 
+       printf("%d %d %d\n", i, j, k); 
+   
+       return 0;
+   }
+   ```
 
-    return 0;
-}
-```
+   ```
+   1
+   3 4 5
+   0
+   7 8 9
+   1
+   8 8 9
+   1
+   2 1 1
+   ```
 
-```
-1
-3 4 5
-0
-7 8 9
-1
-8 8 9
-1
-2 1 1
-```
+   
 
-*4. 编写一个表达式，要求这个表达式根据 i 小于、等于、大于 j 这 3 种情况，分别取值为-1、0、+1。
+4. 编写一个表达式，要求这个表达式根据 i 小于、等于、大于 j 这 3 种情况，分别取值为-1、0、+1。
 
-```c
-#include<stdio.h>
-int main(void)
-{
-    int i, j;
-    printf("Please enter i:\n");
-    scanf("%d %d", &i, &j);
+   ```C
+   #include<stdio.h>
+   int main(void)
+   {
+       int i, j;
+       printf("Please enter i:\n");
+       scanf("%d %d", &i, &j);
+   
+     	// 一共想到了两种写法，一种就是简单的级联。
+       (i < j)? (-1) : (i == j ? 0: 1);
+     	// 另一种就是通过对非零值取反再取反会得到1或者0的特性。
+       i >= j? !!(i - j) : -1;
+   
+       return 0;
+   }
+   ```
 
-  	// 一共想到了两种写法，一种就是简单的级联。
-    (i < j)? (-1) : (i == j ? 0: 1);
-  	// 另一种就是通过对非零值取反再取反会得到1或者0的特性。
-    i >= j? !!(i - j) : -1;
+   ```C
+   参考答案：
+   i > j ? 1 : ( i < j ? - 1 : 0)
+   ```
 
-    return 0;
-}
-```
+   
 
-```
-参考答案：
-i > j ? 1 : ( i < j ? - 1 : 0)
-```
+5. 下面的 if 语句在 C 语言中是否合法？
 
-*5. 下面的 if 语句在 C 语言中是否合法？
+   ```
+   if (n >= 1 <= 10) 
+   printf("n is between 1 and 10\n"); 
+   ```
 
-```
-if (n >= 1 <= 10) 
-printf("n is between 1 and 10\n"); 
-```
+   如果合法，那么当 n 等于 0 时会发生什么？
 
-如果合法，那么当 n 等于 0 时会发生什么？
+   ```C
+   // 程序是合法的但不是合理的，无法得到字面的程序期望。
+   // 如果为了表示取值在1~10之间，可以使用表达式n>=0 && n<=10的形式。
+   #include<stdio.h>
+   int main(void)
+   {
+       int n = 0;
+       if(n >= 1 <= 10)
+       printf("n is between 1 and 10\n");
+   
+       return 0;
+   }
+   ```
 
-```C
-// 程序是合法的但不是合理的，无法得到字面的程序期望。
-// 如果为了表示取值在1~10之间，可以使用表达式n>=0 && n<=10的形式。
-#include<stdio.h>
-int main(void)
-{
-    int n = 0;
-    if(n >= 1 <= 10)
-    printf("n is between 1 and 10\n");
+   ```
+   n is between 1 and 10
+   ```
 
-    return 0;
-}
-```
+   
 
-```
-n is between 1 and 10
-```
+6. 下面的 if 语句在 C 语言中是否合法？
 
-*6. 下面的 if 语句在 C 语言中是否合法？
+   ```C
+   if (n == 1 - 10) 
+   printf("n is between 1 and 10\n"); 
+   ```
 
-```
-if (n == 1 - 10) 
-printf("n is between 1 and 10\n"); 
-```
+   如果合法，那么当 n 等于 5 时会发生什么？
 
-如果合法，那么当 n 等于 5 时会发生什么？
+   ```C
+   // 程序是合法的但不是合理的，无法得到字面的程序期望。
+   #include<stdio.h>
+   int main(void)
+   {
+       int n = 5;
+       if (n == 1 - 10) 
+           printf("n is between 1 and 10\n"); 
+   
+       return 0;
+   }
+   ```
 
-```C
-// 程序是合法的但不是合理的，无法得到字面的程序期望。
-#include<stdio.h>
-int main(void)
-{
-    int n = 5;
-    if (n == 1 - 10) 
-        printf("n is between 1 and 10\n"); 
+   **没有任何的输出**
 
-    return 0;
-}
-```
+   
 
-**没有任何的输出**
+7. 如果 i 的值为 17，下面的语句显示的结果是什么？如果 i 的值为-17，下面的语句显示的结果又是什么？`printf("%d\n", i >= 0 ? i : -i);` 
 
-7. 如果 i 的值为 17，下面的语句显示的结果是什么？如果 i 的值为-17，下面的语句显示的结果又是什么？
+   ```C
+   #include<stdio.h>
+   int main(void)
+   {
+       int i = 17;
+       printf("%d\n", i >= 0 ? i : -i);
+       i = -17;
+       printf("%d\n", i >= 0 ? i : -i);
+   
+       return 0;
+   }
+   ```
 
-`printf("%d\n", i >= 0 ? i : -i);` 
+   ```
+   17
+   17
+   ```
 
-```C
-#include<stdio.h>
-int main(void)
-{
-    int i = 17;
-    printf("%d\n", i >= 0 ? i : -i);
-    i = -17;
-    printf("%d\n", i >= 0 ? i : -i);
-
-    return 0;
-}
-```
-
-```
-17
-17
-```
+   
 
 8. 下面的 if 语句不需要这么复杂，请尽可能地加以简化。
 
-```C
-if (age >= 13) 
-  if (age <= 19) 
-    teenager = true; 
-	else 
-  	teenager = false; 
-else if (age < 13) 
-  teenager = false; 
-```
+   ```C
+   if (age >= 13) 
+     if (age <= 19) 
+       teenager = true; 
+   	else 
+     	teenager = false; 
+   else if (age < 13) 
+     teenager = false; 
+   ```
 
-```c
-#include<stdio.h>
-int main(void)
-{
-    if (13 <= age && age <= 19) 
-        teenager = true; 
-		else 
-  	    teenager = false; 
+   ```C
+   #include<stdio.h>
+   int main(void)
+   {
+       if (13 <= age && age <= 19) 
+           teenager = true; 
+   		else 
+     	    teenager = false; 
+   
+       return 0;
+   }
+   ```
 
-    return 0;
-}
-```
+   
 
 9. 下面两个 if 语句是否等价？如果不等价，为什么？
 
-```C
-if (score >= 90) 					
-	printf("A");  
-else if (score >= 80) 
-	printf("B");  
-else if (score >= 70)
-	printf("C"); 
-else if (score >= 60) 
-	printf("D"); 
-else 
-  printf("F"); 
-```
+   ```C
+   if (score >= 90) 					
+   	printf("A");  
+   else if (score >= 80) 
+   	printf("B");  
+   else if (score >= 70)
+   	printf("C"); 
+   else if (score >= 60) 
+   	printf("D"); 
+   else 
+     printf("F"); 
+   ```
 
-```c
-if (score < 60) 
-  printf("F");
-else if (score < 70) 
-  printf("D"); 
-else if (score < 80) 
-  printf("C"); 
-else if (score < 90) 
-  printf("B"); 
-else printf("A");
-```
+   ```C
+   if (score < 60) 
+     printf("F");
+   else if (score < 70) 
+     printf("D"); 
+   else if (score < 80) 
+     printf("C"); 
+   else if (score < 90) 
+     printf("B"); 
+   else printf("A");
+   ```
 
-这两个是等价的
+   这两个是等价的
+   **答案解析：**
+   两条if级联语句的输出结果相同，但是不能认为它们是等价的，因为两者的逻辑判断顺序和结构不同，只是一种算法的两种实现。
 
-**答案解析**
-两条if级联语句的输出结果相同，但是不能认为它们是等价的，因为两者的逻辑判断顺序和结构不同，只是一种算法的两种实现。
+   ```
+   #include <stdio.h>
+   int main(void)
+   {
+       int score;
+       if (score >= 90)
+           printf("A");
+       else if (score >= 80)
+           printf("B");
+       else if (score >= 70)
+           printf("C");
+       else if (score >= 60)
+           printf("D");
+       else
+           printf("F");
+   
+       if (score < 60)
+           printf("F");
+       else if (score < 70)
+           printf("D");
+       else if (score < 80)
+           printf("C");
+       else if (score < 90)
+           printf("B");
+       else
+           printf("A");
+           
+       return 0;
+   }
+   ```
 
-```c
-#include <stdio.h>
-int main(void)
-{
-    int score;
-    if (score >= 90)
-        printf("A");
-    else if (score >= 80)
-        printf("B");
-    else if (score >= 70)
-        printf("C");
-    else if (score >= 60)
-        printf("D");
-    else
-        printf("F");
-
-    if (score < 60)
-        printf("F");
-    else if (score < 70)
-        printf("D");
-    else if (score < 80)
-        printf("C");
-    else if (score < 90)
-        printf("B");
-    else
-        printf("A");
-        
-    return 0;
-}
-```
+   
 
 5.3 节
 
-*10. 下面的代码片段的输出结果是什么？（假设 i 是整型变量。）
+10. 下面的代码片段的输出结果是什么？（假设 i 是整型变量。）
 
-```C
-i = 1; 
-switch (i % 3) { 
- case 0: printf("zero"); 
- case 1: printf("one"); 
- case 2: printf("two"); 
-} 
-```
+    ```C
+    i = 1; 
+    switch (i % 3) { 
+     case 0: printf("zero"); 
+     case 1: printf("one"); 
+     case 2: printf("two"); 
+    } 
+    ```
 
-```c
-#include <stdio.h>
-int main(void)
-{
-    i = 1;
-    switch (i % 3)
+    ```C
+    #include <stdio.h>
+    int main(void)
     {
-    case 0:
-        printf("zero");
-    case 1:
-        printf("one");
-    case 2:
-        printf("two");
+        i = 1;
+        switch (i % 3)
+        {
+        case 0:
+            printf("zero");
+        case 1:
+            printf("one");
+        case 2:
+            printf("two");
+        }
+        return 0;
     }
-    return 0;
-}
-```
+    ```
 
-```
-onetwo
-```
+    ```
+    onetwo
+    ```
+
+    
 
 11. 表 5-5 给出了美国佐治亚州的电话区号，以及每个区号所对应地区最大的城市。
+    **表 5-5 美国佐治亚州电话区号及对应的主要城市**
 
-**表 5-5 美国佐治亚州电话区号及对应的主要城市**
+    | 区号 | 主要城市 |
+    | :--: | :------: |
+    | 229  |  Albany  |
+    | 404  | Atlanta  |
+    | 470  | Atlanta  |
+    | 478  |  Macon   |
+    | 678  | Atlanta  |
+    | 706  | Columbus |
+    | 762  | Columbus |
+    | 770  | Atlanta  |
+    | 912  | Savannah |
 
-| 区号 | 主要城市 |
-| :--: | :------: |
-| 229  |  Albany  |
-| 404  | Atlanta  |
-| 470  | Atlanta  |
-| 478  |  Macon   |
-| 678  | Atlanta  |
-| 706  | Columbus |
-| 762  | Columbus |
-| 770  | Atlanta  |
-| 912  | Savannah |
+    编写一个 switch 语句，其控制表达式是变量 area_code。如果 area_code 的值在表中，switch 语句打印出相应的城市名；否则 switch 语句显示消息“Area code not recognized”。使用 5.3 节讨论的方法，使 switch 语句尽可能地简单。
 
-编写一个 switch 语句，其控制表达式是变量 area_code。如果 area_code 的值在表中，switch 语句打印出相应的城市名；否则 switch 语句显示消息“Area code not recognized”。使用 5.3 节讨论的方法，使 switch 语句尽可能地简单。
-
-```C
-#include <stdio.h>
-int main(void)
-{
-    int area_code;
-    printf("Please enter the area code: ");
-    scanf("%d", &area_code);
-
-    switch (area_code)
+    ```C
+    #include <stdio.h>
+    int main(void)
     {
-    case 229:
-        printf("Albany");
-        break;
-    case 404:
-    case 470:
-    case 678:
-    case 770:
-        printf("Atlanta");
-        break;
-    case 478:
-        printf("Macon");
-        break;
-    case 706:
-    case 762:
-        printf("Columbus");
-        break;
-    case 912:
-        printf("Savannah");
-        break;
-    default:
-        printf("Area code not recognized");
-        break;
+        int area_code;
+        printf("Please enter the area code: ");
+        scanf("%d", &area_code);
+    
+        switch (area_code)
+        {
+        case 229:
+            printf("Albany");
+            break;
+        case 404:
+        case 470:
+        case 678:
+        case 770:
+            printf("Atlanta");
+            break;
+        case 478:
+            printf("Macon");
+            break;
+        case 706:
+        case 762:
+            printf("Columbus");
+            break;
+        case 912:
+            printf("Savannah");
+            break;
+        default:
+            printf("Area code not recognized");
+            break;
+        }
+        return 0;
     }
-    return 0;
-}
-```
+    ```
 
-
+    
 
 ### 编程题
 
@@ -10257,29 +10304,29 @@ Enter a card: 0
 
 1. 假设下列声明是有效的：
 
-```C
-int a[] = {5, 15, 34, 54, 14, 2, 52, 72}; 
-int *p = &a[1], *q = &a[5];
-```
-
-```
-(a) *(p + 3)的值是多少？
-(b) *(q - 3)的值是多少？
-(c) q - p 的值是多少？
-(d) p < q 的结果是真还是假？
-(e) *p < *q 的结果是真还是假？
-```
-
-```
-(a) *(p + 3)的值是多少？相当于a[1 + 3]的值也就是a[4]的值即54
-(b) *(q - 3)的值是多少？相当于a[5 - 2]的值也就是a[3]的值即34
-(c) q - p 的值是多少？相当于数组a第六个元素和第一个元素的距离，结果为4，需要注意的是p - q为-4
-(d) p < q 的结果是真还是假？p和q在同一个数组中，p所指向的元素在q的前面，因此表达式的值为0
-(e) *p < *q 的结果是真还是假？相当于a[1] < a[5]，5 < 14，结果为1
-```
+   ```C
+   int a[] = {5, 15, 34, 54, 14, 2, 52, 72}; 
+   int *p = &a[1], *q = &a[5];
+   ```
+   ```
+   (a) *(p + 3)的值是多少？
+   (b) *(q - 3)的值是多少？
+   (c) q - p 的值是多少？
+   (d) p < q 的结果是真还是假？
+   (e) *p < *q 的结果是真还是假？
+   ```
+   
+   ```
+   (a) *(p + 3)的值是多少？相当于a[1 + 3]的值也就是a[4]的值即54
+   (b) *(q - 3)的值是多少？相当于a[5 - 2]的值也就是a[3]的值即34
+   (c) q - p 的值是多少？相当于数组a第六个元素和第一个元素的距离，结果为4，需要注意的是p - q为-4
+   (d) p < q 的结果是真还是假？p和q在同一个数组中，p所指向的元素在q的前面，因此表达式的值为0
+   (e) *p < *q 的结果是真还是假？相当于a[1] < a[5]，5 < 14，结果为1
+   ```
+   
+   
 
 2. *假设 `high`、`low` 和 `middle` 是具有相同类型的指针变量，并且 `low` 和 `high` 指向数组元素。下面的语句为什么是不合法的，如何修改它？
-
 ```C
 middle = (low + high) / 2;
 ```
@@ -13768,48 +13815,858 @@ White advanced!
    (c) 如果 x与y的乘积小于100则值为1，否则值为0。   
    ```
    你写的宏始终正常工作吗？如果不是，哪些参数会导致失败呢？
+   ```C
+   #include <stdio.h>
+   
+   #define CUBE(x) ((x) * (x) * (x))
+   #define REMAINDER_FOUR(x) ((x) %= 4)
+   #define JUDGE(x, y) (((x) * (y)) < 100 ? 1 : 0)
+   
+   
+   int main(void)
+   {
+       int x = 2, y = 3;
+   
+       printf("The square is %d\n", CUBE(x));
+       printf("The remainder is %d\n", REMAINDER_FOUR(x));
+       
+       if(JUDGE(x, y))
+           printf("The res is 1\n");
+       else
+           printf("The res is 0\n");
+   
+       return 0;
+   }
+   ```
+   
+   **ANS:**
+   
+   ```C
+   // 宏定义及说明：
+   
+   // (a) x 的立方
+   #define CUBE(x) ((x) * (x) * (x))
+   // 示例：CUBE(2 + 1) 展开为 ((2 + 1) * (2 + 1) * (2 + 1))，结果为 27
+   // 注意：必须用括号包裹参数和整个宏表达式，以防止运算优先级错误
+   
+   // (b) n 除以 4 的余数
+   #define REMAINDER_FOUR(n) ((n) % 4)
+   // 示例：REMAINDER_FOUR(10) -> (10 % 4) -> 2
+   // 注意：不要写成 n %= 4，因为这会修改实参变量，副作用明显，不推荐
+   
+   // (c) 如果 x 与 y 的乘积小于 100，则值为 1，否则值为 0
+   #define JUDGE(x, y) (((x) * (y)) < 100 ? 1 : 0)
+   // 示例：JUDGE(5, 10) -> ((5 * 10) < 100 ? 1 : 0) -> 1
+   // 注意：宏中包含重复求值，应避免使用具有副作用的实参，如 JUDGE(a++, b++)
+   ```
+   
+   
+2. 编写一个宏`NELEMS(a)`来计算一维数组a中元素的个数。提示：见8.1节中有关sizeof运算符的讨论。  
+
+   ```C
+   #include <stdio.h>
+   
+   #define SIZE 10
+   #define COUNT(x) (sizeof(x) / sizeof(x[0]))
+   
+   int number[SIZE] = {0};
+   
+   int main(void)
+   {
+       printf("%lu\n", COUNT(number));
+       return 0;
+   }
+   ```
+
+   ```
+   alancong@AlanCongdeMacBook-Air chapter_14 % ./a.out 
+   The number of the array is : 10
+   ```
+
+   
+3. 假定DOUBLE 是如下宏：  
+   
+   ```
+   #define DOUBLE(x) 2*x  
+   (a) DOUBLE(1+2)的值是多少？  
+   (b) 4/DOUBLE(2)的值是多少？  
+   (c) 改正 DOUBLE 的定义。 
+   ```
+   
+   ```C
+   #include<stdio.h>
+   
+   #define DOUBLE(x) 2*x  
+   
+   int main(void)
+   {
+       printf("The result of DOUBLE(1+2) is : %d\n", DOUBLE(1 + 2));
+       printf("The result of 4/DOUBLE(2) is : %d\n", 4/DOUBLE(2));
+   #undef DOUBLE
+   #define DOUBLE(x) (2 * (x)) 
+       printf("The result of DOUBLE(1+2) is : %d\n", DOUBLE(1 + 2));
+       printf("The result of 4/DOUBLE(2) is : %d\n", 4/DOUBLE(2));
+   
+       return 0;
+   }
    ```
    
    ```
-2. 编写一个宏NELEMS(a)来计算一维数组a中元素的个数。提示：见8.1节中有关sizeof运算符的讨论。  
-3. 假定DOUBLE 是如下宏：  #define DOUBLE(x) 2*x  *
-   *(a) DOUBLE(1+2)的值是多少？  *
-   *(b) 4/DOUBLE(2)的值是多少？  *
-   *(c) 改正 DOUBLE 的定义。 *
-4. 针对下面每一个宏，举例说明宏的问题，并提出修改方法。  (a) #define AVG(x,y)  (x+y)/2  (b) #define AREA(x,y) (x)*(y)  
+   alancong@AlanCongdeMacBook-Air chapter_14 % ./a.out 
+   The result of DOUBLE(1+2) is : 4
+   The result of 4/DOUBLE(2) is : 4
+   The result of DOUBLE(1+2) is : 6
+   The result of 4/DOUBLE(2) is : 1
+   ```
+   
+   
+4. 针对下面每一个宏，举例说明宏的问题，并提出修改方法。  
 
-*5. 假定 TOUPPER 定义成下面的宏：  #define TOUPPER(c) ('a'<=(c)&&(c)<='z'?(c)-'a'+'A':(c))  假设s是一个字符串，i是一个int类型变量。给出下面每个代码段产生的输出。  
-(a) strcpy(s, "abcd");    i = 0;     putchar(TOUPPER(s[++i]));  (b) strcpy(s, "0123");    i = 0;    putchar(TOUPPER(s[++i]));  
+   ```
+   (a) #define AVG(x,y)  (x+y)/2  
+   (b) #define AREA(x,y) (x)*(y) 
+   ```
 
-6. (a) 编写宏 DISP(f,x)，使其扩展为printf 函数的调用，显示函数f在参数为x时的值。例如：  DISP(sqrt, 3.0);  应该扩展为  printf("sqrt(%g) = %g\n", 3.0, sqrt(3.0));  (b) 编写宏DISP2(f,x,y)，类似DISP 但应用于有两个参数的函数。  
+   **ANS:**
 
-*7. 假定 GENERIC_MAX 是如下宏：  #define GENERIC_MAX(type)   \  type type##_max(type x, type y) \  {           \  return x > y ? x : y;   }   \  (a) 写出 GENERIC_MAX(long)被预处理器扩展后的形式。  (b) 解释为什么GENERIC_MAX 不能应用于unsigned long 这样的基本类型。  (c) 如何使GENERIC_MAX 可以用于unsigned long 这样的基本类型？提示：不要改变GENERIC_MAX 的定义。  
+   ```C
+   (a) One problem stems from the lack of parentheses around the replacement list. For example, the statement
+   
+   a = 1/AVG(b, c);
+   will be replaced by
+   
+   a = 1/(b+c)/2;
+   Even if we add the missing parentheses, though, the macro still has problems, because it needs parentheses around x and y in the replacement list. The preprocessor will turn the statement
+   
+   a = AVG(b<c, c>d);
+   into
+   
+   a = ((b<c+c>d)/2);
+   which is equivalent to
+   
+   a = ((b<(c+c)>d)/2);
+   Here's the final (corrected) version of the macro:
+   
+   #define AVG(x,y) (((x)+(y))/2)
+   (b) The problem is the lack of parentheses around the replacement list. For example,
+   
+   a = 1/AREA(b, c);
+   becomes
+   
+   a = 1/(b)*(c);
+   Here's the corrected macro:
+   
+   #define AREA(x,y) ((x)*(y))
+   ```
 
-*8. 如果需要一个宏，使它扩展后包含当前行号和文件名。换言之，我们想把  const char *str = LINE_FILE;  扩展为  const char *str = "Line 10 of file foo.c";  其中foo.c是包含程序的文件，10是调用LINE_FILE的行号。警告：这个练习仅针对高级程序员。尝 试编写前请认真阅读“问与答”部分的内容！  
+    
 
-9. 编写下列带参数的宏。  (a) CHECK(x,y,n)——x 和y 都落在0~n1范围内（包括端点）时值为1。  (b) MEDIAN(x,y,z)——计算x、y 和z的中位数。  (c) POLYNOMIAL(x)——计算多项式3x5+2x45x3x2+7x6。  
+5. *假定 TOUPPER 定义成下面的宏：  
+   `#define TOUPPER(c) ('a'<=(c)&&(c)<='z'?(c)-'a'+'A':(c))`  
+   假设s是一个字符串，i是一个int类型变量。给出下面每个代码段产生的输出。  
+
+   ```C
+   (a) strcpy(s, "abcd");    
+   		i = 0;     
+       putchar(TOUPPER(s[++i]));  
+   (b) strcpy(s, "0123");    
+   		i = 0;    
+   		putchar(TOUPPER(s[++i]));  
+   ```
+
+   ```
+   (a) The call of putchar expands into the following statement:
+   
+   
+   putchar(('a'<=(s[++i])&&(s[++i])<='z'?(s[++i])-'a'+'A':(s[++i])));
+   The character a is less than or equal to s[1] (which is b), yielding a true condition. The character s[2] (which is c) is less than or equal to z, which is also true. The value printed is s[3]-'a'+'A', which is D (assuming that the character set is ASCII).
+   
+   (b) The character a is not less than or equal to s[1] (which is 1) so the test condition is false. The value printed is s[2], which is 2.
+   ```
+
+   ```C
+   #include <stdio.h>
+   #include <string.h>
+   
+   #define SIZE 100
+   #define TOUPPER(c) ('a' <= (c) && (c) <= 'z' ? (c) - 'a' + 'A' : (c))
+   
+   int main(void)
+   {
+       char s[SIZE];
+       int i;
+   
+       strcpy(s, "abcd");
+       i = 0;
+       putchar(TOUPPER(s[++i]));
+   
+       strcpy(s, "0123");
+       i = 0;
+       putchar(TOUPPER(s[++i]));
+   
+       return 0;
+   }
+   ```
+
+   **OUTS:**
+
+   ```
+   alancong@AlanCongdeMacBook-Air chapter_14 % ./a.out 
+   D2% 
+   ```
+
+   
+
+6. (a) 编写宏 DISP(f,x)，使其扩展为printf 函数的调用，显示函数f在参数为x时的值。
+   例如：`DISP(sqrt, 3.0);` 
+   应该扩展为  `printf("sqrt(%g) = %g\n", 3.0, sqrt(3.0));`  
+   (b) 编写宏`DISP2(f,x,y)`，类似DISP 但应用于有两个参数的函数。  
+
+   ```C
+   // a
+   #include<stdio.h>
+   #include<math.h>
+   
+   #define DISP(f, x) printf("%s" "(%g) = %g\n", #f, x, f(x))
+   
+   int main(void)
+   {
+       DISP(sqrt, 3.0);
+       return 0;
+   }
+   ```
+
+   **OUTS**
+
+   ```
+   alancong@AlanCongdeMacBook-Air chapter_14 % ./a.out 
+   fabs(3) = 3
+   ```
+
+   
+
+   ```C
+   // b
+   #include<stdio.h>
+   #include<math.h>
+   
+   #define DISP(f, x) printf("%s" "(%g) = %g\n", #f, x, f(x))
+   #define DISP2(f, x, y) printf("%s" "(%g, %g) = %g\n", #f, x, y, f(x, y))
+   
+   int main(void)
+   {
+       DISP(sqrt, 3.0);
+       DISP2(pow, 2.0, 2.0);
+       return 0;
+   }
+   ```
+
+   **OUTS**
+
+   ```
+   alancong@AlanCongdeMacBook-Air chapter_14 % ./a.out 
+   sqrt(3) = 1.73205
+   pow(2, 2) = 4
+   ```
+
+   
+
+7. *假定 GENERIC_MAX 是如下宏：  
+
+   ```C
+   #define GENERIC_MAX(type)       \  
+   type type##_max(type x, type y) \  
+   {                               \  
+     return x > y ? x : y;         \
+   }                               
+   ```
+
+   (a) 写出 GENERIC_MAX(long)被预处理器扩展后的形式。  
+   (b) 解释为什么GENERIC_MAX 不能应用于unsigned long 这样的基本类型。  
+   (c) 如何使GENERIC_MAX 可以用于unsigned long 这样的基本类型？提示：不要改变GENERIC_MAX 的定义。
+
+   ```C
+   // a
+   #define GENERIC_MAX(type)       \
+   type type##_max(type x, type y) \
+   {                               \
+     return x > y ? x : y;         \
+   }     
+   
+   int main(void)
+   {
+       GENERIC_MAX(long)
+   
+       return 0;
+   }
+   ```
+
+    **Attention!**
+
+   ```
+   使用的预处理器命令是cc -E 14_7.c这个是直接输出到终端的
+   如果要输出到文件就是cc -E 14_7.c -o 14_7.i
+   需要注意的是宏定义的反斜杠（\）后面不能紧跟空格或 tab，再换行，否则会导致编译器识别为非法的换行转义。
+   ```
+
+   **OUTS:**
+
+   ```C
+   alancong@AlanCongdeMacBook-Air chapter_14 % cc -E 14_7.c
+   # 1 "14_7.c"
+   # 1 "<built-in>" 1
+   # 1 "<built-in>" 3
+   # 466 "<built-in>" 3
+   # 1 "<command line>" 1
+   # 1 "<built-in>" 2
+   # 1 "14_7.c" 2
+   
+   
+   
+   
+   
+   
+   int main(void)
+   {
+       long long_max(long x, long y) { return x > y ? x : y; }
+   
+       return 0;
+   }
+   ```
+
+   ```
+   // b
+   因为unsigned long中间有空格，在替换的时候会再函数名多一个空格，导致错误，如下所示：
+   lancong@AlanCongdeMacBook-Air chapter_14 % cc -E 14_7.c
+   # 1 "14_7.c"
+   # 1 "<built-in>" 1
+   # 1 "<built-in>" 3
+   # 466 "<built-in>" 3
+   # 1 "<command line>" 1
+   # 1 "<built-in>" 2
+   # 1 "14_7.c" 2
+   
+   
+   
+   
+   
+   
+   int main(void)
+   {
+       unsigned long unsigned long_max(unsigned long x, unsigned long y) { return x > y ? x : y; }
+   
+       return 0;
+   }
+   ```
+
+   ```
+   // c
+   不会！
+   ```
+
+   **ANS:**
+
+   ```
+   (a)
+   
+   long long_max(long x, long y)
+   {
+     return x > y ? x : y;
+   }
+   The preprocessor would actually put all the tokens on one line, but this version is more readable.
+   
+   (b) The problem with types such as unsigned long is that they require two words, which prevents GENERIC_MAX from creating the desired function name. For example, GENERIC_MAX(unsigned long) would expand into
+   
+   unsigned long unsigned long_max(unsigned long x, unsigned long y)
+   {
+     return x > y ? x : y;
+   }
+   (c) To make GENERIC_MAX work with any basic type, use a type definition to rename the type:
+   
+   typedef unsigned long ULONG;
+   We can now write GENERIC_MAX(ULONG).
+   ```
+
+   
+
+8. *如果需要一个宏，使它扩展后包含当前行号和文件名。换言之，我们想把  
+   `const char *str = LINE_FILE;`  
+   扩展为  
+   `const char *str = "Line 10 of file foo.c";`  
+   其中foo.c是包含程序的文件，10是调用LINE_FILE的行号。
+   警告：这个练习仅针对高级程序员。尝试编写前请认真阅读“问与答”部分的内容！  
+
+   ```C
+   #include<stdio.h>
+   
+   #define STR(x) #x
+   #define STR2(x) STR(x)
+   
+   #define LINE_FILE "Line " STR2(__LINE__) " of file " __FILE__
+   
+   #line 9 "foo.c"
+   
+   const char *str = LINE_FILE;
+   
+   int main(void)
+   {
+       printf("%s\n", str);
+       
+       return 0;
+   }
+   ```
+
+   **OUTS**
+
+   ```
+   alancong@AlanCongdeMacBook-Air chapter_14 % ./a.out 
+   Line 10 of file foo.c
+   ```
+
+   **Attention！**
+
+   ```
+   /* C 语言宏展开：两层宏展开技巧 */
+   
+   // C 语言宏在预处理阶段是分两个阶段展开的：
+   // 1. 参数替换阶段
+   // 2. 宏体展开阶段
+   
+   // 解释：为什么需要两层宏？
+   // 当你使用 `#`（字符串化运算符）时，宏参数不会再被展开，而是直接转换成字面值字符串。
+   
+   // 举个例子：
+   #define LINE_FILE "Line " #__LINE__ " of file " __FILE__
+   // 你以为展开为： "Line 42 of file myfile.c"
+   // 但实际上展开为： "Line __LINE__ of file myfile.c"
+   // 这是因为 `#` 不会展开宏参数 `__LINE__`，它只是直接变成字面量 `"__LINE__"`。
+   
+   // 正确做法：使用两层宏展开
+   #define STR2(x) #x                  // 第一层宏：字符串化
+   #define STR(x) STR2(x)              // 第二层宏：展开宏参数后再字符串化
+   #define LINE_FILE "Line " STR(__LINE__) " of file " __FILE__
+   
+   // 执行过程：
+   // 1. STR(__LINE__) 展开为 STR2(42)
+   // 2. STR2(42) 展开为 "42"
+   // 结果："Line 42 of file myfile.c" ✔️
+   
+   // 总结：
+   // - 当你需要将宏参数转化为字符串时，必须先展开它，避免直接使用 `#` 来作用在未展开的宏参数上。
+   // - **两层宏展开** 是解决这一问题的有效方式。
+   
+   // 小贴士：
+   // - 记住：在宏中使用 `##`（拼接运算符）时，也需要小心类似的展开问题。
+   // - 两层宏展开常见应用：
+   //     - 打印调试信息（文件名、行号）
+   //     - 自动生成结构体字段
+   //     - 自动命名变量（尤其在宏中）
+   
+   // 示例：
+   #define TO_STRING(x) #x               // 把参数变成字符串
+   #define TO_NAME(x) name_##x           // 拼接变量名
+   #define EXPAND_AND_STRINGIFY(x) TO_STRING(x)  // 先展开，再字符串化
+   ```
+
+   
+
+9. 编写下列带参数的宏。  
+   (a) `CHECK(x,y,n)`——x 和y 都落在$0 \textasciitilde n-1$范围内（包括端点）时值为1。  
+   (b) `MEDIAN(x,y,z)`——计算x、y 和z的中位数。  
+   (c) `POLYNOMIAL(x)`——计算多项式$3x^5+2x^4-5x^3-x^2+7x-6$。  
+
+   ```C
+   #include<stdio.h>
+   #include<math.h>
+   
+   #define CHECK(x,y,n)  (((0 <= (x) && (x) < n) && (0 <= (y) && (y) < n)) ? 1 : 0)
+   #define MEDIAN(x,y,z)   ((((y) <= (x) && (x) <= (z)) || ((z) <= (x) && (x) <= (y))) ? x : \
+                           ((((x) <= (y) && (y) <= (z)) || ((z) <= (y) && (y) <= (x))) ? y : z))
+   #define POLYNOMIAL(x) (3 * pow(x, 5) + 2 * pow(x, 4) - 5 * pow(x, 3) - pow(x, 2) + 7 * (x) - 6)
+   #undef POLYNOMIAL
+   // 因为调用函数本身也会产生开销，例如
+   #define POLYNOMIAL(x) (3 * (x)*(x)*(x)*(x)*(x) + 2 * (x)*(x)*(x)*(x) - 5 * (x)*(x)*(x) - (x)*(x) + 7 * (x) - 6)
+   
+   int main(void)
+   {
+       if(CHECK(1, 2, 3))
+           printf("The x and y is in the range of 0 ~ n - 1\n");
+       
+       printf("The median of x:%d y:%d z:%d is %d\n", 4, 8, 2, MEDIAN(4, 8, 2));
+   
+       printf("the res of polynomial is %.2f\n", POLYNOMIAL(3.0));
+   
+       return 0;
+   }
+   ```
+
+   **ANS：**
+
+   ```
+   alancong@AlanCongdeMacBook-Air chapter_14 % ./a.out 
+   The x and y is in the range of 0 ~ n - 1
+   The median of x:4 y:8 z:2 is 4
+   the res of polynomial is 762.00
+   ```
+
+   ```
+   // 为什么直接用乘法计算多项式要比调用函数计算多项式要更有利于性能的提升？
+   函数调用的开销主要涉及参数传递、栈操作、控制流跳转、寄存器保存和返回值传递等方面。函数参数传递的方式（通过寄存器或栈）直接影响性能，寄存器传递较高效，而栈传递则增加了压栈和弹栈的开销。函数调用的深度和递归调用会导致更大的栈操作开销，尤其是递归时，每次调用都会占用更多的栈空间，增加系统开销。编译器优化，如内联函数，可以消除函数调用的开销，尤其适用于短小、频繁调用的函数，但过度内联可能会导致代码膨胀，影响缓存效率。不同架构对函数调用的支持也不同，例如x86-64通过寄存器传递参数，较为高效，而旧的x86则依赖栈传递。总体而言，合理避免深度递归和频繁的函数调用，特别是涉及复杂参数传递的调用，并合理使用内联函数，可以有效减少函数调用的开销，提升程序性能。
+   ```
+
+   
 10. 函数常常（但不总是）可以写为带参数的宏。讨论函数的哪些特性会使其不适合写为宏的形式。  
-11. C程序员常用fprintf函数（ 22.3节）来输出出错消息：  345 fprintf(stderr, "Range error: index = %d\n", index);  其中stderr流（22.1节）是C的“标准误差”流。其他参数与printf函数的参数一样，以格式串 开始。编写名为ERROR的宏来生成上面的fprintf调用，宏的参数是格式串和需要显示的项：  ERROR("Range error: index = %d\n", index);   
+
+    ```
+    (1).副作用问题
+    如果宏的参数包含副作用（如递增操作 x++ 或函数调用 func()），那么宏的展开可能会多次执行该操作，导致不期望的副作用。例如，宏 SQUARE(x) 展开为 (x) * (x)，如果传递的 x 是 a++，则会导致 a++ 被执行两次，产生不可预期的行为。函数则避免了这个问题，因为函数的参数有副作用也仅在函数体内执行一次。
+    
+    (2).调试困难
+    宏在预处理阶段展开，因此调试时无法像普通函数那样逐行跟踪。如果在宏展开过程中出错，调试过程会变得复杂，错误消息也不容易理解。函数调用则提供了更清晰的栈跟踪和调试信息。
+    
+    (3).类型安全性
+    宏不执行类型检查，可能会导致类型不匹配的错误。例如，宏 MAX(x, y) 不会检查 x 和 y 的类型一致性，导致意外的行为。函数则在编译时进行类型检查，避免了这种风险。
+    
+    (4).表达式求值顺序
+    在宏中，参数会在宏展开时进行求值，这可能会导致求值顺序的不可控性。比如，MAX(x++, y++) 可能会导致 x++ 和 y++ 被多次执行，产生意料之外的结果。函数则按参数的顺序求值，并且可以通过合理控制避免此类问题。
+    
+    (5).代码膨胀
+    宏会在每个调用点进行展开，这可能会导致代码膨胀，尤其是在宏较大或调用频繁的情况下。大量的宏展开可能使得可执行文件变得很大，影响缓存和性能。函数则只有一个定义，调用时只是跳转到该函数。
+    
+    (6).可维护性和可读性
+    宏的代码往往不如函数的代码结构清晰，尤其是在处理复杂的逻辑时。宏可能会在预处理阶段被展开，导致程序的逻辑在源代码中不易追踪。函数则有明确的函数体和作用域，更容易维护和理解。
+    
+    (7).递归和复杂逻辑
+    宏不适合递归和复杂逻辑的实现。由于宏只是简单的文本替换，处理递归和复杂控制流时，宏可能会导致错误的展开或逻辑问题。函数可以支持递归和更复杂的控制流，这在宏中是不容易实现的。
+    ```
+
+    
+11. C程序员常用fprintf函数（ 22.3节）来输出出错消息：
+    `fprintf(stderr, "Range error: index = %d\n", index);`  
+    其中stderr流（22.1节）是C的“标准误差”流。其他参数与printf函数的参数一样，以格式串开始。编写名为ERROR的宏来生成上面的fprintf调用，宏的参数是格式串和需要显示的项：  
+    `ERROR("Range error: index = %d\n", index);`   
+
+    ```C
+    // Although this code works, it does not follow the recommended approach in the problem statement.
+    #include <stdio.h>
+    
+    #define ERROR(x, y) fprintf(stderr, x, y)
+    
+    int main(void)
+    {
+        int index = 1;
+        ERROR("Range error: index = %d\n", index);
+        return 0;
+    }
+    ```
+
+    **ANS：**
+
+    ```
+    alancong@AlanCongdeMacBook-Air chapter_14 % ./a.out 
+    Range error: index = 1
+    ```
+
+    
+
+    ```C
+    // The suggested approach uses variable arguments with __VA_ARGS__ to handle multiple parameters  more flexibly and correctly.
+    #include <stdio.h>
+    
+    #define ERROR(fmt, ...) fprintf(stderr, fmt, __VA_ARGS__)
+    
+    int main(void)
+    {
+        int index = 1;
+        ERROR("Range error: index = %d\n", index);
+        return 0;
+    }
+    ```
+
+    **ANS：**
+
+    ```
+    alancong@AlanCongdeMacBook-Air chapter_14 % ./a.out 
+    Range error: index = 1
+    ```
+
+    
 
 14.4节  
 
-12. 假定宏M有如下定义：   #define M 10    下面哪些测试会失败？   (a) #if M   (b) #ifdef M   (c) #ifndef M   (d) #if defined(M)   (e) #if !defined(M)  
+12. 假定宏M有如下定义： `#define M 10` 下面哪些测试会失败？   
+
+    ```
+    (a) #if M   
+    (b) #ifdef M   
+    (c) #ifndef M   
+    (d) #if defined(M)   
+    (e) #if !defined(M)  
+    ```
+
+    ```
+    (c) and (e) will fail, since M is defined.
+    ```
+
+    
 
 13. (a) 指出下面的程序在预处理后的形式。因为包含了头而多出来的代码行可以忽略。   
 
+    ```C
+    #include <stdio.h>
+    #define N 100
+    void f(void);
+    int main(void)
+    {
+        f();
+    #ifdef N
+    #undef N
+    #endif
+        return 0;
+    }
+    void f(void)
+    {
+    #if defined(N)
+        printf("N is %d\n", N);
+    #else
+        printf("N is undefined\n");
+    #endif
+    }
     ```
-    #include    #define N 100   void f(void);   int main(void)  {   f();  #ifdef N  #undef N  #endif   return 0;  }   void f(void)  {  #if defined(N)   printf("N is %d\n", N);  #else   printf("N is undefined\n");  #endif  }  
-    ```
-
+    
       (b) 这个程序的输出是什么？  
+    
+    ```C
+    // a
+    void f(void);
+    int main(void)
+    {
+        f();
+    
+    
+    
+        return 0;
+    }
+    void f(void)
+    {
+    
+    
+    
+        printf("N is undefined\n");
+    
+    }
+    ```
+    
+    ```
+    // b 输出如下所示
+    alancong@AlanCongdeMacBook-Air chapter_14 % ./a.out 
+    N is undefined
+    ```
+    
+    
 
-\*14.指出下面的程序在预处理后的形式。其中有几行可能会导致编译错误，请找出这些错误。   #define N = 10  #define INC(x) x+1  #define SUB (x,y) x-y  #define SQR(x) ((x)*(x))  #define CUBE(x) (SQR(x)*(x))  #deflne M1(x,y) x##y  #define M2(x,y) #x #y   int main(void)  {   int a[N], i, j, k, m;   #ifdef N   i = j;\#else   j = i;  #endif   i = 10 * INC(j);   i = SUB(j, k);   i = SQR(SQR(j));   i = CUBE(j);   i = M1(j, k);   puts(M2(i, j));  #undef SQR   i = SQR(j);  #define SQR   i = SQR(j);   return 0;  }  
+14. 指出下面的程序在预处理后的形式。其中有几行可能会导致编译错误，请找出这些错误。   
 
-15. 假定程序需要用英语、法语或西班牙语显示消息。使用条件编译编写程序片段，根据指定的宏是否 定义来显示出下列3条消息中的一条。  Insert Disk 1  (如果定义了ENGLISH)  Inserez Le Disque 1 (如果定义了FRENCH)  Inserte El Disco 1  (如果定义了SPANISH)  
+    ```C
+    #define N = 10
+    #define INC(x) x + 1 
+    #define SUB(x, y) x - y 
+    #define SQR(x)((x) * (x)) 
+    #define CUBE(x)(SQR(x) * (x)) 
+    #deflne M1(x, y) x##y 
+    #define M2(x, y) #x #y 
+    
+    int main(void)
+    {
+        int a[N], i, j, k, m;
+    #ifdef N 
+      i = j;
+    #else 
+      j = i;
+    #endif 
+      
+      	i = 10 * INC(j);
+        i = SUB(j, k);
+        i = SQR(SQR(j));
+        i = CUBE(j);
+        i = M1(j, k);
+        puts(M2(i, j));
+      
+    #undef SQR i = SQR(j);
+    #define SQR i = SQR(j);
+      
+        return 0;
+    }
+    ```
+
+    ```
+    // 第六行的i写成了l
+    alancong@AlanCongdeMacBook-Air chapter_14 % cc -E 14_14.c
+    # 1 "14_14.c"
+    # 1 "<built-in>" 1
+    # 1 "<built-in>" 3
+    # 466 "<built-in>" 3
+    # 1 "<command line>" 1
+    # 1 "<built-in>" 2
+    # 1 "14_14.c" 2
+    14_14.c:6:2: error: invalid preprocessing directive
+        6 | #deflne M1(x, y) x##y 
+          |  ^
+    
+    
+    
+    
+    
+    
+    
+    
+    int main(void)
+    {
+        int a[= 10], i, j, k, m;
+    
+      i = j;
+    
+    
+    
+    
+       i = 10 * j + 1;
+        i = j - k;
+        i = ((((j) * (j))) * (((j) * (j))));
+        i = (((j) * (j)) * (j));
+        i = M1(j, k);
+        puts("i" "j");
+    
+    
+        i = SQR(j);
+    
+        i = (j);
+    
+        return 0;
+    }
+    1 error generated.
+    ```
+
+    **ANS：**
+
+    ```C
+    Blank line
+    Blank line
+    Blank line
+    Blank line
+    Blank line
+    Blank line
+    Blank line
+    
+    int main(void)
+    {
+      int a[= 10], i, j, k, m;
+    
+    Blank line
+      i = j;
+    Blank line
+    Blank line
+    Blank line
+    
+      i = 10 * j+1;
+      i = (x,y) x-y(j, k);
+      i = ((((j)*(j)))*(((j)*(j))));
+      i = (((j)*(j))*(j));
+      i = jk;
+      puts("i" "j");
+    
+    Blank line
+      i = SQR(j);
+    Blank line
+      i = (j);
+    
+      return 0;
+    }
+    Some preprocessors delete white-space characters at the beginning of a line, so your results may vary. Three lines will cause errors when the program is compiled. Two contain syntax errors:
+    
+    int a[= 10], i, j, k, m;
+    i = (x,y) x-y(j, k);
+    The third refers to an undefined variable:
+    
+    i = jk;
+    ```
+
+    
+
+15. 假定程序需要用英语、法语或西班牙语显示消息。使用条件编译编写程序片段，根据指定的宏是否定义来显示出下列3条消息中的一条。  
+
+    ```
+    Insert Disk 1        (如果定义了ENGLISH)  
+    Inserez Le Disque 1  (如果定义了FRENCH)  
+    Inserte El Disco 1   (如果定义了SPANISH)  
+    ```
+
+    ```C
+    #include<stdio.h>
+    
+    #define ENGLISH
+    
+    int main(void)
+    {
+    #if defined ENGLISH
+        printf("Insert Disk 1\n");
+    #elif defined FRENCH
+        printf("Inserez Le Disque 1\n");
+    #elif defined SPANISH
+        printf("Inserte El Disco 1\n");
+    #else
+        printf("No language selected\n");
+    #endif
+        return 0;
+    }
+    ```
+
+    ```C
+    alancong@AlanCongdeMacBook-Air chapter_14 % ./a.out 
+    Insert Disk 1
+    ```
+
+    
 
 14.5 节  
 
-*16.  假定有下列宏定义：  #define IDENT(x) PRAGMA(ident #x)  #define PRAGMA(x) _Pragma(#x)  下面的代码行在宏扩展之后会变成什么样子？  IDENT(foo)
+16. 假定有下列宏定义：  
+
+    ```
+    #define IDENT(x) PRAGMA(ident #x)  
+    #define PRAGMA(x) _Pragma(#x)  
+    ```
+
+    下面的代码行在宏扩展之后会变成什么样子？  
+
+    ```
+    IDENT(foo)
+    ```
+
+    ```C
+    #define IDENT(x) PRAGMA(ident #x)  
+    #define PRAGMA(x) _Pragma(#x)  
+    
+    int main(void)
+    {
+        IDENT(foo)
+        return 0;
+    }
+    ```
+
+    ```
+    // the output is below
+    // use the instruction cc -E 14_15.c
+    
+    
+    
+    int main(void)
+    {
+    #pragma ident "foo"
+        return 0;
+    }
+    ```
+
+    
 
 ## 第十五章 编写大型程序
 
@@ -13843,31 +14700,31 @@ White advanced!
 
 4. 假设debug.h是具有如下内容的头文件：   
 
-```C
-#ifdef DEBUG  
-#define PRINT_DEBUG(n) printf("Value of " #n ": %d\n", n)  
-#else  
-#define PRINT_DEBUG(n)  
-#endif    
-```
+   ```
+   #ifdef DEBUG  
+   #define PRINT_DEBUG(n) printf("Value of " #n ": %d\n", n)  
+   #else  
+   #define PRINT_DEBUG(n)  
+   #endif    
+   ```
 
-假定源文件testdebug.c的内容如下：   
+   假定源文件testdebug.c的内容如下：   
 
-```C
-#include    
-#define DEBUG  
-#include "debug.h"   
-int main(void)  
-{    
-  int i = 1, j = 2, k = 3;   
-  #ifdef DEBUG   
-  printf("Output if DEBUG is defined:\n");  #else   printf("Output if DEBUG is not defined:\n");  #endif    PRINT_DEBUG(i);   PRINT_DEBUG(j);   PRINT_DEBUG(k);   PRINT_DEBUG(i + j);   PRINT_DEBUG(2 * i + j - k);    return 0;  }  
-```
+   ```
+   #include    
+   #define DEBUG  
+   #include "debug.h"   
+   int main(void)  
+   {    
+     int i = 1, j = 2, k = 3;   
+     #ifdef DEBUG   
+     printf("Output if DEBUG is defined:\n");  #else   printf("Output if DEBUG is not defined:\n");  #endif    PRINT_DEBUG(i);   PRINT_DEBUG(j);   PRINT_DEBUG(k);   PRINT_DEBUG(i + j);   PRINT_DEBUG(2 * i + j - k);    return 0;  }  
+   ```
 
-(a) 程序执行时的输出是什么？    
-(b) 如果从testdebug.c中删去#define指令，输出又是什么？   
-(c) 解释(a)和(b)中的输出为什么不同。   
-(d) 为了使PRINT_DEBUG能起到预期的效果，把DEBUG宏的定义放在包含debug.h的指令之前是否有 必要？验证你的结论。 
+   (a) 程序执行时的输出是什么？    
+   (b) 如果从testdebug.c中删去#define指令，输出又是什么？   
+   (c) 解释(a)和(b)中的输出为什么不同。   
+   (d) 为了使PRINT_DEBUG能起到预期的效果，把DEBUG宏的定义放在包含debug.h的指令之前是否有 必要？验证你的结论。 
 
 15.4 节  
 
