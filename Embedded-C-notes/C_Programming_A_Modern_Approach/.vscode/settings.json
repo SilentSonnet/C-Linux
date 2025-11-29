@@ -21,6 +21,8 @@
         "__bit_reference": "c",
         "array": "c",
         "iterator": "c",
-        "unordered_map": "c"
+        "unordered_map": "c",
+        "stack.h": "c",
+        "rpn_calculator.h": "c"
     }
 }
