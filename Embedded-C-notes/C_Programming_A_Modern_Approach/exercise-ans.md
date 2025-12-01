@@ -15161,11 +15161,27 @@ White advanced!
 
 16.1 节  
 
-1. 在下列声明中，结构x和结构y都拥有名为x和y的成员：struct { int x,  y; } x;  struct { int x,  y; } y;  单独出现时，这两个声明是否合法？两个声明是否可以同时出现在程序中呢？验证你的答案。  
+1. 在下列声明中，结构x和结构y都拥有名为x和y的成员：
+   `struct { int x,  y; } x;
+   struct { int x,  y; } y;`  
+   单独出现时，这两个声明是否合法？两个声明是否可以同时出现在程序中呢？验证你的答案。  
+
+   ```
+   
+   ```
+
+   
+
 2. (a) 声明名为 c1、c2 和c3 的结构变量，每个结构变量都拥有double类型的成员real和imaginary。  
    (b) 修改(a)中的声明，使c1的成员初始值为0.0和1.0，c2的成员初始值为1.0和0.0。（c3不初始化。）  
    (c) 编写语句把c2的成员复制给c1。这项操作可以在一条语句中完成，还是必须要两条语句？  
    (d) 编写语句把c1和c2的对应成员相加，并且把结果存储在c3中。  
+
+   ```
+   
+   ```
+
+   
 
 16.2 节  
 
@@ -15175,41 +15191,182 @@ White advanced!
    (d) 编写名为add_complex 的函数，此函数用来把两个实际参数（都是complex结构）的对应成员相 加，然后返回结果（另一个complex结构）。  
 4. 重做练习题3，这次要求使用名为Complex的类型。  
 5. 编写下列函数，假定date结构包含三个成员：month、day和year（都是int类型）。  
-   (a) int day_of_year(struct date d);  返回d是一年中的第多少天（1~366范围内的整数）。  
-   (b) int compare_dates(struct date d1, struct date d2);  如果日期d1在d2之前，返回1；如果d1在d2之后，返回+1；如果d1和d2相等，返回0。  
-6. 编写下列函数，假定time结构包含三个成员：hours、minutes和seconds（都是int类型）。  struct time split_time(long total_seconds);  total_seconds 是从午夜开始的秒数。函数返回一个包含等价时间的结构，等价的时间用小时 （0~23）、分钟（0~59）和秒（0~59）表示。  
-7. 假定fraction 结构包含两个成员：numerator和denominator（都是int类型）。编写函数完成下 列分数运算。  (a) 把分数 f 化为最简形式。提示：为了把分数化为最简形式，首先计算分子和分母的最大公约数 （GCD），然后把分子和分母都除以该最大公约数。  (b) 把分数f1 和f2相加。  (c) 从分数f1 中减去分数f2。  (d) 把分数f1 和f2相乘。  (e) 用分数f1 除以分数f2。  分数f、f1和f2都是struct fraction类型的参数。每个函数返回一个struct fraction类 型的值。(b)~(e)中函数返回的分式应为最简形式。提示：可以使用(a)中的函数辅助编写(b)~(e)中的 函数。  
-8. 设 color 是如下的结构：  struct color {  int red;  int green;  int blue;  };  407 408 (a) 为 struct color 类型的 const 变量MAGENTA 编写声明，成员的值分别为255、0和255。(b)重复上题，但是使用指示器。要求不指定green的值，使其默认为0。  
-9. 编写下列函数。（color结构的定义见练习题8。）  (a) struct color make_color(int red, int green, int blue);  函数返回一个包含指定的red、green和blue值的color结构。如果参数小于0，把结构的对应 成员置为0。如果参数大于255，把结构的对应成员置为255。  (b) int getRed(struct color c);  函数返回c的red成员的值。  (c) bool equal_color(struct color color1, struct color color2);  如果color1 和color2 的对应成员相等，函数返回true。  (d) struct color brighter(struct color c);  函数返回一个表示颜色c的更亮版本的color 结构。该结构等同于c，但每个成员都除以了0.7 （把结果截断为整数）。但是，有３种特殊情形：(1) 如果c的所有成员都为0，函数返回一个所 有成员的值都为3的颜色；(2) 如果c的任意成员比0大且比3小，那么在除以0.7之前将其置为 3；(3) 如果除以0.7之后得到了超过255的成员，将其置为255。  (e) struct color darker(struct color c);  函数返回一个表示颜色c的更暗版本的color 结构。该结构等同于c，但每个成员都乘以了0.7 （把结果截断为整数）。  
+   (a) int day_of_year(struct date d);  
+   返回d是一年中的第多少天（1~366范围内的整数）。  
+   (b) int compare_dates(struct date d1, struct date d2);  
+   如果日期d1在d2之前，返回-1；如果d1在d2之后，返回+1；如果d1和d2相等，返回0。  
+6. 编写下列函数，假定time结构包含三个成员：hours、minutes和seconds（都是int类型）。  
+   struct time split_time(long total_seconds);  
+   total_seconds 是从午夜开始的秒数。
+   函数返回一个包含等价时间的结构，等价的时间用小时 （0~23）、分钟（0~59）和秒（0~59）表示。  
+7. 假定fraction 结构包含两个成员：numerator和denominator（都是int类型）。
+   编写函数完成下 列分数运算。  
+   (a) 把分数 f 化为最简形式。提示：为了把分数化为最简形式，首先计算分子和分母的最大公约数 （GCD），然后把分子和分母都除以该最大公约数。  
+   (b) 把分数f1 和f2相加。  
+   (c) 从分数f1 中减去分数f2。  
+   (d) 把分数f1 和f2相乘。  
+   (e) 用分数f1 除以分数f2。  
+   分数f、f1和f2都是struct fraction类型的参数。每个函数返回一个struct fraction类 型的值。(b)~(e)中函数返回的分式应为最简形式。提示：可以使用(a)中的函数辅助编写(b)~(e)中的 函数。  
+8. 设 color 是如下的结构：  
+
+   ```C
+   struct color {  
+     int red;  
+     int green;  
+     int blue;  
+   };  
+   ```
+
+   (a) 为 struct color 类型的 const 变量MAGENTA 编写声明，成员的值分别为255、0和255。
+   (b)重复上题，但是使用指示器。要求不指定green的值，使其默认为0。  
+9. 编写下列函数。（color结构的定义见练习题8。）  
+   (a) struct color make_color(int red, int green, int blue);  函数返回一个包含指定的red、green和blue值的color结构。如果参数小于0，把结构的对应 成员置为0。如果参数大于255，把结构的对应成员置为255。  
+   (b) int getRed(struct color c);  函数返回c的red成员的值。  
+   (c) bool equal_color(struct color color1, struct color color2);  如果color1 和color2 的对应成员相等，函数返回true。  
+   (d) struct color brighter(struct color c);  函数返回一个表示颜色c的更亮版本的color 结构。该结构等同于c，但每个成员都除以了0.7 （把结果截断为整数）。但是，有３种特殊情形：(1) 如果c的所有成员都为0，函数返回一个所 有成员的值都为3的颜色；(2) 如果c的任意成员比0大且比3小，那么在除以0.7之前将其置为 3；(3) 如果除以0.7之后得到了超过255的成员，将其置为255。  
+   (e) struct color darker(struct color c);  函数返回一个表示颜色c的更暗版本的color 结构。该结构等同于c，但每个成员都乘以了0.7 （把结果截断为整数）。  
 
 16.3 节  
 
-10. 下列结构用来存储图形屏幕上的对象信息。  struct point { int x,  y; };  struct rectangle { struct point upper_left, lower_right; };  409  结构point 用来存储屏幕上点的x和y坐标，结构rectangle用来存储矩形的左上和右下坐标点。 编写函数，要求可以在rectangle结构变量r上执行下列操作，且r作为实际参数传递。  (a) 计算 r的面积。  (b) 计算r的中心，并且把此中心作为point值返回。如果中心的x或y坐标不是整数，在point结 构中存储截断后的值。  (c) 将 r 沿x轴方向移动x个单位，沿 y 轴移动y个单位，返回r修改后的内容。（x和y是函数的另 外两个实际参数。）  (d) 确定点p是否位于r内，返回true或者false。（p是struct point类型的另外一个实际参数。）  
+10. 下列结构用来存储图形屏幕上的对象信息。  
+    `struct point { int x,  y; };`  
+    `struct rectangle { struct point upper_left, lower_right; };` 
+    结构point 用来存储屏幕上点的x和y坐标，结构rectangle用来存储矩形的左上和右下坐标点。 编写函数，要求可以在rectangle结构变量r上执行下列操作，且r作为实际参数传递。  
+    (a) 计算 r的面积。  
+    (b) 计算r的中心，并且把此中心作为point值返回。如果中心的x或y坐标不是整数，在point结 构中存储截断后的值。  
+    (c) 将 r 沿x轴方向移动x个单位，沿 y 轴移动y个单位，返回r修改后的内容。（x和y是函数的另 外两个实际参数。）  
+    (d) 确定点p是否位于r内，返回true或者false。（p是struct point类型的另外一个实际参数。）  
 
 16.4 节  
 
-11. 假设s是如下结构：  struct {   double a;   union {     char b[4];     double c;     int d;   } e;   char f[4];  } s;  如果char类型值占1字节，int类型值占4字节，double类型值占8字节，那么C编译器将为s分 配多大的内存空间？（假设编译器没有在成员之间留“空洞”。）  
-12. 假设u是如下联合：union {   double a;   struct {     char b[4];     double c;     int d;   } e;   char f[4];  } u;  如果char类型值占1字节，int类型值占4字节，double类型值占8字节，那么C编译器将为u分 配多大的内存空间？（假设编译器没有在成员之间留“空洞”。）  
-13. 假设s是如下结构（point是在练习题10中声明的结构标记）：  struct shape {   int shape_kind;        /* RECTANGLE or CIRCLE */   struct point center;   /* coordinates of center */   union {     struct {       int height, width;     } rectangle;     struct {       int radius;     } circle;   } u;  } s;  如果 shape_kind 的值为 RECTANGLE，那么 height 和 width 成员分别存储矩形的两维。如果 shape_kind的值为CIRCLE，那么radius成员存储圆形的半径。请指出下列哪些语句是合法的，并 说明如何修改不合法的语句。  (a) s.shape_kind = RECTANGLE;  (b) s.center.x = 10;  (c) s.height = 25;  (d) s.u.rectangle.width = 8;  (e) s.u.circle = 5;  (f)  s.u.radius = 5;  
-14. 假设shape 是练习题13中声明的结构标记。编写函数在shape类型结构变量s上完成下列操作，并 且s作为实际参数传递给函数。  (a) 计算 s 的面积。  (b) 将 s 沿x轴方向移动x个单位，沿 y 轴移动y个单位，返回s修改后的内容。（x和y是函数的另外 两个实际参数。）  (c) 把 s 缩放c倍（c是double 类型的值），返回 s修改后的内容。（c是函数的另外一个实际参数。）  
+11. 假设s是如下结构：  
+
+    ```C
+    struct {   
+      double a;   
+      union {     
+        char b[4];     
+        double c;     
+        int d;   
+      } e;   
+      char f[4];  
+    } s; 
+    ```
+
+
+    如果char类型值占1字节，int类型值占4字节，double类型值占8字节，那么C编译器将为s分配多大的内存空间？（假设编译器没有在成员之间留“空洞”。）  
+12. 假设u是如下联合：
+
+    ```C
+    union
+    {
+        double a;
+        struct
+        {
+            char b[4];
+            double c;
+            int d;
+        } e;
+        char f[4];
+    } u;
+    ```
+
+    如果char类型值占1字节，int类型值占4字节，double类型值占8字节，那么C编译器将为u分配多大的内存空间？（假设编译器没有在成员之间留“空洞”。）  
+13. 假设s是如下结构（point是在练习题10中声明的结构标记）：  
+
+    ```C
+    struct shape
+    {
+        int shape_kind;      /* RECTANGLE or CIRCLE */
+        struct point center; /* coordinates of center */
+        union
+        {
+            struct
+            {
+                int height, width;
+            } rectangle;
+            struct
+            {
+                int radius;
+            } circle;
+        } u;
+    } s;
+    ```
+
+    如果 shape_kind 的值为 RECTANGLE，那么 height 和 width 成员分别存储矩形的两维。如果 shape_kind的值为CIRCLE，那么radius成员存储圆形的半径。请指出下列哪些语句是合法的，并 说明如何修改不合法的语句。  
+
+    ```
+    (a) s.shape_kind = RECTANGLE;  
+    (b) s.center.x = 10;  
+    (c) s.height = 25;  
+    (d) s.u.rectangle.width = 8;  
+    (e) s.u.circle = 5;  
+    (f)  s.u.radius = 5;  
+    ```
+
+    
+14. 假设shape 是练习题13中声明的结构标记。编写函数在shape类型结构变量s上完成下列操作，并且s作为实际参数传递给函数。  
+    (a) 计算 s 的面积。  
+    (b) 将 s 沿x轴方向移动x个单位，沿 y 轴移动y个单位，返回s修改后的内容。（x和y是函数的另外 两个实际参数。）  
+    (c) 把 s 缩放c倍（c是double 类型的值），返回 s修改后的内容。（c是函数的另外一个实际参数。）  
 
 16.5 节  
 
-15. (a) 为枚举声明标记，此枚举的值表示一周中的7天。  (b) 用 typedef 定义(a)中枚举的名字。  
+15. (a) 为枚举声明标记，此枚举的值表示一周中的7天。  
+    (b) 用 typedef 定义(a)中枚举的名字。  
 
-16. 下列关于枚举常量的叙述，哪些是正确的？  (a) 枚举常量可以表示程序员指定的任何整数。  (b) 枚举常量具有的性质和用#define创建的常量的性质完全一样。  (c) 枚举常量的默认值为0, 1, 2, …。 (d) 枚举中的所有常量必须具有不同的值。   (e) 枚举常量在表达式中可以作为整数使用。  
+16. 下列关于枚举常量的叙述，哪些是正确的？  
+    (a) 枚举常量可以表示程序员指定的任何整数。  
+    (b) 枚举常量具有的性质和用#define创建的常量的性质完全一样。  
+    (c) 枚举常量的默认值为0, 1, 2, …。 
+    (d) 枚举中的所有常量必须具有不同的值。   
+    (e) 枚举常量在表达式中可以作为整数使用。  
 
-17.  假设b和i以如下形式声明：   enum {FALSE, TRUE} b;  int i;    下列哪些语句是合法的？哪些是“安全的”（始终产生有意义的结果）？   (a) b = FALSE;  (b)  b = i;    (c) b++;   (d)  i = b;    (e) i = 2 * b + 1;  
+17. 假设b和i以如下形式声明：   
 
-18.  (a) 国际象棋棋盘的每个方格中可能有一个棋子，即兵、马、象、车、皇后或国王，也可能为空。每个 棋子可能是黑色的，也可能是白色的。请定义两个枚举类型：Piece用来包含7种可能的值（其 中一种为“空”），Color用来表示2种颜色。   (b) 利用(a)中的类型，定义名为Square的结构类型，使此类型可以存储棋子的类型和颜色。   (c) 利用(b)中的Square类型，声明一个名为board的8×8的数组，使此数组可以用来存储棋盘上的 全部内容。   (d) 给(c)中的声明添加初始化器，使board的初始值对应国际象棋比赛开始时的棋子布局。没有棋子 的方格值为“空”且颜色为黑色。  
+    ```
+    enum {FALSE, TRUE} b;  
+    int i;  
+    ```
 
-19. 声明一个具有如下成员的结构，其标记为pinball_machine：   name，字符串，最多有40个字符；   year，整数，表示制造年份；   type，枚举类型的值，可能的取值为EM（机电式的）和SS（固态电路的）；   players，整数，表示玩家的最大数目。  
+    下列哪些语句是合法的？哪些是“安全的”（始终产生有意义的结果）？   
 
-20. 假定direction变量声明如下：   enum {NORTH, SOUTH, EAST, WEST} direction;    设x和y为int类型的变量。编写switch语句测试direction的值，如果值为EAST就使x增1， 如果值为WEST就使x减1，如果值为SOUTH就使y增1，如果值为NORTH就使y减1。  
+    ```
+    (a) b = FALSE;  
+    (b)  b = i;    
+    (c) b++;   
+    (d)  i = b;    
+    (e) i = 2 * b + 1;  
+    ```
+
+    
+
+18. (a) 国际象棋棋盘的每个方格中可能有一个棋子，即兵、马、象、车、皇后或国王，也可能为空。每个棋子可能是黑色的，也可能是白色的。请定义两个枚举类型：Piece用来包含7种可能的值（其中一种为“空”），Color用来表示2种颜色。   
+    (b) 利用(a)中的类型，定义名为Square的结构类型，使此类型可以存储棋子的类型和颜色。   
+    (c) 利用(b)中的Square类型，声明一个名为board的8×8的数组，使此数组可以用来存储棋盘上的全部内容。   (d) 给(c)中的声明添加初始化器，使board的初始值对应国际象棋比赛开始时的棋子布局。没有棋子的方格值为“空”且颜色为黑色。  
+
+19. 声明一个具有如下成员的结构，其标记为pinball_machine：   
+
+    ```
+    name，字符串，最多有40个字符；   
+    year，整数，表示制造年份；   
+    type，枚举类型的值，可能的取值为EM（机电式的）和SS（固态电路的）；   
+    players，整数，表示玩家的最大数目。
+    ```
+
+      
+
+20. 假定direction变量声明如下：   
+
+    ```C
+    enum {NORTH, SOUTH, EAST, WEST} direction;
+    ```
+
+    设x和y为int类型的变量。编写switch语句测试direction的值，如果值为EAST就使x增1， 如果值为WEST就使x减1，如果值为SOUTH就使y增1，如果值为NORTH就使y减1。  
 
 21. 下列声明中，枚举常量的整数值分别是多少？   
 
-    ```
+    ```C
     (a) enum {NUL, SOH, STX, ETX};   
     (b) enum {VT = 11, FF, CR};   
     (c) enum {SO = 14, SI, DLE, CAN = 24, EM};   
@@ -15218,16 +15375,19 @@ White advanced!
 
     
 
-22. 枚举chess_pieces声明如下：   enum chess_pieces {KING, QUEEN, ROOK, BISHOP, KNIGHT, PAWN};    (a) 为名为piece_value的整数常数数组编写声明（包含一个初始化器），这个数组存储数200、9、 5、3、3和1，分别表示从国王到兵这些棋子。［国王的值实际上是无穷大，因为一旦王被擒（将 死）则游戏结束，但一些象棋软件会给国王分配一个类似200的较大值。］   (b) 重复上题，但是使用指示器来初始化数组。把chess_pieces中的枚举常量作为指示器的下 标使用。（提示：参考“问与答”部分的最后一个问题。）
+22. 枚举chess_pieces声明如下：   
+    `enum chess_pieces {KING, QUEEN, ROOK, BISHOP, KNIGHT, PAWN};`    
+    (a) 为名为piece_value的整数常数数组编写声明（包含一个初始化器），这个数组存储数200、9、 5、3、       3和1，分别表示从国王到兵这些棋子。［国王的值实际上是无穷大，因为一旦王被擒（将死）则游戏结   束，但一些象棋软件会给国王分配一个类似200的较大值。］   
+    (b) 重复上题，但是使用指示器来初始化数组。把chess_pieces中的枚举常量作为指示器的下标使用。（提示：参考“问与答”部分的最后一个问题。）
 
 ### 编程题
 
-1. 编写程序要求用户输入国际电话区号，然后在数组country_codes中查找它（见16.3节）。如果找 到对应的区号，程序需要显示相应的国家（地区）名称，否则显示出错消息。  
+1. 编写程序要求用户输入国际电话区号，然后在数组country_codes中查找它（见16.3节）。如果找到对应的区号，程序需要显示相应的国家（地区）名称，否则显示出错消息。  
 1. 修改16.3节的inventory.c程序，使p（显示）操作可以按零件编号的顺序显示零件。  
 1. 修改16.3节的inventory.c程序，使inventory 和num_parts 局部于main 函数。  
-1. 修改16.3节的inventory.c程序，为结构part添加成员price。insert函数应该要求用户输入新商品 的价格。serach函数和print函数应该显示价格。添加一条新的命令，允许用户修改零件的价格。  
-1. 修改第5章的编程题8，以便用一个单独的数组存储时间。数组的元素都是结构，每个结构包含航班 的起飞时间和抵达时间。（时间都是整数，表示从午夜开始的分钟数。）程序用一个循环从数组中搜 索与用户输入的时间最接近的起飞时间。  
-1. 修改第5章的编程题9，以便用户输入的日期都存储在一个date结构（见练习题5）中。把练习题5 中的compare_dates 函数集成到你的程序中。
+1. 修改16.3节的inventory.c程序，为结构part添加成员price。insert函数应该要求用户输入新商品的价格。serach函数和print函数应该显示价格。添加一条新的命令，允许用户修改零件的价格。  
+1. 修改第5章的编程题8，以便用一个单独的数组存储时间。数组的元素都是结构，每个结构包含航班的起飞时间和抵达时间。（时间都是整数，表示从午夜开始的分钟数。）程序用一个循环从数组中搜索与用户输入的时间最接近的起飞时间。  
+1. 修改第5章的编程题9，以便用户输入的日期都存储在一个date结构（见练习题5）中。把练习题5中的compare_dates 函数集成到你的程序中。
 
 ## 第十七章 指针的高级应用
 
@@ -15235,46 +15395,149 @@ White advanced!
 
 17.1 节  
 
-1. 每次调用时都检查函数 malloc（或其他任何内存分配函数）的返回值是件很烦人的事情。请编写一 个名为my_malloc 的函数作为malloc 函数的“包装器”。当调用函数my_malloc 并且要求分配n 字节时，它会调用malloc 函数，判断malloc 函数确实没有返回空指针，然后返回来自malloc 的 指针。如果malloc返回空指针，那么函数my_malloc显示出错消息并且终止程序。  
+1. 每次调用时都检查函数 malloc（或其他任何内存分配函数）的返回值是件很烦人的事情。请编写一 个名为my_malloc 的函数作为malloc 函数的“包装器”。当调用函数my_malloc 并且要求分配n 字节时，它会调用malloc 函数，判断malloc 函数确实没有返回空指针，然后返回来自malloc 的指针。如果malloc返回空指针，那么函数my_malloc显示出错消息并且终止程序。  
 
 17.2 节  
 
-2. 编写名为duplicate 的函数，此函数使用动态存储分配来创建字符串的副本。例如，调用p = duplicate(str);  将为和str 长度相同的字符串分配内存空间，并且把字符串str的内容复制到新字符串，然后返回 指向新字符串的指针。如果分配内存失败，那么函数duplicate返回空指针。  
+2. 编写名为duplicate 的函数，此函数使用动态存储分配来创建字符串的副本。例如，调用
+
+   ```
+   p = duplicate(str);  
+   ```
+
+   将为和str 长度相同的字符串分配内存空间，并且把字符串str的内容复制到新字符串，然后返回指向新字符串的指针。如果分配内存失败，那么函数duplicate返回空指针。  
 
 17.3 节  
 
-3. 编写下列函数：  int *create_array(int n, int initial_value);  函数应返回一个指向动态分配的 n 元 int 型数组的指针，数组的每个成员都初始化为 initial_  value。如果内存分配失败，返回值为NULL。  
+3. 编写下列函数：  
+
+   ```
+   int *create_array(int n, int initial_value);
+   ```
+
+   函数应返回一个指向动态分配的 n 元 int 型数组的指针，数组的每个成员都初始化为 initial_  value。如果内存分配失败，返回值为NULL。  
 
 17.5 节  
 
-4. 假设下列声明有效：  struct point { int x, y; };  453  struct rectangle { struct point upper_left, lower_right; };  struct rectangle *p;  假设希望p指向一个rectangle结构，此结构的左上角位于(10, 25)的位置上，而右下角位于(20, 15) 的位置上。请编写一系列语句用来分配这样一个结构，并且像说明的那样进行初始化。  
+4. 假设下列声明有效：  
 
-5. 假设f和p的声明如下所示：  struct {    union {     char a, b;     int c;   } d;   int e[5];  } f, *p = &f;  那么下列哪些语句是合法的？  (a) p->b = ' ';  (b) p->e[3] = 10;  (c)(*p).d.a = '*';  (d) p->d->c = 20;  
+   ```C
+   struct point { int x, y; };
+   struct rectangle { struct point upper_left, lower_right; };  
+   struct rectangle *p; 
+   ```
+
+    假设希望p指向一个rectangle结构，此结构的左上角位于(10, 25)的位置上，而右下角位于(20, 15) 的位置上。请编写一系列语句用来分配这样一个结构，并且像说明的那样进行初始化。  
+
+5. 假设f和p的声明如下所示：  
+
+   ```C
+   struct
+   {
+       union
+       {
+           char a, b;
+           int c;
+       } d;
+       int e[5];
+   } f, *p = &f;
+   ```
+
+   那么下列哪些语句是合法的？  
+
+   ```C
+   (a) p->b = ' ';  
+   (b) p->e[3] = 10;  
+   (c)(*p).d.a = '*';  
+   (d) p->d->c = 20;  
+   ```
+
+   
 6. 请修改函数delete_from_list 使它使用一个指针变量而不是两个（即cur和prev）。  
-7. 下列循环希望删除链表中的全部结点，并且释放它们占用的内存。但是，此循环有错误。请解释错 误是什么并且说明如何修正错误。  for (p = first; p != NULL; p = p->next)   free(p);  
-8. 15.2 节描述的文件 stack.c 提供了在栈中存储整数的函数。在那一节中，栈是用数组实现的。请修改 程序stack.c从而使栈现在作为链表来存储。使用单独一个指向链表首结点的指针变量（栈“顶”）来 替换变量contents和变量top。在stack.c中编写的函数要使用此指针。删除函数is_full，用返回 true（如果创建的结点可以获得内存）或false（如果创建的结点无法获得内存）的函数push来 代替。  
+7. 下列循环希望删除链表中的全部结点，并且释放它们占用的内存。但是，此循环有错误。请解释错误是什么并且说明如何修正错误。  
+
+   ```C
+   for (p = first; p != NULL; p = p->next)   
+     free(p); 
+   ```
+
+    
+8. 15.2 节描述的文件 stack.c 提供了在栈中存储整数的函数。在那一节中，栈是用数组实现的。请修改程序stack.c从而使栈现在作为链表来存储。使用单独一个指向链表首结点的指针变量（栈“顶”）来替换变量contents和变量top。在stack.c中编写的函数要使用此指针。删除函数is_full，用返回 true（如果创建的结点可以获得内存）或false（如果创建的结点无法获得内存）的函数push来代替。  
 9. 判断：如果x是一个结构而a是该结构的成员，那么(&x)->a与x.a是一样的。验证你的答案。  
 10. 修改 16.2节的print_part 函数，使得它的形式参数是一个指向part 结构的指针。请使用->运 算符。 
 
-11. 编写下列函数：  int count_occurrences(struct node *list, int n);  其中形式参数list指向一个链表。函数应返回n在该链表中出现的次数。node结构的定义见17.5节。  
-12. 编写下列函数：  struct node *find_last(struct node *list, int n);  其中形式参数list指向一个链表。函数应返回一个指针，该指针指向最后一个包含n的结点，如果 n 不存在则返回NULL。node结构的定义见17.5节。  
-13. 下面的函数希望在有序链表的适当位置插入一个新结点，并返回指向新链表首结点的指针。但是， 函数无法做到在所有的情况下都正确。解释问题所在，并说明如何修正。node结构的定义见17.5节。  struct node *insert_into_ordered_list(struct node *list, struct node *new_node)  {   struct node *cur = list, *prev = NULL;   while (cur->value <= new_node->value) {     prev = cur;     cur = cur->next;   }   prev->next = new_node;   new_node->next = cur;   return list;  }  *
+11. 编写下列函数：  
+
+    ```C
+    int count_occurrences(struct node *list, int n);  
+    ```
+
+    其中形式参数list指向一个链表。函数应返回n在该链表中出现的次数。node结构的定义见17.5节。  
+12. 编写下列函数：  
+
+    ```C
+    struct node *find_last(struct node *list, int n); 
+    ```
+
+     其中形式参数list指向一个链表。函数应返回一个指针，该指针指向最后一个包含n的结点，如果 n 不存在则返回NULL。node结构的定义见17.5节。  
+13. 下面的函数希望在有序链表的适当位置插入一个新结点，并返回指向新链表首结点的指针。但是， 函数无法做到在所有的情况下都正确。解释问题所在，并说明如何修正。node结构的定义见17.5节。  
+
+    ```C
+    struct node *insert_into_ordered_list(struct node *list, struct node *new_node)
+    {
+        struct node *cur = list, *prev = NULL;
+        while (cur->value <= new_node->value)
+        {
+            prev = cur;
+            cur = cur->next;
+        }
+        prev->next = new_node;
+        new_node->next = cur;
+        return list;
+    }
+    ```
+
+    
 
 17.6 节  
 
-14. 修改函数delete_from_list（17.5节），使函数的第一个形式参数是struct node **类型（即指向 链表首结点的指针的指针），并且返回类型是void。在删除了期望的结点后，函数delete_from_list 必须修改第一个实际参数，使其指向该链表。  
+14. 修改函数delete_from_list（17.5节），使函数的第一个形式参数是struct node **类型（即指向链表首结点的指针的指针），并且返回类型是void。在删除了期望的结点后，函数delete_from_list 必须修改第一个实际参数，使其指向该链表。  
 
 17.7 节  
 
 15. 请说明下列程序的输出结果，并解释程序的功能。  
 
-    ```
-    #include   int f1(int (*f)(int));  int f2(int i);  int main(void)  {   printf("Answer: %d\n", f1(f2));   return 0;  }  int f1(int (*f) (int))  {   int n = 0;   while ((*f)(n)) n++;   return n;  }  int f2(int i)  {   return i * i +  i - 12;  }
+    ```C
+    #include <stdio.h>
+    int f1(int (*f)(int));
+    int f2(int i);
+    int main(void)
+    {
+        printf("Answer: %d\n", f1(f2));
+        return 0;
+    }
+    int f1(int (*f)(int))
+    {
+        int n = 0;
+        while ((*f)(n))
+            n++;
+        return n;
+    }
+    int f2(int i)
+    {
+        return i * i + i - 12;
+    }
     ```
 
       
 
-16. 编写下列函数。调用sum(g, i, j)应该返回g(i) + … + g(j)。  454 int sum(int (*f)(int), int start, int end);
+16. 编写下列函数。调用sum(g, i, j)应该返回g(i) + … + g(j)。  
+
+    ```
+    int sum(int (*f)(int), int start, int end);
+    ```
+
+    
 
 17. 设a是有100个整数的数组。请编写函数qsort的调用，只对数组a中的后50个元素进行排序。（不 需要编写比较函数。）  
 
@@ -15283,31 +15546,43 @@ White advanced!
 19. 请编写一个函数，要求在给定字符串作为实际参数时，此函数搜索下列所示的结构数组寻找匹配的 命令名，然后调用和匹配名称相关的函数：  
 
     ```C
-    struct { 
-     char *cmd_name; 
-     void (*cmd_pointer)(void); 
-    } file_cmd[] = 
-     { {"new", new_cmd}, 
-     {"open", open_cmd}, 
-     {"close", close_cmd}, 
-     {"close all", close_all_cmd}, 
-     {"save", save_cmd}, 
-     {"save as", save_as_cmd}, 
-     {"save all", save_all_cmd}, 
-     {"print", print_cmd}, 
-     {"exit" , exit_cmd} 
-     };
+    struct
+    {
+        char *cmd_name;
+        void (*cmd_pointer)(void);
+    } file_cmd[] =
+        {{"new", new_cmd},
+         {"open", open_cmd},
+         {"close", close_cmd},
+         {"close all", close_all_cmd},
+         {"save", save_cmd},
+         {"save as", save_as_cmd},
+         {"save all", save_all_cmd},
+         {"print", print_cmd},
+         {"exit", exit_cmd}
+    };
     ```
-
+    
     
 
 ### 编程题
 
-1. 修改 16.3节的程序 inventory.c，使其可以对数组 inventory 进行动态内存分配，并且在以后填满时 重新进行内存分配。初始使用malloc为拥有10个part结构的数组分配足够的内存空间。当数组没 有足够的空间给新的零件时，使用realloc 函数来使内存数量加倍。在每次数组变满时重复加倍操 作步骤。  
+1. 修改 16.3节的程序 inventory.c，使其可以对数组 inventory 进行动态内存分配，并且在以后填满时 重新进行内存分配。初始使用malloc为拥有10个part结构的数组分配足够的内存空间。当数组没有足够的空间给新的零件时，使用realloc 函数来使内存数量加倍。在每次数组变满时重复加倍操作步骤。  
 1. 修改16.3节的程序inventory.c，使得p命令在显示零件前调用qsort对inventory数组排序。  
 1. 修改17.5节的程序inventory2.c，增加一个e命令（擦除）以允许用户从数据库中删除一个零件。  
-1. 修改15.3节的程序justify，重新编写line.c文件使其存储链表中的当前行。链表中的每个结点存储一 个单词。用一个指向包含第一个单词的结点的指针变量来替换原有的line数组，当行为空时该变量 存储空指针。  
-1. 编写程序对用户输入的一系列单词排序：  Enter word: foo Enter word: bar Enter word: baz Enter word: quux Enter word:   In sorted order: bar baz foo quux  假设每个单词不超过20个字符。当用户输入空单词（即敲击回车键而没有输入任何单词）时停止读 取。把每个单词存储在一个动态分配的字符串中，像remind2.c程序（17.2节）那样用一个指针数组 来跟踪这些字符串。读完所有的单词后对数组排序（可以使用任何排序算法），然后用一个循环按存 储顺序显示这些单词。提示：像remind2.c那样，使用read_line函数读取每个单词。  
+1. 修改15.3节的程序justify，重新编写line.c文件使其存储链表中的当前行。链表中的每个结点存储一个单词。用一个指向包含第一个单词的结点的指针变量来替换原有的line数组，当行为空时该变量存储空指针。  
+1. 编写程序对用户输入的一系列单词排序：  
+
+   ```
+   Enter word: foo 
+   Enter word: bar 
+   Enter word: baz 
+   Enter word: quux 
+   Enter word:   
+   In sorted order: bar baz foo quux
+   ```
+
+   假设每个单词不超过20个字符。当用户输入空单词（即敲击回车键而没有输入任何单词）时停止读取。把每个单词存储在一个动态分配的字符串中，像remind2.c程序（17.2节）那样用一个指针数组来跟踪这些字符串。读完所有的单词后对数组排序（可以使用任何排序算法），然后用一个循环按存储顺序显示这些单词。提示：像remind2.c那样，使用read_line函数读取每个单词。  
 1. 修改编程题5，用qsort对指针数组排序。  
 1. 修改17.2节的remind2.c程序，使得 reminders 数组中的每个元素都是指向vstring 结构（见 17.9 节）的指针，而不是指向普通字符串的指针。
 
@@ -15317,34 +15592,154 @@ White advanced!
 
 18.1 节  
 
-1. 请指出下列声明的存储类型、类型限定符、类型指定符、声明符和初始化器。  (a) static char **lookup(int level);  (b) volatile unsigned long io_flags;  (c) extern char *file_name[MAX_FILES], path[];  (d) static const char token_buf[] = "";  
+1. 请指出下列声明的存储类型、类型限定符、类型指定符、声明符和初始化器。  
+
+   ```C
+   (a) static char **lookup(int level);  
+   (b) volatile unsigned long io_flags;  
+   (c) extern char *file_name[MAX_FILES], path[];  
+   (d) static const char token_buf[] = "";  
+   ```
 
 18.2 节  
 
-2. 用 auto、extern、register 和 static 来回答下列问题。  (a)哪种存储类型主要用于表示能被几个文件共享的变量或函数？  (b)假设变量x需要被一个文件中的几个函数共享，但要对其他文件中的函数隐藏。那么变量x应该 被声明为哪种存储类型呢？  (c)哪些存储类型会影响变量的存储期？  
-2. 列出下列文件中每个变量和形式参数的存储期（静态/自动）、作用域（块/文件）和链接（内部/外部/无）：  extern float a;  void f(register double b)  {   static int c;   auto char d;  }  
-2. 假设f是下列函数。如果在此之前f从来没有被调用过，那么f(10)的值是多少呢？如果在此之前f 已经被调用过5次，那么f(10)的值又是多少呢？  int f(int i)  {   static int j = 0;   return i * j++;  }  
-2. 指出下列语句是否正确，并验证你的答案。  (a) 具有静态存储期的变量都具有文件作用域。  (b) 在函数内部声明的变量都没有链接。  (c) 具有内部连接的变量都具有静态存储期。  (d) 每个形式参数都具有块作用域。  
-2. 下面的函数希望打印一条出错消息。每条消息的前面有一个整数，表明函数已经被调用了多少次。 但是，消息前面的整数总是 1。找出错误所在，并说明如何在不对函数外部做任何修改的情况下修 正该错误。  void print_error(const char *message)  {   int n = 1;   printf("Error %d: %s\n", n++, message);  }  
+2. 用 auto、extern、register 和 static 来回答下列问题。  
+
+   ```
+   (a)哪种存储类型主要用于表示能被几个文件共享的变量或函数？  
+   (b)假设变量x需要被一个文件中的几个函数共享，但要对其他文件中的函数隐藏。那么变量x应该 被声明为哪种存储类型呢？  
+   (c)哪些存储类型会影响变量的存储期？
+   ```
+
+     
+2. 列出下列文件中每个变量和形式参数的存储期（静态/自动）、作用域（块/文件）和链接（内部/外部/无）：  
+
+   ```C
+   extern float a;  
+   void f(register double b)  
+   {   
+     static int c;   
+     auto char d;  
+   }  
+   ```
+
+   
+2. 假设f是下列函数。如果在此之前f从来没有被调用过，那么f(10)的值是多少呢？如果在此之前f 已经被调用过5次，那么f(10)的值又是多少呢？ 
+
+   ```C
+   int f(int i)  
+   {   
+     static int j = 0;   
+     return i * j++;  
+   }  
+   ```
+
+   
+2. 指出下列语句是否正确，并验证你的答案。  
+
+   ```
+   (a) 具有静态存储期的变量都具有文件作用域。  
+   (b) 在函数内部声明的变量都没有链接。  
+   (c) 具有内部连接的变量都具有静态存储期。  
+   (d) 每个形式参数都具有块作用域。  
+   ```
+
+   
+2. 下面的函数希望打印一条出错消息。每条消息的前面有一个整数，表明函数已经被调用了多少次。 但是，消息前面的整数总是 1。找出错误所在，并说明如何在不对函数外部做任何修改的情况下修 正该错误。  
+
+   ```C
+   void print_error(const char *message)  
+   {   
+     int n = 1;   
+     printf("Error %d: %s\n", n++, message);  
+   }  
+   ```
+
+   
 
 18.3 节
 
-7. *假设声明x为const对象，那么下列关于x的陈述哪条是假的呢？(a) 如果 x的类型是int，那么可以把它用作switch语句中分支标号的值。  (b) 编译器将检查是否没有对x进行赋值。  (c) x 遵循和变量一样的作用域规则。  (d) x 可以是任意类型。  
+7. 假设声明x为const对象，那么下列关于x的陈述哪条是假的呢？
+
+   ```
+   (a) 如果 x的类型是int，那么可以把它用作switch语句中分支标号的值。  
+   (b) 编译器将检查是否没有对x进行赋值。  
+   (c) x 遵循和变量一样的作用域规则。  
+   (d) x 可以是任意类型。  
+   ```
+
+   
 
 18.4 节  
 
-8. 请按下列每个声明指定的那样编写x类型的完整描述。  (a) char (*x[10])(int);   (b) int (*x(int))[5];  (c) float *(*x(void))(int);   (d) void (*x(int, void (*y)(int)))(int);  
-9. 请利用一系列的类型定义来简化练习题8中的每个声明。  
-10. 请为下列变量和函数编写声明。 (a) p 是指向函数的指针，并且此函数以字符型指针作为实际参数，函数返回的也是字符型指针。  (b) f 是带有两个实际参数的函数：一个参数是指向结构的指针p，且此结构标记为t；另一参数是长 整数n。f返回指向函数的指针，且指向的函数无实际参数也无返回值。  (c) a 是含有 4个元素的数组，且每个元素都是指向函数的指针，而这些函数都是无实际参数且无返 回值的。a的元素初始指向的函数名分别是insert、search、update和print。  (d) b 是含有10个元素的数组，且每个元素都是指向函数的指针，而这些函数都有两个int型实际参 数且返回标记为t的结构。   
-11. 18.4 节讲过，下列声明是非法的：  int f(int)[];        int g(int)(int);    int a[10](int);     /* functions can't return arrays     */  /* functions can't return functions  */  /* array elements can't be functions */  然而，可以通过使用指针获得相似的效果：函数可以返回指向数组第一个元素的指针，也可以返回 指向函数的指针；数组的元素可以是指向函数的指针。请根据这些描述修订上述每个声明。  
+8. 请按下列每个声明指定的那样编写x类型的完整描述。  
 
-*12. (a) 假设函数f的声明如下，为函数f的类型编写完整的描述：  int (*f(float (*)(long), char *))(double);  (b)给出一个示例，说明如何调用f。  
+   ```C
+   (a) char (*x[10])(int);   
+   (b) int (*x(int))[5];  
+   (c) float *(*x(void))(int);   
+   (d) void (*x(int, void (*y)(int)))(int);  
+   ```
+
+   
+9. 请利用一系列的类型定义来简化练习题8中的每个声明。  
+10. 请为下列变量和函数编写声明。 
+
+    ```
+    (a) p 是指向函数的指针，并且此函数以字符型指针作为实际参数，函数返回的也是字符型指针。  
+    (b) f 是带有两个实际参数的函数：一个参数是指向结构的指针p，且此结构标记为t；另一参数是长 整数n。f返回指向函数的指针，且指向的函数无实际参数也无返回值。  
+    (c) a 是含有 4个元素的数组，且每个元素都是指向函数的指针，而这些函数都是无实际参数且无返 回值的。a的元素初始指向的函数名分别是insert、search、update和print。  
+    (d) b 是含有10个元素的数组，且每个元素都是指向函数的指针，而这些函数都有两个int型实际参 数且返回标记为t的结构。
+    ```
+
+       
+11. 18.4 节讲过，下列声明是非法的：  
+
+    ```C
+    int f(int)[]; 			/* functions can't return arrays */ 
+    int g(int)(int); 		/* functions can't return functions */ 
+    int a[10](int); 		/* array elements can't be functions */
+    ```
+
+    然而，可以通过使用指针获得相似的效果：函数可以返回指向数组第一个元素的指针，也可以返回 指向函数的指针；数组的元素可以是指向函数的指针。请根据这些描述修订上述每个声明。  
+
+12. (a) 假设函数f的声明如下，为函数f的类型编写完整的描述：  
+    `int (*f(float (*)(long), char *))(double);`  
+    (b)给出一个示例，说明如何调用f。  
 
 18.5 节  
 
-13. 下列哪些声明是合法的？（假设PI是表示3.141 59的宏。）  (a) char c = 65;  (b) static int i = 5, j = i * i;  (c) double d = 2  * PI;   (d) double angles[] = {0, PI / 2, PI, 3 * PI / 2};  
-14. 下列哪些类型的变量不能被初始化？  (a) 数组变量  (b) 枚举变量  (c) 结构变量  (d) 联合变量  (e) 上述都不能  
-15. 变量的哪种性质决定了它是否具有默认的初始值？  (a) 存储期   (b) 作用域   (c) 链接    (d) 类型
+13. 下列哪些声明是合法的？（假设PI是表示3.141 59的宏。）  
+
+    ```C
+    (a) char c = 65;  
+    (b) static int i = 5, j = i * i;  
+    (c) double d = 2  * PI;   
+    (d) double angles[] = {0, PI / 2, PI, 3 * PI / 2}; 
+    ```
+
+     
+14. 下列哪些类型的变量不能被初始化？  
+
+    ```
+    (a) 数组变量  
+    (b) 枚举变量  
+    (c) 结构变量  
+    (d) 联合变量  
+    (e) 上述都不能  
+    ```
+
+    
+15. 变量的哪种性质决定了它是否具有默认的初始值？ 
+
+    ```
+     (a) 存储期   
+     (b) 作用域   
+     (c) 链接    
+     (d) 类型
+    ```
+
+    
 
 ## 第十九章 程序设计
 
@@ -15352,33 +15747,50 @@ White advanced!
 
 19.1 节  
 
-1. 队列类似于栈，两者的差异是队列的项从一端添加，而从另一端按 FIFO（先进先出）的方式删除。 对于队列的操作可以包括以下几种。   向队列的末端加入项。   从队列的开始删除项。   返回队列第一项（不改变队列）。   返回队列的末项（不改变队列）。   检查队列是否为空。  以头文件queue.h的形式给队列模块定义一个接口。  
+1. 队列类似于栈，两者的差异是队列的项从一端添加，而从另一端按 FIFO（先进先出）的方式删除。 对于队列的操作可以包括以下几种。  
+   - 向队列的末端加入项。  
+   - 从队列的开始删除项。  
+   - 返回队列第一项（不改变队列）。  
+   - 返回队列的末项（不改变队列）。  
+   - 检查队列是否为空。  
+
+​	以头文件queue.h的形式给队列模块定义一个接口。  
 
 19.2 节   
 
 2. 修改文件stack2.c，以使用PUBLIC 宏和PRIVATE 宏。  
-3. (a) 按照练习题 1中的描述用数组实现一个队列模块。用三个整数来记录栈的状态，第一个整数存储 数组中的第一个空位置（插入数据项时用到），第二个整数存储待删除的下一项位置，第三个整 数存储队列中数据项的个数。插入或删除操作可能会导致前两个整数超出数组的边界，此时需要 把变量置为0，以“折返”到数组的起始位置。(b) 按照练习题 1中的描述用链表实现一个队列模块。使用两个指针，一个指向链表的首结点，另一 个指向链表的末结点。向队列中插入数据项时，将其加到链表的最后。从队列中删除数据项时， 删除链表中的第一个结点。  
+3. (a) 按照练习题 1中的描述用数组实现一个队列模块。用三个整数来记录栈的状态，第一个整数存储 数组中的第一个空位置（插入数据项时用到），第二个整数存储待删除的下一项位置，第三个整数存储队列中数据项的个数。插入或删除操作可能会导致前两个整数超出数组的边界，此时需要把变量置为0，以“折返”到数组的起始位置。
+   (b) 按照练习题 1中的描述用链表实现一个队列模块。使用两个指针，一个指向链表的首结点，另一个指向链表的末结点。向队列中插入数据项时，将其加到链表的最后。从队列中删除数据项时， 删除链表中的第一个结点。  
 
 19.3 节   
 
-4. (a) 编写 Stack 类型的实现，假设Stack 是一个包含定长数组的结构。  (b) 使用链表替换数组，重写上面的Stack类型。（给出stack.h和stack.c。）  
-5. 修改练习题1中的queue.h，使之定义一个Queue类型，其中Queue是包含定长数组的结构（见练习 题3(a)）。同时修改queue.h中的函数，用Queue *作为形式参数。   
+4. (a) 编写 Stack 类型的实现，假设Stack 是一个包含定长数组的结构。  
+   (b) 使用链表替换数组，重写上面的Stack类型。（给出stack.h和stack.c。）  
+5. 修改练习题1中的queue.h，使之定义一个Queue类型，其中Queue是包含定长数组的结构（见练习题3(a)）。同时修改queue.h中的函数，用Queue *作为形式参数。   
 
 19.4 节  
 
-6. (a) 给 stackADT.c 增加一个 peek 函数，该函数具有Stack 类型的形式参数。调用时该函数返回栈顶 的数据项，但不修改栈的内容。  (b) 重复上一题，这次修改stackADT2.c。  (c) 重复上一题，这次修改stackADT3.c。  
-7. 修改 stackADT2.c，使得栈满时自动加倍容量。要求 push 函数能动态地分配一个大小是原来的两倍 的新数组，并将原数组的内容复制到新数组中。一定要在数据复制结束后用push函数回收原数组所 占的空间。 
+6. (a) 给 stackADT.c 增加一个 peek 函数，该函数具有Stack 类型的形式参数。调用时该函数返回栈顶的数据项，但不修改栈的内容。  
+   (b) 重复上一题，这次修改stackADT2.c。  
+   (c) 重复上一题，这次修改stackADT3.c。  
+7. 修改 stackADT2.c，使得栈满时自动加倍容量。要求 push 函数能动态地分配一个大小是原来的两倍的新数组，并将原数组的内容复制到新数组中。一定要在数据复制结束后用push函数回收原数组所占的空间。 
 
 ### 编程题
 
-1. 修改第 10章的编程题1，改用19.4节描述的栈抽象数据类型。允许采用该节描述的任意抽象数据类 型实现。 
+1. 修改第 10章的编程题1，改用19.4节描述的栈抽象数据类型。允许采用该节描述的任意抽象数据类型实现。 
 
-2. 修改第 10章的编程题6，改用19.4节描述的栈抽象数据类型。允许采用该节描述的任意抽象数据类 型实现。  
+2. 修改第 10章的编程题6，改用19.4节描述的栈抽象数据类型。允许采用该节描述的任意抽象数据类型实现。  
 
-3. 修改19.4节的stackADT3.c文件，为stack_type 结构增加一个名为len的int类型成员。该成员记 录当前在栈中存储了多少数据项。增加一个名为length的新函数，要求形式参数的类型为Stack且 返回len成员的值。（stackADT3.c中的一些现有的函数也需要修改。）修改stackclient.c，使其在每次 对栈进行修改后调用length函数（并显示返回的值）。  
+3. 修改19.4节的stackADT3.c文件，为stack_type 结构增加一个名为len的int类型成员。该成员记录当前在栈中存储了多少数据项。增加一个名为length的新函数，要求形式参数的类型为Stack且返回len成员的值。（stackADT3.c中的一些现有的函数也需要修改。）修改stackclient.c，使其在每次对栈进行修改后调用length函数（并显示返回的值）。  
 
-4. 修改19.4节的stackADT.h和 stackADT3.c文件，使栈存储void *类型的值（如19.5节所述）而不再使 用Item 类型。修改stackclient.c使其存储指向s1 和s2栈中的字符串的指针。  
-5. 从练习题1的queue.h出发，创建一个名为queueADT.h的文件，定义如下的Queue类型：  typedef struct queue_type *Queue;  queue_type 是不完整类型。创建一个名为queueADT.c的文件，其中包含queue_type的完整定义以 及queue.h 中所有函数的定义。使用定长数组来存储队列中的数据项（见练习题 3(a)）。创建一个名 为queueclient.c 的文件（类似于 19.4节的 stackclient.c文件）来创建两个队列并执行队列操作。确保为 你的抽象数据类型提供create和destroy函数。  
+4. 修改19.4节的stackADT.h和 stackADT3.c文件，使栈存储void *类型的值（如19.5节所述）而不再使用Item 类型。修改stackclient.c使其存储指向s1 和s2栈中的字符串的指针。  
+5. 从练习题1的queue.h出发，创建一个名为queueADT.h的文件，定义如下的Queue类型：  
+
+   ```
+   typedef struct queue_type *Queue;
+   ```
+
+   queue_type 是不完整类型。创建一个名为queueADT.c的文件，其中包含queue_type的完整定义以及queue.h 中所有函数的定义。使用定长数组来存储队列中的数据项（见练习题 3(a)）。创建一个名为queueclient.c 的文件（类似于 19.4节的 stackclient.c文件）来创建两个队列并执行队列操作。确保为你的抽象数据类型提供create和destroy函数。  
 6. 修改编程题 5，用动态分配的数组来存储队列中的数据项。动态分配的数组的长度作为参数传给 create 函数。  
 7. 修改编程题5，用链表来存储队列中的数据项（见练习题3(b)）。
 
@@ -15388,26 +15800,130 @@ White advanced!
 
 20.1 节  
 
-1. 指出下面每一个代码段的输出。假定i、j和k都是unsigned short类型的变量。  (a) i = 8; j = 9;  printf("%d", i >> 1 + j >> 1);  (b) i = 1;  printf("%d", i & ~i);  (c) i = 2; j = 1; k = 0;  printf("%d", ~i & j ^ k);  (d) i = 7; j = 8; k = 9;  printf("%d", i ^ j & k);  
+1. 指出下面每一个代码段的输出。假定i、j和k都是unsigned short类型的变量。  
+
+   ```C
+   (a) i = 8; j = 9;  
+   		printf("%d", i >> 1 + j >> 1);  
+   (b) i = 1;  
+   		printf("%d", i & ~i);  
+   (c) i = 2; j = 1; k = 0;  
+   		printf("%d", ~i & j ^ k);  
+   (d) i = 7; j = 8; k = 9;  
+   		printf("%d", i ^ j & k);  
+   ```
+
+   
 
 2. 请说出如何简便地“切换”一个位（从0改为1或从1改为0）。通过编写一条语句切换变量i的第 4位来说明这种方法。  
-3. 请解释下面的宏对它的实际参数起什么作用。假设参数具有相同类型。  #define M(x,y) ((x)^=(y),(y)^=(x),(x)^=(y))  
-4. 在计算机图形学中，颜色通常是用分别代表红、绿、蓝3种颜色的3个数存储的。假定每个数需要8 位来存储，而且我们希望将3个值一起存放在一个长整数中。请编写一个名为MK_COLOR的宏，使其 包含3个参数（红、绿、蓝色的强度）。MK_COLOR 宏应该返回一个long 值，其中后3个字节分别 包含红、绿和蓝色的强度（红作为最后一个字节，绿作为倒数第二个字节）。  
-5. 编写名为GET_RED、GET_GREEN 和GET_BLUE 的宏，并以一个给定的颜色值作为参数（见练习题4）， 返回8位的红、绿、蓝色的强度。  
-6. (a) 使用位运算符编写如下函数：  unsigned short swap_bytes(unsigned short i);  函数swap_bytes 的返回值是将i的两个字节调换后产生的结果。（在大多数计算机中，短整数占两 个字节。）例如，假设i的值是0x1234（二进制形式为00010010 00110100），那么swap_bytes的 返回值应该为0x3412（二进制形式为00110100 00010010）。编写一个程序来测试你的函数。程序以 十六进制读入数，然后交换两个字节并显示出来：  Enter a hexadecimal number (up to four digits): 1234 Number with bytes swapped: 3412 提示：使用%hx转换来读入和输出十六进制数。  (b) 将swap_bytes 函数的函数体化简为一条语句。  
-7. 编写如下函数：  unsigned int rotate_left(unsigned int i, int n);  unsigned int rotate_right(unsigned int i, int n);  525  函数rotate_left 返回的值应是将i左移n位并将从左侧移出的位移入i右端而产生的结果。（例 如，假定整数占32位，rotate_left(0x12345678, 4)将返回0x23456781。）函数rotate_right 也类似，只是将数字中的位向右循环移位。  
-8. 假定函数f如下：  unsigned int f(unsigned int i, int m, int n)  {    return (i >> (m + 1 - n)) & ~(~0 << n);   }  (a) ~(~0 << n)的结果是什么？  (b) 函数 f的作用是什么？  
-9. (a) 编写如下函数：  int count_ones(unsigned char ch);  count_ones 应返回ch 中1的位数。  (b) 编写(a)中的函数，要求不使用循环。  
-10. 编写如下函数：  unsigned int reverse_bits(unsigned int n);  reverse_bits 应返回一个无符号整数，该整数的数位与n完全相同但顺序相反。下面的每个宏定义了整数内部的单个位的位置：  #define SHIFT_BIT  1  #define CTRL_BIT   2  #define ALT_BIT    4  下面的语句希望测试这3个位中是否至少有一位被设置，但永远无法输出指定的消息。请解释原因，并修正该 语句。假设key_code是int类型的变量。  if (key_code & (SHIFT_BIT | CTRL_BIT | ALT_BIT) == 0)   printf("No modifier keys pressed\n");   
+3. 请解释下面的宏对它的实际参数起什么作用。假设参数具有相同类型。  
 
-12. 下面的函数试图把两个字节组成一个无符号短整数。解释为什么函数不能工作，并给出你的修改 方案。  unsigned short create_short(unsigned char high_byte,                             unsigned char low_byte)  {   return high_byte << 8 + low_byte;  }  
+   ```
+   #define M(x,y) ((x)^=(y),(y)^=(x),(x)^=(y)) 
+   ```
+4. 在计算机图形学中，颜色通常是用分别代表红、绿、蓝3种颜色的3个数存储的。假定每个数需要8 位来存储，而且我们希望将3个值一起存放在一个长整数中。请编写一个名为MK_COLOR的宏，使其包含3个参数（红、绿、蓝色的强度）。MK_COLOR 宏应该返回一个long 值，其中后3个字节分别包含红、绿和蓝色的强度（红作为最后一个字节，绿作为倒数第二个字节）。  
+5. 编写名为GET_RED、GET_GREEN 和GET_BLUE 的宏，并以一个给定的颜色值作为参数（见练习题4），返回8位的红、绿、蓝色的强度。  
+6. (a) 使用位运算符编写如下函数：  
 
-13. 如果 n 是一个unsigned int 类型的变量，下面的语句会对n中的位有什么影响？  n &= n – 1;  提示：考虑这条语句多次执行后对n的影响。  
+   ```
+   unsigned short swap_bytes(unsigned short i);
+   ```
+
+   函数swap_bytes 的返回值是将i的两个字节调换后产生的结果。（在大多数计算机中，短整数占两 个字节。）例如，假设i的值是0x1234（二进制形式为00010010 00110100），那么swap_bytes的 返回值应该为0x3412（二进制形式为00110100 00010010）。编写一个程序来测试你的函数。程序以 十六进制读入数，然后交换两个字节并显示出来：  
+
+   ```
+   Enter a hexadecimal number (up to four digits): 1234 
+   Number with bytes swapped: 3412 
+   ```
+
+   提示：使用%hx转换来读入和输出十六进制数。  
+   (b) 将swap_bytes 函数的函数体化简为一条语句。  
+7. 编写如下函数：  
+
+   ```
+   unsigned int rotate_left(unsigned int i, int n);  
+   unsigned int rotate_right(unsigned int i, int n);
+   ```
+
+   函数rotate_left 返回的值应是将i左移n位并将从左侧移出的位移入i右端而产生的结果。（例如，假定整数占32位，rotate_left(0x12345678, 4)将返回0x23456781。）函数rotate_right 也类似，只是将数字中的位向右循环移位。  
+8. 假定函数f如下：  
+
+   ```C
+   unsigned int f(unsigned int i, int m, int n)  
+   {    
+     return (i >> (m + 1 - n)) & ~(~0 << n);   
+   }
+   ```
+
+     
+   (a) ~(~0 << n)的结果是什么？  
+   (b) 函数 f的作用是什么？  
+9. (a) 编写如下函数：  
+
+   ```
+   int count_ones(unsigned char ch);
+   ```
+
+   count_ones 应返回ch 中1的位数。  
+   (b) 编写(a)中的函数，要求不使用循环。  
+10. 编写如下函数：  
+    unsigned int reverse_bits(unsigned int n);  
+    reverse_bits 应返回一个无符号整数，该整数的数位与n完全相同但顺序相反。
+    下面的每个宏定义了整数内部的单个位的位置：  
+
+    ```C
+    #define SHIFT_BIT  1  
+    #define CTRL_BIT   2  
+    #define ALT_BIT    4
+    ```
+
+    下面的语句希望测试这3个位中是否至少有一位被设置，但永远无法输出指定的消息。请解释原因，并修正该 语句。假设key_code是int类型的变量。  
+
+    ```C
+    if (key_code & (SHIFT_BIT | CTRL_BIT | ALT_BIT) == 0)   
+      printf("No modifier keys pressed\n");
+    ```
+
+       
+
+11. 下面的函数试图把两个字节组成一个无符号短整数。解释为什么函数不能工作，并给出你的修改 方案。  
+
+    ```C
+    unsigned short create_short(unsigned char high_byte,                             																	unsigned char low_byte)  
+    {   
+      return high_byte << 8 + low_byte;  
+    }  
+    ```
+
+    
+
+12. 如果 n 是一个unsigned int 类型的变量，下面的语句会对n中的位有什么影响？  
+
+    ```
+    n &= n – 1; 
+    ```
+
+     提示：考虑这条语句多次执行后对n的影响。  
 
 20.2 节  
 
 14. 当按照IEEE浮点标准存储浮点数时，一个float型的值由1个符号位（最左边的位或最高有效位）、 8个指数位以及23个小数位依次组成。请设计一个32位的结构类型，包含与符号、指数和小数相对应 的位域成员。声明位域的类型为unsigned int。请参考你所用编译器的用户手册来决定位域的顺序。  
-14.  (a) 假设变量 s 的声明如下：  struct {   int flag: 1;   } s;  在有些编译器下，执行下面的语句会显示1；但在另一些编译器下，输出是1。请解释原因。  s.flag = 1;  printf("%d\n", s.flag);  (b) 如何避免这一问题？  
+14. (a) 假设变量 s 的声明如下：  
+
+    ```C
+    struct {   
+      int flag: 1;   
+    } s;
+    ```
+
+    在有些编译器下，执行下面的语句会显示1；但在另一些编译器下，输出是$-1$。请解释原因。  
+
+    ```C
+    s.flag = 1;  
+    printf("%d\n", s.flag);
+    ```
+
+    (b) 如何避免这一问题？  
 
 20.3 节  
 
@@ -15415,7 +15931,7 @@ White advanced!
 
 ### 编程题
 
- 1.设计一个联合类型，使一个32位的值既可以看作一个float类型的值，也可以看作练习题14中定义 的结构。写一个程序将1存储在结构的符号字段，将128存储在指数字段，0存储在小数字段，然后 按float 值的形式显示存储在联合中的值。（如果你的位域设置正确的话，结果应该是2.0。） 
+1. 设计一个联合类型，使一个32位的值既可以看作一个float类型的值，也可以看作练习题14中定义的结构。写一个程序将1存储在结构的符号字段，将128存储在指数字段，0存储在小数字段，然后按float 值的形式显示存储在联合中的值。（如果你的位域设置正确的话，结果应该是$-2.0$。） 
 
 ## 第二十一章 标准库
 
@@ -15429,39 +15945,50 @@ White advanced!
 
 3. 当使用宏隐藏函数时，在头文件中，宏定义和函数原型哪一个必须放在前面？验证你的结论。  
 
-4. 列出C99标准的“future library directions”部分的所有保留标识符。有的标识符只在具体的头文件被 包含时才被保留，有的标识符被保留用作外部名字。请对这两种标识符加以区分。  
+4. 列出C99标准的“future library directions”部分的所有保留标识符。有的标识符只在具体的头文件被包含时才被保留，有的标识符被保留用作外部名字。请对这两种标识符加以区分。  
 
-5. 中的 islower 函数用于测试字符是否为小写字母。下面的宏版本为什么不符合 C标准？ （假定字符集是ASCII。）  #define islower(c) ((c) >= 'a' && (c) <= 'z')  
+5. <ctype.h>中的 islower 函数用于测试字符是否为小写字母。下面的宏版本为什么不符合 C标准？ （假定字符集是ASCII。）  
 
-6. 头通常把它的函数也定义为宏。这些宏依赖于一个在中声明但在另一个文件 中定义的静态数组。下面给出了常见的头的一部分。使用这个例子回答下列问题。  (a) 为什么“位”宏（例如_UPPER）和_ctype数组用下划线开头？  (b) 解释_ctype 数组包含什么内容。假设字符集是ASCII，给出位置9（水平制表符）、位置32（空 格符）、位置65（字母A）、位置94（字符^）处的数组元素的值。关于每个宏返回什么值的描 述见23.5节。  (c) 使用数组实现下面这些宏有什么好处？  
-
-   ```C
-   #define _UPPER 0x01 /* upper-case letter */ 
-   #define _LOWER 0x02 /* lower-case letter */ 
-   #define _DIGIT 0x04 /* decimal digit */ 
-   #define _CONTROL 0x08 /* control character */ 
-   #define _PUNCT 0x10 /* punctuation character */ 
-   #define _SPACE 0x20 /* white-space character */ 
-   #define _HEX 0x40 /* hexadecimal digit */ 
-   #define _BLANK 0x80 /* space character */ 
-   #define isalnum(c)(_ctype[c] & (_UPPER | _LOWER | _DIGIT)) 
-   #define isalpha(c)(_ctype[c] & (_UPPER | _LOWER)) 
-   #define iscntrl(c)(_ctype[c] & _CONTROL) 
-   #define isdigit(c)(_ctype[c] & _DIGIT) 
-   #define isgraph(c)(_ctype[c] & (_PUNCT | _UPPER | _LOWER | _DIGIT)) 
-   #define islower(c)(_ctype[c] & _LOWER) 
-   #define isprint(c)(_ctype[c] & (_BLANK | _PUNCT | _UPPER | _LOWER | _DIGIT)) 
-   #define ispunct(c)(_ctype[c] & _PUNCT) 
-   #define isspace(c)(_ctype[c] & _SPACE) 
-   #define isupper(c)(_ctype[c] & _UPPER) 
-   #define isxdigit(c)(_ctype[c] & (_DIGIT | _HEX))
+   ```
+   #define islower(c) ((c) >= 'a' && (c) <= 'z')  
    ```
 
+6. <ctype.h>头通常把它的函数也定义为宏。这些宏依赖于一个在中声明但在另一个文件中定义的静态数组。下面给出了常见的<ctype.h>头的一部分。使用这个例子回答下列问题。  
+   (a) 为什么“位”宏（例如\_UPPER）和\_ctype数组用下划线开头？  
+   (b) 解释_ctype 数组包含什么内容。假设字符集是ASCII，给出位置9（水平制表符）、位置32（空 格符）、位置65（字母A）、位置94（字符^）处的数组元素的值。关于每个宏返回什么值的描述见23.5节。  
+   (c) 使用数组实现下面这些宏有什么好处？  
+   
+   ```C
+   #define _UPPER 0x01   /* upper-case letter */
+   #define _LOWER 0x02   /* lower-case letter */
+   #define _DIGIT 0x04   /* decimal digit */
+   #define _CONTROL 0x08 /* control character */
+   #define _PUNCT 0x10   /* punctuation character */
+   #define _SPACE 0x20   /* white-space character */
+   #define _HEX 0x40     /* hexadecimal digit */
+   #define _BLANK 0x80   /* space character */
+   
+   #define isalnum(c) (_ctype[c] & (_UPPER | _LOWER | _DIGIT))
+   #define isalpha(c) (_ctype[c] & (_UPPER | _LOWER))
+   #define iscntrl(c) (_ctype[c] & _CONTROL)
+   #define isdigit(c) (_ctype[c] & _DIGIT)
+   #define isgraph(c) (_ctype[c] & (_PUNCT | _UPPER | _LOWER | _DIGIT))
+   
+   #define islower(c) (_ctype[c] & _LOWER)
+   #define isprint(c) (_ctype[c] & (_BLANK | _PUNCT | _UPPER | _LOWER | _DIGIT))
+   #define ispunct(c) (_ctype[c] & _PUNCT)
+   #define isspace(c) (_ctype[c] & _SPACE)
+   #define isupper(c) (_ctype[c] & _UPPER)
+   #define isxdigit(c) (_ctype[c] & (_DIGIT | _HEX))
+   ```
+   
    
 
 21.2 节  
 
 7. 在哪个标准头中可以找到下面描述的函数或宏？ 
+   
+   ```
    (a) 判断当前是星期几的函数。 
    (b) 判断字符是否是数字的函数。  
    (c) 给出最大的unsigned int 类型值的宏。  
@@ -15470,10 +15997,13 @@ White advanced!
    (f) 指定 double 类型值有效位个数的宏。  
    (g) 在字符串中查找特定字符的函数。  
    (h) 以读方式打开文件的函数。
+   ```
+   
+   
 
 ### 编程题
 
- 1.编写一个程序声明结构s（见21.4节），并显示成员a、b、c的大小和偏移量。（使用sizeof得到 大小，使用offsetof 得到偏移量。）同时使程序显示整个结构的大小。根据这些信息，判断结构中 是否包含空洞。如果包含空洞，指出每一个空洞的位置和大小。
+1. 编写一个程序声明结构s（见21.4节），并显示成员a、b、c的大小和偏移量。（使用sizeof得到大小，使用offsetof 得到偏移量。）同时使程序显示整个结构的大小。根据这些信息，判断结构中是否包含空洞。如果包含空洞，指出每一个空洞的位置和大小。
 
 ## 第二十二章 输入输出
 
@@ -15481,62 +16011,313 @@ White advanced!
 
 22.1 节  
 
-1. 指出下列每个文件更可能包含文本数据还是二进制数据。  (a) C 编译器产生的目标代码文件。  (b) C 编译器产生的程序列表。  (c) 从一台计算机发送到另一台计算机的电子邮件消息。  (d) 含有图形图像的文件。  
+1. 指出下列每个文件更可能包含文本数据还是二进制数据。  
+   (a) C 编译器产生的目标代码文件。  
+   (b) C 编译器产生的程序列表。  
+   (c) 从一台计算机发送到另一台计算机的电子邮件消息。  
+   (d) 含有图形图像的文件。  
 
 22.2 节 
 
-2. 指出在下列每种情况下最可能把哪种模式字符串传递给fopen函数。(a) 数据库管理系统打开含有将被更新的记录的文件。  (b) 邮件程序打开存有消息的文件以便在文件末尾添加额外的消息。  (c) 图形程序打开含有将被显示在屏幕上的图片的文件。  (d) 操作系统命令解释器打开含有将被执行的命令的“shell脚本”（或者“批处理文件”）。  
-3. 找出下列程序片段中的错误，并说明如何修正。  FILE *fp;   if (fp = fopen(filename, "r")) {  读取字符直到文件末尾  }  fclose(fp);  
+2. 指出在下列每种情况下最可能把哪种模式字符串传递给fopen函数。
+   (a) 数据库管理系统打开含有将被更新的记录的文件。  
+   (b) 邮件程序打开存有消息的文件以便在文件末尾添加额外的消息。  
+   (c) 图形程序打开含有将被显示在屏幕上的图片的文件。  
+   (d) 操作系统命令解释器打开含有将被执行的命令的“shell脚本”（或者“批处理文件”）。  
+3. 找出下列程序片段中的错误，并说明如何修正。  
+
+   ```C
+   FILE *fp;   
+   if (fp = fopen(filename, "r")) {  
+     读取字符直到文件末尾  
+   }  
+   fclose(fp);  
+   ```
+
+   
 
 22.3 节  
 
-4. 如果printf 函数用%#012.5g 作为转换说明来执行显示操作，请指出下列数字显示的形式。  (a) 83.7361  (b) 29748.6607  (c) 1054932234.0  (d) 0.000 023 521 8  582 
+4. 如果printf 函数用%#012.5g 作为转换说明来执行显示操作，请指出下列数字显示的形式。  
+
+   ```
+   (a) 83.7361  
+   (b) 29748.6607  
+   (c) 1054932234.0  
+   (d) 0.000 023 521 8
+   ```
 5. printf 函数的转换说明%.4d 和%04d 有区别吗？如果有，请说明区别是什么。  
-6. 编写 printf 函数的调用，要求：如果变量widget（int 类型）的值为1，则显示1 widget；如果 值为n，则显示n widgets。不允许使用 if 语句或任何其他语句，答案必须是一个单独的 printf 调用。  
-7. 假设按照下列形式调用scanf函数：  n = scanf("%d%f%d", &i, &x, &j);  （其中，i、j和n都是int类型变量，而x是float类型变量。）假设输入流含有下面所示的字符， 请指出这个调用后i、j、n和x的值。此外，请说明一下这个调用会消耗哪些字符。  (a) 10·20·30¤  (b) 1.0·2.0·3.0¤  (c) 0.1·0.2·0.3¤  (d) .1·.2·.3¤  
+6. 编写 printf 函数的调用，要求：如果变量widget（int 类型）的值为1，则显示1 widget；如果值为$n$，则显示$n$ widgets。不允许使用 if 语句或任何其他语句，答案必须是一个单独的 printf 调用。  
+7. 假设按照下列形式调用scanf函数：  
+   `n = scanf("%d%f%d", &i, &x, &j);`  
+   （其中，i、j和n都是int类型变量，而x是float类型变量。）假设输入流含有下面所示的字符， 请指出这个调用后i、j、n和x的值。此外，请说明一下这个调用会消耗哪些字符。  
+
+   ```
+   (a) 10·20·30¤  
+   (b) 1.0·2.0·3.0¤  
+   (c) 0.1·0.2·0.3¤  
+   (d) .1·.2·.3¤  
+   ```
 8. 在前面几章中，当希望跳过空白字符而读取非标准空白字符时，已经使用过scanf函数的" %c"格式 串。而一些程序员用"%1s"来代替。这两种方法等效吗？如果不等效，区别是什么？  
 
 22.4 节  
 
-9. 如果要想从标准输入流中读取一个字符，下列调用方式哪种是无效的？  (a) getch()  (b) getchar()  (c) getc(stdin)  (d) fgetc(stdin)  
-10. 程序 fcopy有一个小缺陷：当它向目标文件写入时无法检查错误。虽然在写操作过程中错误是极少见 的，但是偶尔会发生（比如，磁盘可能会变满）。假设一旦发生错误，希望程序可以显示一条消息并 立刻终止，请说明如何为fcopy.c添加遗漏的错误检查。在程序fcopy.c中出现了下列循环：  while ((ch = getc(source_fp)) != EOF)   putc(ch, dest_fp);   
-11. 假设省略表达式ch = getc(source_fp)两边的圆括号：  while (ch = getc(source_fp) != EOF)   putc(ch, dest_fp);  程序可以无错通过编译吗？如果可以，那么运行时程序会做些什么呢？  
-12. 找出下列函数中的错误，并说明如何修正。  int count_periods(const char *filename)  {   FILE *fp;   int n = 0;   if ((fp = fopen(filename, "r")) != NULL) {     while (fgetc(fp) != EOF)       if (fgetc(fp) == '.')         n++;     fclose(fp);   }   return n;  }  
-13. 编写下列函数：  int line_length(const char *filename, int n);   函数应返回名为filename的文本文件中第n行的长度（假定文件的第一行是行1）。如果该行不存 在，函数返回0。  
+9. 如果要想从标准输入流中读取一个字符，下列调用方式哪种是无效的？  
+
+   ```
+   (a) getch()  
+   (b) getchar()  
+   (c) getc(stdin)  
+   (d) fgetc(stdin)  
+   ```
+
+   
+
+10. 程序 fcopy有一个小缺陷：当它向目标文件写入时无法检查错误。虽然在写操作过程中错误是极少见的，但是偶尔会发生（比如，磁盘可能会变满）。假设一旦发生错误，希望程序可以显示一条消息并立刻终止，请说明如何为fcopy.c添加遗漏的错误检查。
+
+11. 在程序fcopy.c中出现了下列循环：  
+
+    ```C
+    while ((ch = getc(source_fp)) != EOF)   
+      putc(ch, dest_fp);  
+    ```
+
+     假设省略表达式ch = getc(source_fp)两边的圆括号：  
+
+    ```C
+    while (ch = getc(source_fp) != EOF)   
+    	putc(ch, dest_fp); 
+    ```
+
+    程序可以无错通过编译吗？如果可以，那么运行时程序会做些什么呢？  
+
+12. 找出下列函数中的错误，并说明如何修正。  
+
+    ```C
+    int count_periods(const char *filename)
+    {
+        FILE *fp;
+        int n = 0;
+        if ((fp = fopen(filename, "r")) != NULL)
+        {
+            while (fgetc(fp) != EOF)
+                if (fgetc(fp) == '.')
+                    n++;
+            fclose(fp);
+        }
+        return n;
+    }
+    ```
+
+    
+
+13. 编写下列函数：  `int line_length(const char *filename, int n);`   函数应返回名为filename的文本文件中第n行的长度（假定文件的第一行是行1）。如果该行不存在，函数返回0。  
 
 22.5 节  
 
-14. (a) 编写自己版本的fgets 函数，使此函数的操作尽可能与实际的fgets函数相同。特别是一定要确保 函数具有正确的返回值。为了避免和标准库发生冲突，请不要把自己编写的函数也命名为fgets。  (b) 请编写自己版本的fputs函数，规则和(a)要求的一样。  
+14. (a) 编写自己版本的fgets 函数，使此函数的操作尽可能与实际的fgets函数相同。特别是一定要确保函数具有正确的返回值。为了避免和标准库发生冲突，请不要把自己编写的函数也命名为fgets。  
+    (b) 请编写自己版本的fputs函数，规则和(a)要求的一样。  
 
 22.7 节  
 
-15. 编写fseek 函数的调用来在二进制文件中执行下列文件定位操作，其中，二进制文件的数据以64字 节“记录”的形式进行排列。采用fp作为下列每种情况中的文件指针。  (a) 移动到记录n的开始处（假设文件中的首记录为记录0）。  (b) 移动到文件中最后一条记录的开始处。  (c) 向前移动一条记录。  (d) 向后移动两条记录。  
+15. 编写fseek 函数的调用来在二进制文件中执行下列文件定位操作，其中，二进制文件的数据以64字节“记录”的形式进行排列。采用fp作为下列每种情况中的文件指针。  
+    (a) 移动到记录n的开始处（假设文件中的首记录为记录0）。  
+    (b) 移动到文件中最后一条记录的开始处。  
+    (c) 向前移动一条记录。  
+    (d) 向后移动两条记录。  
 
 22.8 节  
 
-16. 假设 str 是包含“销售排行”的字符串，它紧跟在符号#的后面（#的前面可能有其他字符，销售排 行的后面也可能有其他字符）。销售排行是一系列的十进制数，可能包含逗号，示例如下：  989  24,675  1,162,620  编写sscanf 的调用，提取出销售排行（不要#号）并将其存储在一个名为sales_rank 的字符串变 量中。 
+16. 假设 str 是包含“销售排行”的字符串，它紧跟在符号#的后面（#的前面可能有其他字符，销售排行的后面也可能有其他字符）。销售排行是一系列的十进制数，可能包含逗号，示例如下：  
+
+    ```
+    989  
+    24,675  
+    1,162,620  
+    ```
+
+    编写sscanf 的调用，提取出销售排行（不要#号）并将其存储在一个名为sales_rank 的字符串变量中。 
 
 ### 编程题
 
-1. 扩展22.2节的canopen.c程序，以便用户把任意数量的文件名放置在命令行中：  canopen foo bar baz  584  这个程序应该为每个文件分别显示出can be opended消息或者can't be opened消息。如果一个 或多个文件无法打开，程序以EXIT_FAILURE状态终止。  
-2. 编写程序，把文件中的所有字母转换成大写形式（非字母字符不改变）。程序应从命令行获取文件名 并把输出写到stdout中。  
-3. 编写一个名为fcat的程序，通过把任意数量的文件写到标准输出中而把这些文件一个接一个地“拼 接”起来，并且文件之间没有间隙。例如，下列命令将在屏幕上显示文件f1.c、f2.c和f3.c：  fcat f1.c f2.c f3.c  如果任何文件都无法打开，那么程序 fcat 应该发出出错消息。提示：因为每次只可以打开一个文 件，所以程序fcat只需要一个文件指针变量。一旦对一个文件完成操作，程序fcat在打开下一个文件 时可以使用同一个文件指针变量。  
-4. (a) 编写程序统计文本文件中字符的数量。  (b) 编写程序统计文本文件中单词的数量。（此处“单词”指不含空白字符的任意序列。）  (c) 编写程序统计文本文件中行的数量。  要求每一个程序都通过命令行获得文件名。  
+1. 扩展22.2节的canopen.c程序，以便用户把任意数量的文件名放置在命令行中：  
+   canopen foo bar baz 
+   这个程序应该为每个文件分别显示出can be opended消息或者can't be opened消息。如果一个 或多个文件无法打开，程序以EXIT_FAILURE状态终止。  
+
+2. 编写程序，把文件中的所有字母转换成大写形式（非字母字符不改变）。程序应从命令行获取文件名并把输出写到stdout中。  
+
+3. 编写一个名为fcat的程序，通过把任意数量的文件写到标准输出中而把这些文件一个接一个地“拼接”起来，并且文件之间没有间隙。例如，下列命令将在屏幕上显示文件f1.c、f2.c和f3.c：  
+   fcat f1.c f2.c f3.c  
+   如果任何文件都无法打开，那么程序 fcat 应该发出出错消息。提示：因为每次只可以打开一个文 件，所以程序fcat只需要一个文件指针变量。一旦对一个文件完成操作，程序fcat在打开下一个文件时可以使用同一个文件指针变量。  
+
+4. (a) 编写程序统计文本文件中字符的数量。  
+   (b) 编写程序统计文本文件中单词的数量。（此处 “单词” 指不含空白字符的任意序列。）  
+   (c) 编写程序统计文本文件中行的数量。  
+   要求每一个程序都通过命令行获得文件名。  
+
 5. 20.1 节中的程序 xor.c 拒绝对原始格式或加密格式中是控制字符的字节进行加密。现在可以摆脱这种 限制了。修改此程序，使输入文件名和输出文件名都是命令行参数。以二进制模式打开这两个文 件，并且把用来检查原始字符或加密字符是否是控制字符的判断删除。  
-6. 编写程序，按字节方式和字符方式显示文件的内容。用户通过命令行指定文件名。程序用于显示2.1 节的pun.c文件时，输出如下：  Offset               Bytes                ------   -----------------------------     Characters ----------      0   23 69 6E 63 6C 75 64 65 20 3C    #include <     10   73 74 64 69 6F 2E 68 3E 0D 0A    stdio.h>..     20   0D 0A 69 6E 74 20 6D 61 69 6E    ..int main     30   28 76 6F 69 64 29 0D 0A 7B 0D    (void)..{.     40   0A 20 20 70 72 69 6E 74 66 28    .  printf(     50   22 64 6F 20 43 2C 20 6F 72 20    "To C, or      60   6E 6F 74 20 74 6F 20 43 3A 20    not to C:      70   74 68 61 74 20 69 73 20 74 68    that is th     80   65 20 71 75 65 73 74 69 6F 6E    e question     90   2E 5C 6E 22 29 3B 0D 0A 20 20    .\n");..    100   72 65 74 75 72 6E 20 30 3B 0D    return 0;.    110   0A 7D                            .}  每行分别以字节方式和字符方式显示文件中的10个字节。Offset一栏中的数值表示该行的第一个字 节在文件中的位置。只显示打印字符（由isprint 函数确定），其他字符显示为点。注意，根据字 符集和操作系统的不同，文本文件的形式可能不同。上面的示例假设pun.c是Windows文件，因此在 每行的最后有0D和0A（ASCII码的回车和回行符）。提示：确保用"rb"模式打开文件。  
-7. 在文件内容压缩的众多方法中，最快捷的方法之一是行程长度编码（run-length encoding）。这种方法 通过用一对字节替换相同的字节序列来压缩文件：第一个字节是重复计数，第二个字节是需要重复 的字节。例如，假设待压缩的文件以下列字节序列开始（以十六进制形式显示）：46 6F 6F 20 62 61 72 21 21 21 20 20 20 20 20  压缩后的文件将包含下列字节：  01 46 02 6F 01 20 01 62 01 61 01 72 03 21 05 20  如果原始文件包含许多相同字节的长序列，那么行程长度编码的方法非常适用。最差的情况（文件中 没有连续的重复字节）下，行程长度编码实际上可能使文件的长度加倍。  (a) 编写名为 compress_file 的程序，此程序使用行程长度编码方法来压缩文件。为了运行程序 compress_file，将使用下列格式的命令：  compress_file 原始文件  程序compress_file 将把原始文件的压缩版本写入到“原始文件.rle”文件中。例如，命令  compress_file foo.txt  将使程序compress_file 把文件 foo.txt的压缩版写到名为 foo.txt.rle的文件中。提示：编程题 6 描述的程序可以用来调试。  (b) 编写名为 uncompress_file 的程序，此程序是程序 compress_file 的反向操作。程序 uncompress_file 的命令格式为  uncompress_file compressed-file  压缩后的文件（compressed-file）扩展名为.rle。例如，命令  uncompress_file foo.txt.rle  会使程序uncompress_file 打开文件 foo.txt.rle，并且把未压缩版的内容写入 foo.txt。如果命令行参 数的扩展名不是.rle，uncompress_file应显示一条出错消息。  
-8. 通过添加两个新的操作来修改16.3节中的inventory.c程序：   在指定文件中保存数据库；   从指定文件中装载数据库。  分别使用代码d（转储）和r（恢复）来表示这两种操作。与用户的交互应该按照下列显示进行：  Enter operation code: d  Enter name of output file: inventory.dat Enter operation code: r  Enter name of input file: inventory.dat 
-9. 编写程序对由inventory程序存储的含有零件记录的两个文件进行合并（见编程题8）。假设每个文件 中的记录都是根据零件编号进行排序的，且我们希望结果文件也应是排好序的。如果两个文件中存 在编号相同的零件，那么要对记录中存储的数量进行合并。（作为一致性的检查，程序要比较零件的 名称，并且在不匹配时显示出错消息。）程序从命令行获取输入文件名以及合并后的文件名。   
-10. 修改 17.5节中的程序inventory2.c，方法是添加编程题8中描述的d（转储）操作和r（恢复）操作。 因为零件的结构不存储在数组中，所以 d 操作无法通过单独一个 fwrite 调用来保存所有内容。因 而，它需要访问链表中的每个结点，把零件的编号、名称以及现有的零件数量保存到文件中。（不保 存指针next，因为一旦程序终止，这一指针就不再有效。）当程序从文件中读取零件时，r操作将重 新构建列表（每次恢复一个结点）。  
-11. 编写程序从命令行读取日期，并且按照下列格式显示：  September 13, 2010允许用户以9-13-2010或者9/13/2010的形式输入日期，并假设日期中没有空格。如果没有按照指 定格式输入日期，那么程序显示出错消息。提示：使用sscanf函数从命令行参数中提取月、日和 年的信息。  
-12. 修改第3章的编程题2，让程序从文件中读取一系列数据项并按列显示数据。文件的每一行具有如下 形式：   数据项,价格,月/日/年    例如，假设文件包含下列两行：   583,13.5,10/24/2005  3912,599.99,7/27/2008    程序的输出形式如下：   Item   Unit   Purchase     Price  Date  583   $  13.50  10/24/2005  3912   $ 599.99  7/27/2008    程序从命令行获取文件名。  
-13. 修改第5章的编程题8，让程序从名为flights.dat的文件中获取起飞时间和抵达时间。文件的每一行先 给出起飞时间再给出抵达时间，中间用一个或多个空格隔开。时间用24小时制表示。例如，如果文 件包含的是原题中的航班信息，则flights.dat如下：   8:00 10:16  9:43 11:52  11:19 13:31  12:47 15.00  14:00 16:08  15:45 17:55  19:00 21:20  21:45 23:58   
-14. 修改第8章的编程题15，让程序提示用户输入包含待加密消息的文件名：   Enter name of file to be encrypted: message.txt  Enter shift amount (1-25): 3    接下来，程序把加密后的消息写入另一个文件，该文件在所读取的文件名之后加上扩展名.enc。在 上面的例子中，原始文件名为message.txt，所以加密消息存储在名为message.txt.enc的文件中。待加 密文件的大小不限，文件中每行的长度也不限。  
+
+6. 编写程序，按字节方式和字符方式显示文件的内容。用户通过命令行指定文件名。程序用于显示2.1 节的pun.c文件时，输出如下：  
+
+   ```
+   Offset                Bytes                Characters 
+   ------    -----------------------------    ---------- 
+        0    23 69 6E 63 6C 75 64 65 20 3C    #include < 
+       10    73 74 64 69 6F 2E 68 3E 0D 0A    stdio.h>.. 
+       20    0D 0A 69 6E 74 20 6D 61 69 6E    ..int main 
+       30    28 76 6F 69 64 29 0D 0A 7B 0D    (void)..{. 
+       40    0A 20 20 70 72 69 6E 74 66 28    . printf( 
+       50    22 64 6F 20 43 2C 20 6F 72 20    "To C, or 
+       60    6E 6F 74 20 74 6F 20 43 3A 20    not to C: 
+       70    74 68 61 74 20 69 73 20 74 68    that is th 
+       80    65 20 71 75 65 73 74 69 6F 6E    e question 
+       90    2E 5C 6E 22 29 3B 0D 0A 20 20    .\n");.. 
+      100    72 65 74 75 72 6E 20 30 3B 0D    return 0;. 
+      110    0A 7D                            .}
+   ```
+
+   每行分别以字节方式和字符方式显示文件中的10个字节。Offset一栏中的数值表示该行的第一个字节在文件中的位置。只显示打印字符（由isprint 函数确定），其他字符显示为点。注意，根据字符集和操作系统的不同，文本文件的形式可能不同。上面的示例假设pun.c是Windows文件，因此在每行的最后有0D和0A（ASCII码的回车和回行符）。提示：确保用"rb"模式打开文件。  
+
+7. 在文件内容压缩的众多方法中，最快捷的方法之一是行程长度编码（run-length encoding）。这种方法通过用一对字节替换相同的字节序列来压缩文件：第一个字节是重复计数，第二个字节是需要重复 的字节。例如，假设待压缩的文件以下列字节序列开始（以十六进制形式显示）：
+
+   ```
+   46 6F 6F 20 62 61 72 21 21 21 20 20 20 20 20  
+   ```
+
+   压缩后的文件将包含下列字节：  
+
+   ```
+   01 46 02 6F 01 20 01 62 01 61 01 72 03 21 05 20  
+   ```
+
+   如果原始文件包含许多相同字节的长序列，那么行程长度编码的方法非常适用。最差的情况（文件中没有连续的重复字节）下，行程长度编码实际上可能使文件的长度加倍。  
+   (a) 编写名为 compress_file 的程序，此程序使用行程长度编码方法来压缩文件。为了运行程序 			compress_file，将使用下列格式的命令：  
+
+   ```
+   compress_file 原始文件
+   ```
+
+   程序compress_file 将把原始文件的压缩版本写入到“原始文件.rle”文件中。例如，命令  
+
+   ```
+   compress_file foo.txt  
+   ```
+
+   将使程序compress_file 把文件 foo.txt的压缩版写到名为 foo.txt.rle的文件中。提示：编程题 6 描述的程序可以用来调试。  
+   (b) 编写名为 uncompress_file 的程序，此程序是程序 compress_file 的反向操作。程序 uncompress_file 的命令格式为  
+
+   ```
+   uncompress_file compressed-file
+   ```
+
+   压缩后的文件（$compressed-file$）扩展名为.rle。例如，命令  
+   uncompress_file foo.txt.rle  
+   会使程序uncompress_file 打开文件 foo.txt.rle，并且把未压缩版的内容写入 foo.txt。如果命令行参 数的扩展名不是.rle，uncompress_file应显示一条出错消息。  
+
+8. 通过添加两个新的操作来修改16.3节中的inventory.c程序：  
+
+   - 在指定文件中保存数据库；  
+   - 从指定文件中装载数据库。  
+
+   分别使用代码d（转储）和r（恢复）来表示这两种操作。与用户的交互应该按照下列显示进行：  
+
+   ```
+   Enter operation code: d  
+   Enter name of output file: inventory.dat 
+   
+   Enter operation code: r  
+   Enter name of input file: inventory.dat 
+   ```
+
+   
+
+9. 编写程序对由inventory程序存储的含有零件记录的两个文件进行合并（见编程题8）。假设每个文件中的记录都是根据零件编号进行排序的，且我们希望结果文件也应是排好序的。如果两个文件中存在编号相同的零件，那么要对记录中存储的数量进行合并。（作为一致性的检查，程序要比较零件的名称，并且在不匹配时显示出错消息。）程序从命令行获取输入文件名以及合并后的文件名。   
+
+10. 修改 17.5节中的程序inventory2.c，方法是添加编程题8中描述的d（转储）操作和r（恢复）操作。 因为零件的结构不存储在数组中，所以 d 操作无法通过单独一个 fwrite 调用来保存所有内容。因而，它需要访问链表中的每个结点，把零件的编号、名称以及现有的零件数量保存到文件中。（不保存指针next，因为一旦程序终止，这一指针就不再有效。）当程序从文件中读取零件时，r操作将重新构建列表（每次恢复一个结点）。  
+
+11. 编写程序从命令行读取日期，并且按照下列格式显示：  
+
+    ```
+    September 13, 2010
+    ```
+
+    允许用户以9-13-2010或者9/13/2010的形式输入日期，并假设日期中没有空格。如果没有按照指定格式输入日期，那么程序显示出错消息。提示：使用sscanf函数从命令行参数中提取月、日和年的信息。  
+
+12. 修改第3章的编程题2，让程序从文件中读取一系列数据项并按列显示数据。文件的每一行具有如下形式： 
+            $数据项,价格,月/日/年$    
+    例如，假设文件包含下列两行：   
+
+    ```
+    583,13.5,10/24/2005  
+    3912,599.99,7/27/2008
+    ```
+
+    程序的输出形式如下：   
+
+    ```
+    Item   Unit      Purchase     
+    			 Price     Date  
+    583    $  13.50  10/24/2005  
+    3912   $ 599.99  7/27/2008  
+    ```
+
+    程序从命令行获取文件名。  
+
+13. 修改第5章的编程题8，让程序从名为flights.dat的文件中获取起飞时间和抵达时间。文件的每一行先 给出起飞时间再给出抵达时间，中间用一个或多个空格隔开。时间用24小时制表示。例如，如果文 件包含的是原题中的航班信息，则flights.dat如下：   
+
+    ```
+    8:00 10:16  
+    9:43 11:52  
+    11:19 13:31  
+    12:47 15.00  
+    14:00 16:08  
+    15:45 17:55  
+    19:00 21:20  
+    21:45 23:58
+    ```
+
+       
+
+14. 修改第8章的编程题15，让程序提示用户输入包含待加密消息的文件名：   
+
+    ```
+    Enter name of file to be encrypted: message.txt  
+    Enter shift amount (1-25): 3 
+    ```
+
+    接下来，程序把加密后的消息写入另一个文件，该文件在所读取的文件名之后加上扩展名.enc。在上面的例子中，原始文件名为message.txt，所以加密消息存储在名为message.txt.enc的文件中。待加密文件的大小不限，文件中每行的长度也不限。  
+
 15. 修改15.3节的justify程序，使其从一个文本文件中读取并写入另一个文本文件。程序从命令行获取 这两个文件名。  
+
 16. 修改22.4节的fcopy.c程序，使其用fread和fwrite来复制文件，复制时使用512字节的块。（当 然，最后一个块包含的字节数可能少于512。）  
-17. 编写程序，从文件中读取一系列电话号码并以标准格式显示。文件的每一行只包含一个电话号码， 但可能存在多种格式。可以假定每行包含10个数字，可能夹杂着其他字符（可以忽略）。例如，假定 文件包含如下内容：   404.817.6900  (215) 686-1776  312-746-6000  877 275 5273  6173434200 程序的输出如下：  (404) 817-6900  (215) 686-1776  (312) 746-6000  (877) 275-5273  (617) 343-4200  程序从命令行获取文件名。  
-18. 编写程序从文本文件中读取整数，文本文件的名字由命令行参数给出。文件的每一行可以包含任意 数量的整数（也可以没有），中间用一个或多个空格隔开。程序显示文件中最大的数、最小的数以及 中位数（整数有序情况下最接近中间的那个数）。如果文件包含偶数个整数，中间会有两个整数，程 序将显示它们的均值（向下舍入）。可以假定文件包含的整数个数不超过10 000。提示：把整数存储 在数组中并对其排序。  
-19. (a) 编写程序把Windows的文本文件转换成UNIX的文本文件。（见22.1节关于两者区别的讨论。）  (b) 编写程序把UNIX的文本文件转换成Windows的文本文件。  每种情况下都从命令行获取两个文件的名字。提示：以"rb"模式打开输入文件，以"wb"模式打开输 出文件。
+
+17. 编写程序，从文件中读取一系列电话号码并以标准格式显示。文件的每一行只包含一个电话号码， 但可能存在多种格式。可以假定每行包含10个数字，可能夹杂着其他字符（可以忽略）。例如，假定 文件包含如下内容：   
+
+    ```
+    404.817.6900  
+    (215) 686-1776  
+    312-746-6000  
+    877 275 5273  
+    6173434200 
+    ```
+
+    程序的输出如下：  
+
+    ```
+    (404) 817-6900  
+    (215) 686-1776  
+    (312) 746-6000  
+    (877) 275-5273  
+    (617) 343-4200 
+    ```
+
+    程序从命令行获取文件名。  
+
+18. 编写程序从文本文件中读取整数，文本文件的名字由命令行参数给出。文件的每一行可以包含任意数量的整数（也可以没有），中间用一个或多个空格隔开。程序显示文件中最大的数、最小的数以及中位数（整数有序情况下最接近中间的那个数）。如果文件包含偶数个整数，中间会有两个整数，程序将显示它们的均值（向下舍入）。可以假定文件包含的整数个数不超过10 000。提示：把整数存储在数组中并对其排序。  
+
+19. (a) 编写程序把Windows的文本文件转换成UNIX的文本文件。（见22.1节关于两者区别的讨论。）  
+    (b) 编写程序把UNIX的文本文件转换成Windows的文本文件。  
+    每种情况下都从命令行获取两个文件的名字。提示：以"rb"模式打开输入文件，以"wb"模式打开输 出文件。
 
 ## 第二十三章 库对数值和字符数据的支持
 
@@ -15544,42 +16325,73 @@ White advanced!
 
 23.3 节  
 
-1. 扩展 round_nearest 函数，使它可以将浮点数x舍入成小数点后n位。例如，调用round_nearest  (3.14159, 3)会返回 3.142。提示：将x乘以10n，舍入成最接近的整数，再除以10n。确保你的函 数在x为正数和负数的情况下都可以正常工作。  
+1. 扩展 round_nearest 函数，使它可以将浮点数$x$舍入成小数点后$n$位。例如，调用round_nearest  (3.14159, 3)会返回 3.142。提示：将x乘以$10^n$，舍入成最接近的整数，再除以$10^n$。确保你的函数在$x$为正数和负数的情况下都可以正常工作。  
 
 23.4 节 
 
-2. 编写下列函数：  double evaluate_polynomial(double a[], int n, double x); 函数应返回多项式1 1 0      n n n n ax a x a的值，其中i a存储在数组a的相应元素中，数组a的长度 为n+1。使用Horner法则计算多项式的值：          1 2 1 0 n n n ax a x a x x a x a            使用fma函数执行乘法和加法。  
-3. 查看你的编译器文档，看它是否对算术表达式进行了紧缩；如果进行了紧缩，看看在什么条件 下这么做。  23.5节   
-4. 使用isalpha和isalnum编写一个函数，用来检查一个字符串是否符合C语言标识符的语法（由字 母、数字和下划线组成，并以字母或下划线开始）。  
-5. 使用isxdigit编写一个函数，用来检查一个字符串是否表示有效的十六进制数（只包含十六进制数 字）。如果是，则函数把该数作为long int类型的值返回；否则函数返回1。  
+2. 编写下列函数：  
+   `double evaluate_polynomial(double a[], int n, double x);` 
+   函数应返回多项式$a_n x^n + a_{n-1} x^{n-1} + \cdots + a_0$的值，其中i a存储在数组a的相应元素中，数组a的长度 为n+1。使用Horner法则计算多项式的值： 
+   $$
+   \left( \left(  \cdots \left( \left( a_n x + a_{n-1} \right) x + a_{n-2} \right) x + \cdots \right) x + a_1 \right) x + a_0
+   $$
+   使用fma函数执行乘法和加法。  
+3. 查看你的编译器文档，看它是否对算术表达式进行了紧缩；如果进行了紧缩，看看在什么条件 下这么做。
+
+23.5节   
+
+4. 使用isalpha和isalnum编写一个函数，用来检查一个字符串是否符合C语言标识符的语法（由字母、数字和下划线组成，并以字母或下划线开始）。  
+
+5. 使用isxdigit编写一个函数，用来检查一个字符串是否表示有效的十六进制数（只包含十六进制数 字）。如果是，则函数把该数作为long int类型的值返回；否则函数返回$-1$。  
 
 23.6节   
 
-6.  对于下面列举的每种情况，指出使用memcpy、memmove、strcpy和strncpy中哪一个函数最好。假 定所列举的行为都是由一个函数调用完成的。   
+6.  对于下面列举的每种情况，指出使用memcpy、memmove、strcpy和strncpy中哪一个函数最好。假定所列举的行为都是由一个函数调用完成的。   
    (a) 将数组中的每个元素都“下移”一个位置，以便将第0个位置空出给新元素。   
    (b) 通过将后面的所有字符都前移一个位置，来删除以空字符结尾的字符串中的第一个字符。   
-   (c) 将一个字符串复制到一个字符数组中，这个字符数组的大小可能不够存放整个字符串。如果数组 太小，就将字符串截断，末尾不需要空字符。   
+   (c) 将一个字符串复制到一个字符数组中，这个字符数组的大小可能不够存放整个字符串。如果数组太小，就将字符串截断，末尾不需要空字符。   
    (d) 将一个数组变量的内容复制到另一个数组变量中。  
-7. 在23.6节中阐述了如何反复调用strchr函数在字符串中找到指定字符的所有出现位置。能否通过反 复调用strrchr函数反向找到指定字符的所有出现位置呢？  
-8. 使用strchr函数编写如下函数：   int numchar(const char *s, char ch);    函数numchar返回字符ch在字符串s中出现的次数。  
-9. 使用一个strchr函数调用来替换下面if语句中的测试条件：   if (ch == 'a' || ch == 'b' || ch == 'c') ...   
-10. 使用一个strstr函数调用来替换下面if语句中的测试条件：   if (strcmp(str, "foo") == 0 || strcmp(str, "bar") == 0 ||     strcmp(str, "baz") == 0) ...    提示：将字面串合并到一个字符串中，并使用一个特殊字符分隔它们。你的答案是否需要对str的 内容做一定的假设？  
+7. 在23.6节中阐述了如何反复调用strchr函数在字符串中找到指定字符的所有出现位置。能否通过反复调用strrchr函数反向找到指定字符的所有出现位置呢？  
+8. 使用strchr函数编写如下函数：   
+   `int numchar(const char *s, char ch);`    
+   函数numchar返回字符ch在字符串s中出现的次数。  
+9. 使用一个strchr函数调用来替换下面if语句中的测试条件：   
+   `if (ch == 'a' || ch == 'b' || ch == 'c') ...`   
+10. 使用一个strstr函数调用来替换下面if语句中的测试条件：   
+
+    ```C
+    if (strcmp(str, "foo") == 0 || strcmp(str, "bar") == 0 ||     
+    		strcmp(str, "baz") == 0) ...    
+    ```
+
+    提示：将字面串合并到一个字符串中，并使用一个特殊字符分隔它们。你的答案是否需要对str的内容做一定的假设？  
 11. 编写一个memset函数的调用，将一个以空字符结尾的字符串s的最后n个字符替换为!字符。  
-12. 的许多版本提供了额外的（非标准）函数，例如下面列出的一些函数。使用C标准的特 性给出每一个函数的实现。   
-    (a) strdup(s)：返回一个指针，该指针指向通过调用malloc函数获得的内存中保存的s的一个副 本。如果没有足够的内存可分配，则返回空指针。  
+12. <string.h>的许多版本提供了额外的（非标准）函数，例如下面列出的一些函数。使用C标准的特 性给出每一个函数的实现。   
+    
+    ```
+    (a) strdup(s)：返回一个指针，该指针指向通过调用malloc函数获得的内存中保存的s的一个副本。如果没有足够的内存可分配，则返回空指针。  
     (b) stricmp(s1, s2)：与strcmp函数类似，但不考虑字母的大小写。  
     (c) strlwr(s)：将s中的大写字母转换为小写字母，其他字符不变，返回s。 
     (d) strrev(s)：反转字符串s中的字符顺序（空字符除外），返回s。  
-    (e) strset(s, ch)：将 s 用 ch 的副本填充，返回s。  如果要对这些函数进行测试，需要修改其名字。以str开头的函数名是C标准保留的。 
-13. 使用strtok 编写下列函数：  int count_words(char *sentence);  count_words 返回字符串 sentence 中单词的数量，其中“单词”是任意的非空白字符序列。允许 count_words 修改字符串。
+    (e) strset(s, ch)：将 s 用 ch 的副本填充，返回s。
+    ```
+    
+      如果要对这些函数进行测试，需要修改其名字。以str开头的函数名是C标准保留的。 
+13. 使用strtok 编写下列函数：  
+    `int count_words(char *sentence);`  
+    count_words 返回字符串 sentence 中单词的数量，其中“单词”是任意的非空白字符序列。允许 count_words 修改字符串。
 
 ### 编程题
 
-1. 编写一个程序，使用下面的公式求方程ax2+bx+c=0的根：  2 x      b b ac 2 a 4 程序提示用户输入a、b和c的值，然后显示出x的两个解。（如果b24ac的值小于0，那么程序需 要显示一条消息，指出根是复数。）  
-2. 编写一个程序，将文本文件从标准输入复制到标准输出，并删除每行开头的空白字符。不要复制仅 包含空白字符的行。  
+1. 编写一个程序，使用下面的公式求方程$ax^2+bx+c=0$的根：  
+   $$
+   x = \frac{-b \pm \sqrt{b^2 - 4ac}}{2a}
+   $$
+   程序提示用户输入a、b和c的值，然后显示出x的两个解。（如果$b^2-4ac$的值小于0，那么程序需要显示一条消息，指出根是复数。）  
+2. 编写一个程序，将文本文件从标准输入复制到标准输出，并删除每行开头的空白字符。不要复制仅包含空白字符的行。  
 3. 编写一个程序，将文本文件从标准输入复制到标准输出，将每个单词的首字母大写。  
-4. 编写一个程序，提示用户输入一系列单词，单词之间用一个空格隔开，然后按相反的顺序显示出 来。将输入按字符串的形式读入，然后使用strtok函数将它们分隔成单词。  625  626  
-5. 假定把钱存入一个储蓄账户t年。设年利率为r，且利息逐年复合。公式A(t)=Pert可以用于计算账户 的最终余额，其中P是初始的存款。例如，按年利率6%把1000美元存10年可以得到1000×e0.06× 10  =1000×e0.6=1000×1.822 118 8≈1822.12 美元。编写程序提示用户输入初始存款、利率和年数，然后 显示计算结果。  
+4. 编写一个程序，提示用户输入一系列单词，单词之间用一个空格隔开，然后按相反的顺序显示出来。将输入按字符串的形式读入，然后使用strtok函数将它们分隔成单词。   
+5. 假定把钱存入一个储蓄账户t年。设年利率为r，且利息逐年复合。公式$A(t)=Pe^{rt}$可以用于计算账户的最终余额，其中P是初始的存款。例如，按年利率6%把1000美元存10年可以得到1000×$e^{0.06× 10}$  =1000×$e^{0.6}$=1000×1.822 118 8≈1822.12 美元。编写程序提示用户输入初始存款、利率和年数，然后显示计算结果。  
 6. 编写一个程序，将文本文件从标准输入复制到标准输出，将除\n之外的控制字符替换为问号。  
 7. 编写一个程序，统计文本文件（从标准输入获取）中句子的数目。假定每个句子以.、?或!结尾，且 后面有一个空白字符（包括\n）。 
 
@@ -15589,28 +16401,113 @@ White advanced!
 
 24.1 节  
 
-1. (a) 断言可以用来检测两种问题：第一种是如果程序正确就不应该发生的问题，第二种是超出程序控 制范围的问题。请解释为什么assert更适用于第一种问题。  (b) 请举出三个超出程序控制范围的问题的例子。   
+1. (a) 断言可以用来检测两种问题：第一种是如果程序正确就不应该发生的问题，第二种是超出程序控制范围的问题。请解释为什么assert更适用于第一种问题。  
+   (b) 请举出三个超出程序控制范围的问题的例子。   
 2. 编写assert 函数调用，当名为top的变量取值为NULL时使程序终止。  
 3. 修改19.4节的stackADT2.c文件，用assert取代if语句来测试错误。（注意，不再需要terminate 函数了，可以删除它。）  
 
 24.2 节  
 
-4. (a) 编写一个名为try_math_fcn的“包装”函数来调用数学函数（假定有一个double类型的参数， 并返回一个double类型的值），然后检查调用是否成功。下面是使用try_math_fnc函数的例子：  y = try_math_fcn(sqrt, x, "Error in call of sqrt");如果调用sqrt(x)成功，try_math_fcn 返回 sqrt 函数的计算结果。如果调用失败，try_math_fcn 需要调用perror显示消息Error in call of sqrt，然后调用exit函数终止程序。  (b) 编写一个与try_math_fcn 具有相同效果的宏，但要求使用函数的名字来构造出错消息：  y = TRY_MATH_FCN(sqrt, x);  如果调用sqrt失败，显示的出错消息应该是“Error in call of sqrt”。提示：让TRY_MATH_FCN 调用try_math_fcn。  
+4. (a) 编写一个名为try_math_fcn的“包装”函数来调用数学函数（假定有一个double类型的参数， 并返回一个double类型的值），然后检查调用是否成功。下面是使用try_math_fnc函数的例子：  
+   `y = try_math_fcn(sqrt, x, "Error in call of sqrt");`
+   如果调用sqrt(x)成功，try_math_fcn 返回 sqrt 函数的计算结果。如果调用失败，try_math_fcn 需要调用perror显示消息Error in call of sqrt，然后调用exit函数终止程序。  
+   (b) 编写一个与try_math_fcn 具有相同效果的宏，但要求使用函数的名字来构造出错消息：  
+   `y = TRY_MATH_FCN(sqrt, x);`  
+   如果调用sqrt失败，显示的出错消息应该是“Error in call of sqrt”。提示：让TRY_MATH_FCN 调用try_math_fcn。  
 
 24.3 节  
 
-5. 在 inventory.c 程序（见 16.3节）中，main 函数用一个for 循环来提示用户输入一个操作码，然后读 入码并调用insert、search、update 或print。在main 函数中加入一个setjmp 调用，要求使随 后的longjmp 调用会返回到for循环。（在调用longjmp函数后，提示用户输入一个操作码，随后 程序正常执行。）setjmp需要一个jmp_buf类型的变量，这个变量应该在哪儿声明呢？
+5. 在 inventory.c 程序（见 16.3节）中，main 函数用一个for 循环来提示用户输入一个操作码，然后读入码并调用insert、search、update 或print。在main 函数中加入一个setjmp 调用，要求使随后的longjmp 调用会返回到for循环。（在调用longjmp函数后，提示用户输入一个操作码，随后程序正常执行。）setjmp需要一个jmp_buf类型的变量，这个变量应该在哪儿声明呢？
 
 ## 第二十五章 国际化特征
 
 ### 练习题
 
-25.1 节  1.请确定你用的编译器支持哪些地区。  25.2 节  2.用于kanji（日文中的汉字）的Shift-JIS编码要求每个字符是单字节或者是双字节的。如果字符的第 一个字节位于0x81 和0x9f 之间，或者位于0xe0 和0xef 之间，那么就需要第二个字节。（把任何 其他字节看成是整个字符。）第二个字节必须在0x40和0x7e之间，或者在0x80和0xfc之间。 （所有的范围都包含边界值。）请指出以下面的每个字符串作为参数时，25.2节的mbcheck 函数的返 回值。假定多字节字符用当前地区的Shift-JIS编码。  (a) "\x05\x87\x80\x36\xed\xaa"  (b) "\x20\xe4\x50\x88\x3f"  (c) "\xde\xad\xbe\xef"  (d) "\x8a\x60\x92\x74\x41"  3.UTF-8的一个有用的性质是，多字节字符内的字节序列不可能表示其他的有效多字节字符。用于 kanji 的 Shift-JIS 编码（见练习题2）是否具有这一性质？  4.给出表示如下短语的C语言字面串。假设字符à、è、é、ê、î、ô、û和ü用单字节的Latin-1字符表示。 （需要查出这些字符的Latin-1码点。）例如，短语déjà vu可以用字符串"d\xe9j\xe0 vu"表示。  (a) Côte d'Azur(b) crème brûlée  (c) crème fraîche  (d) Fahrvergnügen  (e) tête-à-tête  675  676  5.重复练习题4，这次采用UTF-8多字节编码。例如，短语déjà vu可以用字符串"d\xc3\xa9j\xc3\  xa0 vu"表示。  25.3 节  6. 请通过尽可能多地用三联符替换字符的方法来修改下面的程序段。  while ((orig_char = getchar()) != EOF) {   new_char = orig_char ^ KEY;   if (isprint(orig_char) && isprint(new_char))     putchar(new_char);   else     putchar(orig_char);  }  7. 修改练习题6中的程序段，用双联符和中定义的宏来替换尽可能多的记号。 
+25.1 节  
+
+1. 请确定你用的编译器支持哪些地区。  
+
+25.2 节  
+
+2. 用于kanji（日文中的汉字）的Shift-JIS编码要求每个字符是单字节或者是双字节的。如果字符的第一个字节位于0x81 和0x9f 之间，或者位于0xe0 和0xef 之间，那么就需要第二个字节。（把任何其他字节看成是整个字符。）第二个字节必须在0x40和0x7e之间，或者在0x80和0xfc之间。（所有的范围都包含边界值。）请指出以下面的每个字符串作为参数时，25.2节的mbcheck 函数的返回值。假定多字节字符用当前地区的Shift-JIS编码。  
+
+   ```
+   (a) "\x05\x87\x80\x36\xed\xaa"  
+   (b) "\x20\xe4\x50\x88\x3f"  
+   (c) "\xde\xad\xbe\xef"  
+   (d) "\x8a\x60\x92\x74\x41"  
+   ```
+
+   
+
+3. UTF-8的一个有用的性质是，多字节字符内的字节序列不可能表示其他的有效多字节字符。用于 kanji 的 Shift-JIS 编码（见练习题2）是否具有这一性质？  
+
+4. 给出表示如下短语的C语言字面串。假设字符à、è、é、ê、î、ô、û和ü用单字节的Latin-1字符表示。 （需要查出这些字符的Latin-1码点。）例如，短语déjà vu可以用字符串`"d\xe9j\xe0 vu"`表示。  
+
+   ```
+   (a) Côte d'Azur
+   (b) crème brûlée  
+   (c) crème fraîche  
+   (d) Fahrvergnügen  
+   (e) tête-à-tête  
+   ```
+
+   
+
+5. 重复练习题4，这次采用UTF-8多字节编码。例如，短语`déjà vu`可以用字符串`"d\xc3\xa9j\xc3\  xa0 vu"`表示。  
+
+25.3 节  
+
+6. 请通过尽可能多地用三联符替换字符的方法来修改下面的程序段。  
+
+   ```C
+   while ((orig_char = getchar()) != EOF) { 
+     new_char = orig_char ^ KEY; 
+     if (isprint(orig_char) && isprint(new_char)) 
+       putchar(new_char); 
+     else 
+       putchar(orig_char); 
+   }
+   ```
+
+   
+
+7. 修改练习题6中的程序段，用双联符和<iso646.h>中定义的宏来替换尽可能多的记号。 
 
 ### 编程题
 
 1. 编写一个程序，用来测试你用的编译器的""（本地）地区是否和"C"地区一样。  
-2. 编写一个程序，从命令行获取地区的名字，然后显示存储在相应的 lconv 结构中的值。例如，如果 地区是"fi_FI"（芬兰），程序的输出可能如下：  decimal_point = ","  thousands_sep = " "  grouping = 3  mon_decimal_point = ","  mon_thousands_sep = " "  mon_grouping = 3  positive_sign = ""  negative_sign = "-"  currency_symbol = "EUR"  frac_digits = 2  p_cs_precedes = 0  n_cs_precedes = 0  p_sep_by_space = 2  n_sep_by_space = 2  p_sign_posn = 1  n_sign_posn = 1  int_curr_symbol = "EUR "  int_frac_digits = 2  int_p_cs_precedes = 0  int_n_cs_precedes = 0  int_p_sep_by_space = 2  int_n_sep_by_space = 2  int_p_sign_posn = 1  int_n_sign_posn = 1  出于可读性的考虑，grouping和mon_grouping中的字符应显示为十进制数。
+2. 编写一个程序，从命令行获取地区的名字，然后显示存储在相应的 lconv 结构中的值。例如，如果地区是"fi_FI"（芬兰），程序的输出可能如下：  
+
+   ```C
+   decimal_point = "," 
+   thousands_sep = " " 
+   grouping = 3 
+   mon_decimal_point = "," 
+   mon_thousands_sep = " " 
+   mon_grouping = 3 
+   positive_sign = "" 
+   negative_sign = "-" 
+   currency_symbol = "EUR" 
+   frac_digits = 2 
+   p_cs_precedes = 0 
+   n_cs_precedes = 0 
+   p_sep_by_space = 2 
+   n_sep_by_space = 2 
+   p_sign_posn = 1 
+   n_sign_posn = 1 
+   int_curr_symbol = "EUR " 
+   int_frac_digits = 2 
+   int_p_cs_precedes = 0 
+   int_n_cs_precedes = 0 
+   int_p_sep_by_space = 2 
+   int_n_sep_by_space = 2 
+   int_p_sign_posn = 1 
+   int_n_sign_posn = 1
+   ```
+
+
+   出于可读性的考虑，grouping和mon_grouping中的字符应显示为十进制数。
 
 ## 第二十六章 其他库函数
 
@@ -15618,47 +16515,67 @@ White advanced!
 
 26.1 节 
 
-1. 重新编写 max_int 函数，要求不再把整数的个数作为第一个参数，我们必须采用0作为最后一个参 数。提示：max_int 函数必须至少有一个“正常的”参数，所以不能把参数n移走，可以假设n是 要比较的数之一。  
+1. 重新编写 max_int 函数，要求不再把整数的个数作为第一个参数，我们必须采用0作为最后一个参数。提示：max_int 函数必须至少有一个“正常的”参数，所以不能把参数n移走，可以假设n是要比较的数之一。  
 
-2. 编写printf函数的简化版，要求新函数只有一种转换说明%d，并且第一个参数后边的所有参数都必 须是int 类型的。如果函数遇到的%字符后面没有紧跟着字符d，那么同时忽略这两个字符。函数应 调用putchar 来生成所有的输出。可以假定格式串不包含转义序列。  
+2. 编写printf函数的简化版，要求新函数只有一种转换说明%d，并且第一个参数后边的所有参数都必须是int 类型的。如果函数遇到的%字符后面没有紧跟着字符d，那么同时忽略这两个字符。函数应调用putchar 来生成所有的输出。可以假定格式串不包含转义序列。  
 
-3. 扩展练习题2中的函数，使其允许两种转换说明：%d和%s。格式串中的每个%d表示一个int类型的 参数，每个%s表示一个char *类型的参数（字符串）。  
-4. 编写名为 display 的函数，要求支持任意数量的参数。第一个参数必须是整数，其余参数是字符 串。第一个参数指明调用包含多少个字符串。函数在一行内打印出这些字符串，相邻字符串之间用 一个空格隔开。例如，调用  display(4, "Special", "Agent", "Dale", "Cooper");  将产生下列输出：  Special Agent Dale Cooper  
-5. 编写下列函数：  char *vstrcat(const char *first, ...);  假设vstrcat 函数除最后一个参数必须是空指针（强制转换成char *类型）外，其他参数都是字符 串。函数返回一个指向动态分配的字符串的指针，该字符串包含参数的拼接。如果没有足够的内 存，那么vstrcat 函数应该返回空指针。提示：让vstrcat函数两次遍历参数，一次用来确定返回 字符串需要的内存大小，另一次用来把参数复制到字符串中。  
-6. 编写下列函数：  char *max_pair(int num_pairs, ...);  假设 max_pair 的参数是整数与字符串对，num_pairs 的值表明后面有多少对。（每一对包含一个 int 类型的参数和一个跟随其后的char *类型参数。）函数从整数中搜索出最大的一个，然后返回 它后面的字符串。考虑如下函数调用：  max_pair(5, 180, "Seinfeld", 180, "I Love Lucy",              39, "The Honeymooners", 210, "All in the Family",             86, "The Sopranos")  最大的int类型参数是210，所以函数返回参数列表中跟随其后的"All in the Family"。
+3. 扩展练习题2中的函数，使其允许两种转换说明：%d和%s。格式串中的每个%d表示一个int类型的参数，每个%s表示一个char *类型的参数（字符串）。  
+4. 编写名为 display 的函数，要求支持任意数量的参数。第一个参数必须是整数，其余参数是字符串。第一个参数指明调用包含多少个字符串。函数在一行内打印出这些字符串，相邻字符串之间用 一个空格隔开。例如，调用  
+   `display(4, "Special", "Agent", "Dale", "Cooper");`  
+   将产生下列输出：  
+   `Special Agent Dale Cooper`  
+5. 编写下列函数：  
+   `char *vstrcat(const char *first, ...);`  
+   假设vstrcat 函数除最后一个参数必须是空指针（强制转换成char *类型）外，其他参数都是字符串。函数返回一个指向动态分配的字符串的指针，该字符串包含参数的拼接。如果没有足够的内存，那么vstrcat 函数应该返回空指针。$提示$：让vstrcat函数两次遍历参数，一次用来确定返回字符串需要的内存大小，另一次用来把参数复制到字符串中。  
+6. 编写下列函数：  
+   `char *max_pair(int num_pairs, ...);`  
+   假设 max_pair 的参数是整数与字符串对，num_pairs 的值表明后面有多少对。（每一对包含一个 int 类型的参数和一个跟随其后的char *类型参数。）函数从整数中搜索出最大的一个，然后返回 它后面的字符串。考虑如下函数调用：  
+
+   ```C
+   max_pair(5, 180, "Seinfeld", 180, "I Love Lucy",              
+            		39, "The Honeymooners", 210, "All in the Family",             
+            		86, "The Sopranos")  
+   ```
+
+   最大的int类型参数是210，所以函数返回参数列表中跟随其后的"All in the Family"。
 
 26.2 节  
 
-7. 解释下列语句的含义。假设value是long int类型的变量，p是char *类型的变量。  value = strtol(p, &p, 10);  
+7. 解释下列语句的含义。假设value是long int类型的变量，p是char *类型的变量。  
+   `value = strtol(p, &p, 10);`  
 8. 编写一条可以从7、11、15或19中随机取一个数赋值给变量n的语句。  
-9. 编写一个可以返回随机的double类型值d的函数，d的取值范围为0.0≤d＜1.0。  
+9. 编写一个可以返回随机的double类型值$d$的函数，$d$的取值范围为$0.0≤d＜1.0$。  
 
 26.3 节  
 
-10. 把下面的atoi、atol 和atoll 调用分别转换为strtol、strtol和strtoll调用。  (a) atoi(str)  (b) atol(str)  (c) atoll(str)  
+10. 把下面的atoi、atol 和atoll 调用分别转换为strtol、strtol和strtoll调用。  
+    (a) atoi(str)  
+    (b) atol(str)  
+    (c) atoll(str)  
 11. bsearch 函数通常用于有序数组，但有时也可以用于部分有序的数组。如果要确保bsearch 能搜到 一个特定的键，数组必须满足什么条件？提示：C标准中有答案。  
 12. 编写一个函数，要求当向此函数传递年份时，函数返回一个time_t类型的值表示该年第一天的12:00  a.m。  
 13. 26.3 节描述了一些ISO 8601的日期和时间格式。下面给出了另一些格式。 
-    (a)年份后面跟着月中的第几天：YYYY-DDD，其中DDD是001~366范围内的数。  
-    (b)年份、星期、星期几：YYYY-Www-D，其中ww是01~53范围内的数；D是1~7范围内的数字，以星期 一开始，星期日结束。  
-    (c)结合日期与时间：YYYY-MM-DDThh:mm:ss  给出与上述每种格式相对应的strftime字符串。
+    (a)年份后面跟着月中的第几天：$YYYY-DDD$，其中$DDD$是001~366范围内的数。  
+    (b)年份、星期、星期几：$YYYY-Www-D$，其中$ww$是01~53范围内的数；$D$是1~7范围内的数字，以星期 一开始，星期日结束。  
+    (c)结合日期与时间：$YYYY-MM-DD$T$hh:mm:ss$  给出与上述每种格式相对应的strftime字符串。
 
 ### 编程题
 
-1. (a) 编写一个程序，使它可以调用rand函数1000次，并且显示函数返回的每个值的最低位（如果返 回值是偶数，则为0；如果返回值为奇数，则为1）。你发现什么模式了吗？（rand的返回值的 最后几位往往不是特别随机的。）  (b) 如何改进rand 函数的随机性，使它可以在一个小范围内产生数？  
-1. 编写程序测试atexit函数。除main函数外，程序还应包含两个函数。一个函数显示That's all,， 另一个显示folks!。用 atexit 函数来注册这两个函数，使其可以在程序终止时被调用。请一定确 保这两个函数按照正确的顺序进行调用，从而可以在屏幕上看到That's all, folks!。  
-1. 编写一个程序，用clock函数来度量qsort函数对有1000个整数的数组进行排序所用的时间，这些 整数初始时是逆序的。然后再把完成的程序用于有10 000个整数和100 000个整数的数组。  
+1. (a) 编写一个程序，使它可以调用rand函数1000次，并且显示函数返回的每个值的最低位（如果返回值是偶数，则为0；如果返回值为奇数，则为1）。你发现什么模式了吗？（rand的返回值的最后几位往往不是特别随机的。）  
+   (b) 如何改进rand 函数的随机性，使它可以在一个小范围内产生数？  
+1. 编写程序测试atexit函数。除main函数外，程序还应包含两个函数。一个函数显示`That's all`,， 另一个显示folks!。用 atexit 函数来注册这两个函数，使其可以在程序终止时被调用。请一定确保这两个函数按照正确的顺序进行调用，从而可以在屏幕上看到`That's all, folks!`。  
+1. 编写一个程序，用clock函数来度量qsort函数对有1000个整数的数组进行排序所用的时间，这些整数初始时是逆序的。然后再把完成的程序用于有10 000个整数和100 000个整数的数组。  
 1. 编写一个程序，提示用户输入一个日期（月、日和年）和一个整数n，然后显示n天后的日期。  
-1. 编写一个程序，提示用户输入两个日期，然后显示两个日期之间相差的天数。提示：使用mktime函 数和difftime 函数。  
-1. 编写一个程序，分别按照下列每种格式显示当前的日期和时间。使用strftime函数来完成全部或大 部分的格式化工作。  
+1. 编写一个程序，提示用户输入两个日期，然后显示两个日期之间相差的天数。提示：使用mktime函数和difftime 函数。  
+1. 编写一个程序，分别按照下列每种格式显示当前的日期和时间。使用strftime函数来完成全部或大部分的格式化工作。  
 
-```
-(a) Sunday, June 3, 2007   05:48p  
-(b) Sun, 3 Jun 07   17:48  
-(c) 06/03/07   5:48:34 PM
-```
+   ```
+   (a) Sunday, June 3, 2007   05:48p  
+   (b) Sun, 3 Jun 07   17:48  
+   (c) 06/03/07   5:48:34 PM
+   ```
 
-
+   
 
 ## 第二十七章 C99 对数学计算的新增支持
 
@@ -15666,51 +16583,79 @@ White advanced!
 
 27.1 节 
 
-1. 在你系统上安装的中，找出intN_t和uintN_t类型的声明。N可以是哪些值？  
+1. 在你系统上安装的中，找出int$N$\_t和uint$N$\_t类型的声明。$N$可以是哪些值？  
 2. 编写如下带参数的宏：INT32_C(n)、UINT32_C(n)、INT64_C(n)和UINT64_C(n)。假设 int 类型和long int 类型为32位宽，而long long int类型为64位宽。提示：使用##预处理运算符把 一个包含字符L和U的组合的后缀加到n的后面。（7.1节介绍了如何在整型常量中使用后缀L和U。）  
 
 27.2 节  
 3. 在下面的每条语句中，假设变量i的类型是原始类型。用中的宏修改每条语句，使得 i 的类型变为指定的新类型时，语句仍能正常工作。  
 
 ```
-(a) printf("%d",i);      
-(b) printf("%12.4d", i);  
-(c) printf("%-6o", i);     
-(d) printf("%#x", i);    
+(a) printf("%d",i); 				原始类型：int 					新类型：int8_t 
+(b) printf("%12.4d", i); 		原始类型：int 					新类型：int32_t 
+(c) printf("%-6o", i); 			原始类型：unsigned int 新类型：uint16_t 
+(d) printf("%#x", i); 			原始类型：unsigned int 新类型：uint64_t
 ```
 
   
 
 27.5 节  
-4. 假设有下列变量声明：  int i;  float f;  double d;  long double ld;  float complex fc;double complex dc;  long double complex ldc;  下面都是中的宏的调用，请给出预处理（用或中的函数替代宏） 之后的形式。
 
-```
-(a) tan(i)  
-(b) fabs(f)  
-(c) asin(d)  
-(d) exp(ld) 
-(e) log(fc)  
-(f) acosh(dc)  
-(g) nexttoward(d,ld)  
-(h) remainder(f, i)  
-(i) copysign(d, ld)  
-(j) carg(i)  
-(k) cimag(f)  
-(l) conj(ldc)
-```
+4. 假设有下列变量声明：  
 
+   ```C
+   int i;  
+   float f;  
+   double d;  
+   long double ld;  
+   float complex fc;
+   double complex dc;  
+   long double complex ldc; 
+   ```
 
+    下面都是<tgmath.h>中的宏的调用，请给出预处理（用<math.h>或<complex.h>中的函数替代宏）之后的形式。
+
+   ```C
+   (a) tan(i)  
+   (b) fabs(f)  
+   (c) asin(d)  
+   (d) exp(ld) 
+   (e) log(fc)  
+   (f) acosh(dc)  
+   (g) nexttoward(d,ld)  
+   (h) remainder(f, i)  
+   (i) copysign(d, ld)  
+   (j) carg(i)  
+   (k) cimag(f)  
+   (l) conj(ldc)
+   ```
+
+   
 
 ### 编程题
 
-1. 对27.4节的quadratic.c程序做如下修改。 
+1. \<C99>对27.4节的quadratic.c程序做如下修改。 
    (a) 让用户输入多项式的系数（变量a、b、c的值）。  
-   (b) 让程序在显示根的值之前对判别式进行测试。
-   如果判别式为负，按以前的方式显示根的值；如果判别式非 负，以实数（无虚部）的形式显示根的值。例如，如果二次方程为x2+x2=0，那么程序的输出为  root1 = 1  root2 = -2  (c) 修改程序，使得虚部为负的复数的显示形式为abi而不是a+bi。例如，程序使用原始系数的输出将变为  root1 = -0.2 + 0.4i  root2 = -0.2 – 0.4i  
+   (b) 让程序在显示根的值之前对判别式进行测试。如果判别式为负，按以前的方式显示根的值；如果判别式非 负，以实数（无虚部）的形式显示根的值。例如，如果二次方程为$x^2+x-2=0$，那么程序的输出为  
 
-2. 编写程序，把用笛卡儿坐标表示的复数转换为极坐标形式。用户输入a和b（复数的实部和虚部），程序 显示r和θ的值。  
+   ```
+   root1 = 1  
+   root2 = -2  
+   ```
 
-3. 编写程序，把用极坐标表示的复数转换为笛卡儿形式。用户输入r和θ的值，程序以a+bi的形式显 示该数，其中  a = r cosθ  b = r sin θ  4. 编写程序，当给定正整数n时显示单位元素（unity，幺元）的n次方根。单位元素的n次方根由公式 e2πik/n 给出，其中 k是$0-(n-1)$范围内的整数。 
+   (c) 修改程序，使得虚部为负的复数的显示形式为$a-bi$而不是$a+-bi$。例如，程序使用原始系数的输出将变为  
+
+   ```
+   root1 = -0.2 + 0.4i  
+   root2 = -0.2 – 0.4i
+   ```
+
+2. 编写程序，把用笛卡儿坐标表示的复数转换为极坐标形式。用户输入a和b（复数的实部和虚部），程序显示r和θ的值。  
+
+3. 编写程序，把用极坐标表示的复数转换为笛卡儿形式。用户输入r和θ的值，程序以$a+bi$的形式显示该数，其中  
+   $a = r cosθ$
+   $b = r sin θ$  
+
+4. 编写程序，当给定正整数$n$时显示单位元素（unity，幺元）的$n$次方根。单位元素的$n$次方根由公式 $e^{2πik/n}$ 给出，其中 $k$是$0 \textasciitilde (n-1)$范围内的整数。 
 
 ## 第二十八章 C1*X* 新增的多线程和原子操作支持
 
@@ -15719,10 +16664,11 @@ White advanced!
 1. 给定以下代码，主线程main中的断言有可能触发吗？  
 
    ```C
-   #include
-   #include
-   #include
-   #include
+   # include <stdio.h> 
+   # include <assert.h> 
+   # include <threads.h> 
+   # include <stdatomic.h>
+   
    atomic_int x = 0, y = 0, z = 0;
    int w_x(void *arg)
    {
@@ -15773,5 +16719,5 @@ White advanced!
 
 1. 用原子操作函数atomic_fetch_add和atomic_fetch_sub改写前面的atomic.c，使之同样能够避免 数据竞争。  
 
-2. 统计$1~1 000 000 000$的所有整数中，各数位之和为奇数的有几个。要求：先用一个线程来统计并打印 所用的时间，再用10个线程分段各自统计并打印总体所用的时间。 
+2. 统计$1 \textasciitilde 1 000 000 000$的所有整数中，各数位之和为奇数的有几个。要求：先用一个线程来统计并打印所用的时间，再用10个线程分段各自统计并打印总体所用的时间。 
 
